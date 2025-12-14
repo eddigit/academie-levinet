@@ -124,50 +124,102 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Audiences Section */}
-      <section className="py-20 px-6 bg-background">
+      {/* Audiences Section - Obsidian Glass Design */}
+      <section className="py-24 px-6 bg-background">
         <div className="container mx-auto">
-          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-16 tracking-wide">
-            Pour Qui ?
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div className="stat-card hover:scale-105 transition-transform duration-300">
-              <Users className="w-12 h-12 text-accent mb-4" strokeWidth={1} />
-              <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Grand Public</h4>
-              <p className="text-text-secondary font-manrope leading-relaxed mb-4">
-                Hommes, femmes, enfants : développez votre confiance et votre sécurité personnelle
-              </p>
-              <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Techniques efficaces et réalistes</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Discipline et respect</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Gestion des conflits</li>
-              </ul>
+          <div className="mb-16 max-w-3xl">
+            <h3 className="font-oswald text-5xl md:text-6xl font-bold uppercase tracking-tight text-text-primary mb-4">
+              Pour <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">Qui ?</span>
+            </h3>
+            <div className="h-1 w-24 bg-accent mb-6" />
+            <p className="font-manrope text-lg text-text-secondary">
+              L'Académie Jacques Levinet propose des formations adaptées à chaque profil, du débutant au professionnel aguerri.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {/* Grand Public Card */}
+            <div className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl transition-all duration-500 hover:shadow-accent/20">
+              <div 
+                className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
+                style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/m50t9hgn_Grand%20Public%20Card.jpeg)' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
+              
+              <div className="absolute inset-0 flex flex-col justify-end p-8">
+                <div className="relative translate-y-4 transform overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:bg-white/10">
+                  <div className="absolute left-0 top-0 h-full w-1 bg-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  
+                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
+                    Grand Public
+                  </h4>
+                  
+                  <p className="mt-3 font-manrope text-base text-gray-300 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-100">
+                    Hommes, femmes, enfants : développez votre confiance, forme physique et sécurité personnelle
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-2 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-200">
+                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-accent">Découvrir</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="stat-card hover:scale-105 transition-transform duration-300">
-              <Shield className="w-12 h-12 text-secondary mb-4" strokeWidth={1} />
-              <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Self-Défense Féminine</h4>
-              <p className="text-text-secondary font-manrope leading-relaxed mb-4">
-                SFJL : Reprenez le contrôle de votre sécurité avec empowerment
-              </p>
-              <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Scénarios réalistes adaptés</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Confiance en soi</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Sans agressivité excessive</li>
-              </ul>
+            {/* Self-Défense Féminine Card */}
+            <div className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl transition-all duration-500 hover:shadow-secondary/20">
+              <div 
+                className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
+                style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg)' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
+              
+              <div className="absolute inset-0 flex flex-col justify-end p-8">
+                <div className="relative translate-y-4 transform overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:bg-white/10">
+                  <div className="absolute left-0 top-0 h-full w-1 bg-secondary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  
+                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
+                    Self-Défense Féminine
+                  </h4>
+                  
+                  <p className="mt-3 font-manrope text-base text-gray-300 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-100">
+                    SFJL : Techniques spécifiques pour l'autonomie et la sécurité des femmes dans un environnement bienveillant
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-2 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-200">
+                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-secondary">En savoir plus</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="stat-card hover:scale-105 transition-transform duration-300">
-              <Globe className="w-12 h-12 text-primary mb-4" strokeWidth={1} />
-              <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Professionnels</h4>
-              <p className="text-text-secondary font-manrope leading-relaxed mb-4">
-                IPC/ROS : Formation opérationnelle pour forces de l'ordre
-              </p>
-              <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Validé par unités d'élite (ERIS, Spetsnaz)</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Expertise terrain</li>
-                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Excellence opérationnelle</li>
-              </ul>
+            {/* Professionnels Card */}
+            <div className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl transition-all duration-500 hover:shadow-primary/20">
+              <div 
+                className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
+                style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/vjnvljgu_Professionnels%20Card.jpeg)' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
+              
+              <div className="absolute inset-0 flex flex-col justify-end p-8">
+                <div className="relative translate-y-4 transform overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:bg-white/10">
+                  <div className="absolute left-0 top-0 h-full w-1 bg-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  
+                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
+                    Professionnels
+                  </h4>
+                  
+                  <p className="mt-3 font-manrope text-base text-gray-300 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-100">
+                    IPC/ROS : Formation tactique avancée pour les forces de l'ordre et agents de sécurité
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-2 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-200">
+                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-primary">Formation Pro</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
