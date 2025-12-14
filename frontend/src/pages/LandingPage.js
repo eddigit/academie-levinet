@@ -185,6 +185,145 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Mapmonde - Communauté Mondiale */}
+      <section className="py-20 px-6 bg-background">
+        <div className="container mx-auto">
+          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-4 tracking-wide">
+            Présence Mondiale
+          </h3>
+          <p className="text-center text-text-secondary font-manrope text-lg mb-12 max-w-3xl mx-auto">
+            L'Académie Jacques Levinet est représentée sur tous les continents avec des directeurs techniques et clubs affiliés
+          </p>
+          <div className="max-w-6xl mx-auto">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/arc2qkzs_AJL-WKMO-IPC-WORLDWIDE-NETWORK-2048x1120.jpg"
+              alt="Réseau mondial de l'Académie Jacques Levinet"
+              className="w-full rounded-lg border border-white/10"
+            />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
+            <div className="text-center">
+              <p className="text-4xl font-oswald font-bold text-primary mb-2">50+</p>
+              <p className="text-text-secondary font-manrope text-sm">Pays</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-oswald font-bold text-primary mb-2">200+</p>
+              <p className="text-text-secondary font-manrope text-sm">Directeurs Techniques</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-oswald font-bold text-primary mb-2">500+</p>
+              <p className="text-text-secondary font-manrope text-sm">Clubs</p>
+            </div>
+            <div className="text-center">
+              <p className="text-4xl font-oswald font-bold text-primary mb-2">50K+</p>
+              <p className="text-text-secondary font-manrope text-sm">Membres</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cours en Ligne */}
+      <section className="py-20 px-6 bg-paper">
+        <div className="container mx-auto">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h3 className="font-oswald text-4xl font-bold text-text-primary uppercase mb-6 tracking-wide">
+                  Formations en Ligne
+                </h3>
+                <p className="text-text-secondary font-manrope text-lg mb-6 leading-relaxed">
+                  Accédez à une bibliothèque complète de cours vidéo pour vous former où que vous soyez, à votre rythme.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary text-xl">✓</span>
+                    <div>
+                      <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-1">Cours Vidéo HD</h5>
+                      <p className="text-text-secondary font-manrope text-sm">Techniques détaillées filmées sous tous les angles</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary text-xl">✓</span>
+                    <div>
+                      <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-1">Programmes Structurés</h5>
+                      <p className="text-text-secondary font-manrope text-sm">Progressions adaptées à chaque niveau</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-primary text-xl">✓</span>
+                    <div>
+                      <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-1">Manuels Numériques</h5>
+                      <p className="text-text-secondary font-manrope text-sm">Support papier et vidéo téléchargeables</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div className="relative">
+                <div className="stat-card p-8 text-center">
+                  <div className="text-6xl mb-4">🎥</div>
+                  <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-4">E-Learning SPK</h4>
+                  <p className="text-text-secondary font-manrope mb-6">
+                    Rejoignez des milliers d'élèves qui se forment en ligne
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                      <p className="text-3xl font-oswald font-bold text-primary">100+</p>
+                      <p className="text-xs text-text-muted font-manrope">Cours Vidéo</p>
+                    </div>
+                    <div>
+                      <p className="text-3xl font-oswald font-bold text-primary">24/7</p>
+                      <p className="text-xs text-text-muted font-manrope">Accès Illimité</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Encart Défense Féminine */}
+      <section className="py-20 px-6 bg-gradient-to-br from-secondary/10 to-accent/10 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-64 h-64 bg-secondary rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent rounded-full blur-3xl"></div>
+        </div>
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-block px-4 py-2 bg-secondary/20 rounded-full mb-6">
+              <span className="text-secondary font-oswald text-sm uppercase tracking-wide">Spécial Femmes</span>
+            </div>
+            <h3 className="font-oswald text-5xl font-bold text-text-primary uppercase mb-6 tracking-wide">
+              Self-Défense Féminine
+            </h3>
+            <p className="text-xl text-text-secondary font-manrope mb-8 leading-relaxed">
+              Reprenez le Contrôle de Votre Sécurité
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+                <div className="text-4xl mb-3">💪</div>
+                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Empowerment</h5>
+                <p className="text-text-secondary font-manrope text-sm">Développez votre confiance et votre force intérieure</p>
+              </div>
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+                <div className="text-4xl mb-3">🎯</div>
+                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Scénarios Réalistes</h5>
+                <p className="text-text-secondary font-manrope text-sm">Techniques adaptées aux situations réelles</p>
+              </div>
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+                <div className="text-4xl mb-3">🛡️</div>
+                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Sans Agressivité</h5>
+                <p className="text-text-secondary font-manrope text-sm">Pratique sûre et respectueuse</p>
+              </div>
+            </div>
+            <p className="text-lg text-text-primary/90 font-manrope mb-8 max-w-2xl mx-auto">
+              <strong>Dans un contexte où la sécurité personnelle est plus importante que jamais</strong>, 
+              le programme SFJL vous donne les outils pour vous défendre efficacement tout en respectant votre bien-être.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Valeurs Section */}
       <section className="py-20 px-6 bg-paper">
         <div className="container mx-auto max-w-4xl">
