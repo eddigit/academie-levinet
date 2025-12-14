@@ -260,7 +260,9 @@ const LandingPage = () => {
               </div>
               <div className="relative">
                 <div className="stat-card p-8 text-center">
-                  <div className="text-6xl mb-4">🎥</div>
+                  <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Video className="w-10 h-10 text-primary" strokeWidth={1} />
+                  </div>
                   <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-4">E-Learning SPK</h4>
                   <p className="text-text-secondary font-manrope mb-6">
                     Rejoignez des milliers d'élèves qui se forment en ligne
