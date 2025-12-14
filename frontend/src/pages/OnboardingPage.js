@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, User, UserCircle, Shield, ShieldCheck, Sparkles, Activity, Briefcase, Home, Target } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import axios from 'axios';
 import { toast } from 'sonner';
+
+// Icon mapping
+const iconComponents = {
+  User, UserCircle, Baby: User, Shield, ShieldCheck, Sparkles, Activity, Briefcase, Home, Target
+};
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${API_URL}/api`;
