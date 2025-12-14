@@ -49,6 +49,18 @@ class BeltGrade(str, Enum):
     BROWN = "Ceinture Marron"
     BLACK = "Ceinture Noire"
 
+class LeadPersonType(str, Enum):
+    WOMAN = "Femme"
+    MAN = "Homme"
+    CHILD = "Enfant"
+    PROFESSIONAL = "Professionnel"
+
+class LeadStatus(str, Enum):
+    NEW = "Nouveau"
+    CONTACTED = "Contacté"
+    CONVERTED = "Converti"
+    NOT_INTERESTED = "Non intéressé"
+
 # Models
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
