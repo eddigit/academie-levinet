@@ -185,6 +185,45 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Valeurs Section */}
+      <section className="py-20 px-6 bg-paper">
+        <div className="container mx-auto max-w-4xl">
+          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-8 tracking-wide">
+            Pourquoi Choisir le SPK ?
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
+              <div className="text-primary text-3xl">✓</div>
+              <div>
+                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Méthode Brevetée</h5>
+                <p className="text-text-secondary font-manrope text-sm">SPK - Self Pro Krav, validé et reconnu internationalement</p>
+              </div>
+            </div>
+            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
+              <div className="text-primary text-3xl">✓</div>
+              <div>
+                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Efficacité Réaliste</h5>
+                <p className="text-text-secondary font-manrope text-sm">Basé sur l'instinct de survie et les réflexes innés</p>
+              </div>
+            </div>
+            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
+              <div className="text-primary text-3xl">✓</div>
+              <div>
+                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Pratique Sécurisée</h5>
+                <p className="text-text-secondary font-manrope text-sm">Garde-fous éthiques pour une formation responsable</p>
+              </div>
+            </div>
+            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
+              <div className="text-primary text-3xl">✓</div>
+              <div>
+                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Communauté Mondiale</h5>
+                <p className="text-text-secondary font-manrope text-sm">Réseau international de directeurs techniques</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section 
         className="py-20 px-6 relative" 
@@ -197,18 +236,20 @@ const LandingPage = () => {
       >
         <div className="container mx-auto text-center max-w-3xl">
           <h3 className="font-oswald text-4xl md:text-5xl font-bold text-text-primary uppercase mb-6 tracking-wide">
-            Rejoignez le Mouvement SPK
+            Maîtrisez l'Autodéfense la Plus Réaliste au Monde
           </h3>
           <p className="text-lg text-text-secondary font-manrope mb-10 leading-relaxed">
-            Académie Jacques Levinet - L'excellence en Self-Pro Krav partout dans le monde
+            Rejoignez l'Académie Jacques Levinet et développez votre confiance, votre sécurité et vos capacités
           </p>
-          <Link 
-            to="/login" 
-            data-testid="cta-button"
-            className="inline-block px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-lg tracking-wider rounded-sm transition-smooth glow-effect"
-          >
-            Commencer Maintenant
-          </Link>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link 
+              to="/login" 
+              data-testid="cta-button"
+              className="inline-block px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-lg tracking-wider rounded-sm transition-smooth glow-effect"
+            >
+              Devenir Membre
+            </Link>
+          </div>
         </div>
       </section>
 
