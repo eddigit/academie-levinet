@@ -218,7 +218,7 @@ async def login(credentials: UserLogin):
 
 @api_router.get("/auth/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
-    return {k: v for k, v in current_user.items() if k != 'password_hash'}
+    return {k: v for k, v in current_user.items() if k != 'password_hash' and k != '_id'}
 
 # Technical Directors Routes
 @api_router.post("/technical-directors", response_model=TechnicalDirector)
