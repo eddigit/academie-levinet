@@ -239,6 +239,77 @@ class NewsUpdate(BaseModel):
     status: Optional[NewsStatus] = None
     image_url: Optional[str] = None
 
+class Event(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    event_type: EventType
+    start_date: str
+    end_date: str
+    start_time: str
+    end_time: str
+    location: str
+    city: str
+    country: str
+    instructor: Optional[str] = None
+    max_participants: Optional[int] = None
+    current_participants: int = 0
+    price: float = 0.0
+    image_url: Optional[str] = None
+    status: EventStatus = EventStatus.UPCOMING
+    created_by: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class EventCreate(BaseModel):
+    title: str
+    description: str
+    event_type: EventType
+    start_date: str
+    end_date: str
+    start_time: str
+    end_time: str
+    location: str
+    city: str
+    country: str
+    instructor: Optional[str] = None
+    max_participants: Optional[int] = None
+    price: float = 0.0
+    image_url: Optional[str] = None
+
+class EventUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    event_type: Optional[EventType] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    start_time: Optional[str] = None
+    end_time: Optional[str] = None
+    location: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    instructor: Optional[str] = None
+    max_participants: Optional[int] = None
+    price: Optional[float] = None
+    image_url: Optional[str] = None
+    status: Optional[EventStatus] = None
+
+class EventRegistration(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    event_id: str
+    member_id: str
+    member_name: str
+    member_email: str
+    registration_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    status: str = "Confirmé"
+    payment_status: str = "En attente"
+
+class EventRegistrationCreate(BaseModel):
+    event_id: str
+    member_id: str
+
 class DashboardStats(BaseModel):
     total_members: int
     total_revenue: float
