@@ -1,148 +1,94 @@
 {
-  "identity": {
-    "persona": "E1",
-    "mission": "Create a top 1% martial arts CRM that feels like a high-tech control room for a global defense academy.",
-    "principles": [
-      "Fusion: Military Precision x Swiss Design",
-      "Emotion: Discipline, Strength, Global Reach",
-      "Content: Data is the weapon; display it with lethal clarity",
-      "Contrast: Deep shadows vs. Electric signals"
-    ]
-  },
-  "typography": {
-    "fonts": {
-      "heading": {
-        "family": "Oswald",
-        "url": "https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;700&display=swap",
-        "usage": "Headings, Stats, Navigation, Buttons",
-        "weights": ["400", "500", "700"]
+  "design_system": {
+    "identity": {
+      "name": "E1 - The Anti-AI Designer",
+      "core_philosophy": "Fusion over Imitation. Emotion First. Content is King.",
+      "anti_patterns": [
+        "No generic purple/teal gradients",
+        "No 'Inter' font for headings",
+        "No centered layouts without tension",
+        "No 'Bootstrap' column grids"
+      ]
+    },
+    "typography": {
+      "headings": {
+        "font_family": "Oswald, sans-serif",
+        "weights": ["700"],
+        "tracking": "tracking-tight",
+        "usage": "All section titles, card headers, and impact text."
       },
       "body": {
-        "family": "Manrope",
-        "url": "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap",
-        "usage": "Body text, Tables, Inputs, Tooltips",
-        "weights": ["400", "500", "600", "700"]
+        "font_family": "Manrope, sans-serif",
+        "weights": ["400", "500"],
+        "usage": "Paragraphs, descriptions, UI elements."
       }
     },
-    "rules": [
-      "Headings (Oswald) must be uppercase for H1 and H2 to convey authority.",
-      "Use tracking-wide for all small caps labels.",
-      "Body text (Manrope) should have relaxed line-height (1.6) for readability in dense tables."
-    ]
-  },
-  "colors": {
-    "palette": {
-      "background": {
-        "default": "#0B1120",
-        "paper": "#111827",
-        "subtle": "#1F2937"
-      },
-      "primary": {
-        "main": "#3B82F6",
-        "light": "#60A5FA",
-        "dark": "#2563EB",
-        "contrast": "#FFFFFF"
-      },
-      "secondary": {
-        "main": "#EF4444",
-        "light": "#F87171",
-        "dark": "#DC2626",
-        "contrast": "#FFFFFF"
-      },
-      "accent": {
-        "main": "#F97316",
-        "glow": "rgba(249, 115, 22, 0.5)"
-      },
-      "text": {
-        "primary": "#F3F4F6",
-        "secondary": "#9CA3AF",
-        "muted": "#6B7280"
-      },
-      "border": {
-        "default": "#374151",
-        "active": "#3B82F6"
+    "colors": {
+      "background": "#0B1120",
+      "surface": "#111827",
+      "primary": "#3B82F6",
+      "accent": "#F97316",
+      "text_primary": "#F3F4F6",
+      "text_muted": "#9CA3AF",
+      "glass_border": "rgba(255, 255, 255, 0.1)"
+    },
+    "visual_enhancers": {
+      "glassmorphism": "backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]",
+      "gradients": {
+        "overlay": "bg-gradient-to-t from-black/90 via-black/40 to-transparent",
+        "hover_glow": "bg-gradient-to-tr from-accent/20 to-transparent"
       }
-    },
-    "gradients": {
-      "hero": "linear-gradient(135deg, #0B1120 0%, #111827 100%)",
-      "card": "linear-gradient(180deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.8) 100%)",
-      "glow": "radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%)"
-    }
-  },
-  "visual_enhancers": {
-    "glassmorphism": {
-      "sidebar": "backdrop-filter: blur(12px); background: rgba(11, 17, 32, 0.85); border-right: 1px solid rgba(255,255,255,0.05);",
-      "card": "backdrop-filter: blur(8px); background: rgba(31, 41, 55, 0.4); border: 1px solid rgba(255,255,255,0.05);"
-    },
-    "shadows": {
-      "card": "0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)",
-      "glow": "0 0 15px rgba(59, 130, 246, 0.3)"
-    },
-    "borders": {
-      "default": "1px solid rgba(75, 85, 99, 0.4)",
-      "active": "1px solid #3B82F6"
-    }
-  },
-  "layout": {
-    "grid_system": {
-      "dashboard": "grid grid-cols-1 md:grid-cols-12 gap-6",
-      "card_spans": {
-        "stats": "col-span-12 md:col-span-6 lg:col-span-3",
-        "main_chart": "col-span-12 lg:col-span-8",
-        "side_list": "col-span-12 lg:col-span-4"
-      }
-    },
-    "spacing": {
-      "container_padding": "p-6 md:p-8 lg:p-10",
-      "section_gap": "gap-8"
     }
   },
   "components": {
-    "buttons": {
-      "primary": "bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider rounded-sm shadow-glow transition-all duration-300",
-      "secondary": "bg-transparent border border-primary text-primary hover:bg-primary/10 font-oswald uppercase tracking-wider rounded-sm transition-all duration-300",
-      "danger": "bg-secondary/10 border border-secondary/50 text-secondary hover:bg-secondary/20 font-oswald uppercase tracking-wider rounded-sm"
+    "TargetAudienceCard": {
+      "description": "A high-impact, glassmorphic card with hover-reveal interactions.",
+      "structure": "React Functional Component",
+      "props": {
+        "title": "string",
+        "description": "string",
+        "image": "string",
+        "cta": "string"
+      },
+      "code_snippet": "export function TargetAudienceCard({ title, description, image, cta }) {\n  return (\n    <div className=\"group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl transition-all duration-500 hover:shadow-accent/20\">\n      {/* Background Image with Zoom Effect */}\n      <div \n        className=\"absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110\"\n        style={{ backgroundImage: `url(${image})` }}\n      />\n      \n      {/* Gradient Overlay - Always visible but intensifies on hover */}\n      <div className=\"absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90\" />\n\n      {/* Content Container */}\n      <div className=\"absolute inset-0 flex flex-col justify-end p-8\">\n        {/* Floating Glass Pane for Text */}\n        <div className=\"relative translate-y-4 transform overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:bg-white/10\">\n          \n          {/* Decorative Accent Line */}\n          <div className=\"absolute left-0 top-0 h-full w-1 bg-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100\" />\n\n          <h3 className=\"font-oswald text-3xl font-bold uppercase tracking-tight text-white\">\n            {title}\n          </h3>\n          \n          <p className=\"mt-3 font-manrope text-base text-gray-300 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-100\">\n            {description}\n          </p>\n\n          <div className=\"mt-6 flex items-center gap-2 opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:delay-200\">\n            <span className=\"font-oswald text-sm font-bold uppercase tracking-wider text-accent\">{cta}</span>\n            <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"2\" strokeLinecap=\"round\" strokeLinejoin=\"round\" className=\"text-accent\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg>\n          </div>\n        </div>\n      </div>\n    </div>\n  );\n}"
     },
-    "cards": {
-      "base": "bg-card/40 backdrop-blur-md border border-white/5 rounded-lg p-6 shadow-card hover:border-primary/30 transition-colors duration-300",
-      "interactive": "cursor-pointer hover:-translate-y-1 transition-transform duration-300"
-    },
-    "inputs": {
-      "style": "bg-background/50 border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-md text-white placeholder:text-muted-foreground"
+    "TargetAudienceSection": {
+      "description": "The container section for the cards.",
+      "code_snippet": "export default function TargetAudienceSection() {\n  const audiences = [\n    {\n      title: \"Grand Public\",\n      description: \"Des cours adaptés à tous les niveaux pour développer confiance, forme physique et sérénité.\",\n      image: \"https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/m50t9hgn_Grand%20Public%20Card.jpeg\",\n      cta: \"Découvrir\"\n    },\n    {\n      title: \"Self-Défense Féminine\",\n      description: \"Techniques spécifiques pour l'autonomie et la sécurité des femmes dans un environnement bienveillant.\",\n      image: \"https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg\",\n      cta: \"En savoir plus\"\n    },\n    {\n      title: \"Professionnels\",\n      description: \"Formation tactique avancée pour les forces de l'ordre et agents de sécurité.\",\n      image: \"https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/vjnvljgu_Professionnels%20Card.jpeg\",\n      cta: \"Formation Pro\"\n    }\n  ];\n\n  return (\n    <section className=\"relative w-full bg-[#0B1120] py-24\">\n      <div className=\"container mx-auto px-4\">\n        <div className=\"mb-16 max-w-3xl\">\n          <h2 className=\"font-oswald text-5xl font-bold uppercase tracking-tight text-white md:text-6xl\">\n            Pour <span className=\"text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-300\">Qui ?</span>\n          </h2>\n          <div className=\"mt-4 h-1 w-24 bg-accent\" />\n          <p className=\"mt-6 font-manrope text-lg text-gray-400\">\n            L'Académie Jacques Levinet propose des formations adaptées à chaque profil, du débutant au professionnel aguerri.\n          </p>\n        </div>\n\n        <div className=\"grid gap-8 md:grid-cols-2 lg:grid-cols-3\">\n          {audiences.map((item, index) => (\n            <TargetAudienceCard key={index} {...item} />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}"
     }
   },
-  "images": {
-    "hero_bg": {
-      "url": "https://images.unsplash.com/photo-1740895307943-7878df384db1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODF8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBneW0lMjBpbnRlcmlvciUyMGRhcmt8ZW58MHx8fHwxNzY1NzM2Njg3fDA&ixlib=rb-4.1.0&q=85",
-      "alt": "Dark modern gym interior",
-      "usage": "Landing page hero background with heavy overlay"
-    },
-    "action_shot": {
-      "url": "https://images.unsplash.com/photo-1644594570589-ef85bd03169f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxrcmF2JTIwbWFnYSUyMHRyYWluaW5nJTIwY2xhc3N8ZW58MHx8fHwxNzY1NzM2Njg0fDA&ixlib=rb-4.1.0&q=85",
-      "alt": "Sparring session",
-      "usage": "About section or Login page side image"
-    },
-    "logo": {
-      "url": "https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/e712cc50_LOGO-WORLD-KRAV-MAGA-ORGANIZATION-150x150.png",
-      "alt": "Academie Jacques Levinet Logo",
-      "usage": "Sidebar top, Login header"
-    }
+  "assets": {
+    "images": [
+      {
+        "name": "Grand Public",
+        "url": "https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/m50t9hgn_Grand%20Public%20Card.jpeg"
+      },
+      {
+        "name": "Self-Défense Féminine",
+        "url": "https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg"
+      },
+      {
+        "name": "Professionnels",
+        "url": "https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/vjnvljgu_Professionnels%20Card.jpeg"
+      }
+    ]
   },
   "instructions_to_main_agent": [
-    "1. SETUP: Install 'Oswald' and 'Manrope' fonts immediately in index.css.",
-    "2. THEME: Override tailwind.config.js colors with the specific hex codes provided in 'colors' section. Do not rely on default slate/zinc.",
-    "3. LAYOUT: Implement the 'Control Room' grid for the dashboard. Avoid simple single-column layouts.",
-    "4. COMPONENTS: Customize Shadcn components. Remove rounded-xl, use rounded-md or rounded-sm for a sharper, more military feel.",
-    "5. GLASSMORPHISM: Apply the glassmorphism styles to the Sidebar and Sticky Headers.",
-    "6. IMAGES: Use the provided image URLs. Do not use placeholders.",
-    "7. TESTID: Add data-testid to all interactive elements."
+    "Implement the 'TargetAudienceCard' component exactly as provided in the code snippet.",
+    "Ensure 'Oswald' and 'Manrope' fonts are loaded in index.css (already present).",
+    "Use the provided image URLs for the respective cards.",
+    "Do not modify the color palette; stick to the #0B1120 background.",
+    "Ensure the hover effects are smooth (duration-500 or duration-700).",
+    "The 'glassmorphism' effect is achieved via Tailwind utility classes in the snippet (backdrop-blur-md, bg-white/5, etc.)."
   ],
-  "universal_guidelines": [
-    "Do not use gradients for text.",
-    "Avoid 'Inter' font.",
-    "Use 2-3x more spacing than typical.",
-    "Always add hover states with text color changes.",
-    "Never use pure black (#000000). Use the provided #0B1120.",
-    "Ensure all text has sufficient contrast (WCAG AA)."
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Avoid this.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: 'transition: all'.",
+    "You MUST NOT center align the app container.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations.",
+    "NEVER use AI assistant Emoji characters."
   ]
 }
