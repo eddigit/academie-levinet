@@ -547,6 +547,97 @@ async def delete_lead(lead_id: str, current_user: dict = Depends(get_current_use
         raise HTTPException(status_code=404, detail="Lead not found")
     return {"message": "Lead deleted successfully"}
 
+# News Routes
+@api_router.post("/news", response_model=News)
+async def create_news(news_data: NewsCreate, current_user: dict = Depends(get_current_user)):
+    news_dict = news_data.model_dump()
+    news_dict['author_id'] = current_user['id']
+    news_dict['author_name'] = current_user['full_name']
+    
+    if news_data.status == NewsStatus.PUBLISHED:
+        news_dict['published_at'] = datetime.now(timezone.utc).isoformat()
+    
+    news = News(**news_dict)
+    doc = news.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    if doc.get('published_at'):
+        doc['published_at'] = doc['published_at'].isoformat()
+    
+    await db.news.insert_one(doc)
+    return news
+
+@api_router.get("/news", response_model=List[News])
+async def get_news(
+    status: Optional[str] = None,
+    category: Optional[str] = None,
+    limit: int = 100
+):
+    query = {}
+    if status:
+        query['status'] = status
+    if category:
+        query['category'] = category
+    
+    news_list = await db.news.find(query, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+    for news in news_list:
+        if isinstance(news.get('created_at'), str):
+            news['created_at'] = datetime.fromisoformat(news['created_at'])
+        if isinstance(news.get('updated_at'), str):
+            news['updated_at'] = datetime.fromisoformat(news['updated_at'])
+        if news.get('published_at') and isinstance(news.get('published_at'), str):
+            news['published_at'] = datetime.fromisoformat(news['published_at'])
+    return news_list
+
+@api_router.get("/news/{news_id}", response_model=News)
+async def get_news_item(news_id: str):
+    news = await db.news.find_one({"id": news_id}, {"_id": 0})
+    if not news:
+        raise HTTPException(status_code=404, detail="News not found")
+    
+    # Increment views
+    await db.news.update_one({"id": news_id}, {"$inc": {"views": 1}})
+    news['views'] += 1
+    
+    if isinstance(news.get('created_at'), str):
+        news['created_at'] = datetime.fromisoformat(news['created_at'])
+    if isinstance(news.get('updated_at'), str):
+        news['updated_at'] = datetime.fromisoformat(news['updated_at'])
+    if news.get('published_at') and isinstance(news.get('published_at'), str):
+        news['published_at'] = datetime.fromisoformat(news['published_at'])
+    return news
+
+@api_router.put("/news/{news_id}", response_model=News)
+async def update_news(news_id: str, news_data: NewsUpdate, current_user: dict = Depends(get_current_user)):
+    update_data = {k: v for k, v in news_data.model_dump().items() if v is not None}
+    update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    # If changing status to published, set published_at
+    if news_data.status == NewsStatus.PUBLISHED:
+        existing = await db.news.find_one({"id": news_id}, {"_id": 0})
+        if existing and not existing.get('published_at'):
+            update_data['published_at'] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.news.update_one({"id": news_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="News not found")
+    
+    updated = await db.news.find_one({"id": news_id}, {"_id": 0})
+    if isinstance(updated.get('created_at'), str):
+        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
+    if isinstance(updated.get('updated_at'), str):
+        updated['updated_at'] = datetime.fromisoformat(updated['updated_at'])
+    if updated.get('published_at') and isinstance(updated.get('published_at'), str):
+        updated['published_at'] = datetime.fromisoformat(updated['published_at'])
+    return updated
+
+@api_router.delete("/news/{news_id}")
+async def delete_news(news_id: str, current_user: dict = Depends(get_current_user)):
+    result = await db.news.delete_one({"id": news_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="News not found")
+    return {"message": "News deleted successfully"}
+
 app.include_router(api_router)
 
 app.add_middleware(
