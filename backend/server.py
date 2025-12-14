@@ -75,6 +75,20 @@ class NewsStatus(str, Enum):
     DRAFT = "Brouillon"
     PUBLISHED = "Publié"
 
+class EventType(str, Enum):
+    STAGE = "Stage"
+    COURSE = "Cours"
+    COMPETITION = "Compétition"
+    EXAM = "Examen de Grade"
+    SEMINAR = "Séminaire"
+    WORKSHOP = "Workshop"
+
+class EventStatus(str, Enum):
+    UPCOMING = "À venir"
+    ONGOING = "En cours"
+    COMPLETED = "Terminé"
+    CANCELLED = "Annulé"
+
 # Models
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
