@@ -10,6 +10,7 @@ import MemberDetailPage from './pages/MemberDetailPage';
 import TechnicalDirectorsPage from './pages/TechnicalDirectorsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import LeadsPage from './pages/LeadsPage';
+import NewsPage from './pages/NewsPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
