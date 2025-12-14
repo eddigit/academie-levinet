@@ -196,10 +196,12 @@ async def register(user_data: UserCreate):
     doc = user.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     
-    await db.users.insert_one(doc)
+    # Create a clean copy without _id for insertion
+    insert_doc = {k: v for k, v in doc.items()}
+    await db.users.insert_one(insert_doc)
     
     token = create_token(user.id, user.email)
-    user_response = {k: v for k, v in doc.items() if k != 'password_hash'}
+    user_response = {k: v for k, v in doc.items() if k != 'password_hash' and k != '_id'}
     
     return {"token": token, "user": user_response}
 
