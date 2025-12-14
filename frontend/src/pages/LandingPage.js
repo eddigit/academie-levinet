@@ -147,16 +147,18 @@ const LandingPage = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
               
               <div className="absolute inset-0 flex flex-col justify-end p-8">
-                <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-md transition-all duration-500 group-hover:bg-white/15">
+                <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-md transition-all duration-500 group-hover:bg-white/15 min-h-[200px] flex flex-col justify-between">
                   <div className="absolute left-0 top-0 h-full w-1 bg-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   
-                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
-                    Grand Public
-                  </h4>
-                  
-                  <p className="mt-3 font-manrope text-base text-gray-300 transition-all duration-300">
-                    Hommes, femmes, enfants : développez votre confiance, forme physique et sécurité personnelle
-                  </p>
+                  <div>
+                    <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
+                      Grand Public
+                    </h4>
+                    
+                    <p className="mt-3 font-manrope text-base text-gray-300 transition-all duration-300">
+                      Développez confiance, forme physique et sécurité pour toute la famille
+                    </p>
+                  </div>
 
                   <div className="mt-6 flex items-center gap-2 transition-all duration-300">
                     <span className="font-oswald text-sm font-bold uppercase tracking-wider text-accent">Découvrir</span>
