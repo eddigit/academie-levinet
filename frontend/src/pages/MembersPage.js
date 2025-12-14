@@ -115,7 +115,7 @@ const MembersPage = () => {
                 <Plus className="w-4 h-4 mr-2" /> Ajouter un Membre
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-paper border-border max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="add-member-modal">
+            <DialogContent className="bg-paper border-border max-w-2xl max-h-[90vh] overflow-y-auto z-50" data-testid="add-member-modal">
               <DialogHeader>
                 <DialogTitle className="font-oswald text-2xl text-text-primary uppercase">Nouveau Membre</DialogTitle>
               </DialogHeader>
