@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, UserCog, CreditCard, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, UserCog, CreditCard, LogOut, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
@@ -9,6 +9,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Tableau de Bord', testId: 'nav-dashboard' },
+    { path: '/leads', icon: UserPlus, label: 'Leads', testId: 'nav-leads' },
     { path: '/members', icon: Users, label: 'Membres', testId: 'nav-members' },
     { path: '/technical-directors', icon: UserCog, label: 'Directeurs Techniques', testId: 'nav-directors' },
     { path: '/subscriptions', icon: CreditCard, label: 'Cotisations', testId: 'nav-subscriptions' },
