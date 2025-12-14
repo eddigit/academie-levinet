@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Users, Award, Globe } from 'lucide-react';
+import { Shield, Users, Award, Globe, Video, CheckCircle, Target, Sparkles } from 'lucide-react';
 
 const LandingPage = () => {
   return (
