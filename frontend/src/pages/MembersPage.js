@@ -210,7 +210,7 @@ const MembersPage = () => {
                     <SelectTrigger data-testid="select-director" className="bg-background border-border text-text-primary">
                       <SelectValue placeholder="Sélectionner un directeur" />
                     </SelectTrigger>
-                    <SelectContent className="bg-paper border-border">
+                    <SelectContent className="bg-paper border-border z-[100]">
                       {directors.map((dir) => (
                         <SelectItem key={dir.id} value={dir.id} className="text-text-primary">
                           {dir.name} - {dir.city}
