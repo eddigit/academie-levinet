@@ -119,24 +119,27 @@ const OnboardingPage = () => {
                 Sélectionnez votre profil pour une expérience personnalisée
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {personTypes.map((type) => (
-                  <button
-                    key={type.value}
-                    data-testid={`person-type-${type.value.toLowerCase()}`}
-                    onClick={() => handlePersonTypeSelect(type.value)}
-                    className={`p-6 rounded-lg border-2 transition-all duration-300 text-left ${
-                      formData.person_type === type.value
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                  >
-                    <div className="text-4xl mb-3">{type.icon}</div>
-                    <h3 className="font-oswald text-xl font-bold text-text-primary uppercase mb-2">
-                      {type.label}
-                    </h3>
-                    <p className="text-text-secondary font-manrope text-sm">{type.description}</p>
-                  </button>
-                ))}
+                {personTypes.map((type) => {
+                  const IconComponent = iconComponents[type.icon];
+                  return (
+                    <button
+                      key={type.value}
+                      data-testid={`person-type-${type.value.toLowerCase()}`}
+                      onClick={() => handlePersonTypeSelect(type.value)}
+                      className={`p-6 rounded-lg border-2 transition-all duration-300 text-left ${
+                        formData.person_type === type.value
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <IconComponent className="w-12 h-12 mb-3 text-primary" strokeWidth={1} />
+                      <h3 className="font-oswald text-xl font-bold text-text-primary uppercase mb-2">
+                        {type.label}
+                      </h3>
+                      <p className="text-text-secondary font-manrope text-sm">{type.description}</p>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
