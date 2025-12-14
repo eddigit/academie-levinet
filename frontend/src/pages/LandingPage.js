@@ -78,51 +78,108 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Les 3 Piliers */}
       <section className="py-20 px-6 bg-paper" data-testid="features-section">
         <div className="container mx-auto">
-          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-16 tracking-wide">
-            Fonctionnalités Principales
+          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-4 tracking-wide">
+            Les 3 Piliers du SPK
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="stat-card text-center" data-testid="feature-card-members">
+          <p className="text-center text-text-secondary font-manrope text-lg mb-16 max-w-3xl mx-auto">
+            Self-Pro Krav : L'évolution responsable du Krav Maga, conçue pour tous
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="stat-card text-center" data-testid="feature-card-legitimite">
               <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-primary" />
+                <Award className="w-8 h-8 text-primary" />
               </div>
-              <h4 className="font-oswald text-xl font-bold text-text-primary uppercase mb-3">Gestion des Membres</h4>
-              <p className="text-text-secondary font-manrope leading-relaxed">
-                Suivez tous vos adhérents par pays, ville et directeur technique
+              <h4 className="font-oswald text-xl font-bold text-text-primary uppercase mb-3">Légitimité & Expertise</h4>
+              <p className="text-text-secondary font-manrope leading-relaxed mb-3">
+                Héritage du Capitaine Jacques Levinet, Champion du Monde de Karaté
+              </p>
+              <p className="text-text-muted font-manrope text-sm">
+                Méthode éprouvée et reconnue mondialement (WKMO, IPC)
               </p>
             </div>
 
-            <div className="stat-card text-center" data-testid="feature-card-directors">
+            <div className="stat-card text-center" data-testid="feature-card-securite">
               <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Globe className="w-8 h-8 text-secondary" />
+                <Shield className="w-8 h-8 text-secondary" />
               </div>
-              <h4 className="font-oswald text-xl font-bold text-text-primary uppercase mb-3">Réseau International</h4>
-              <p className="text-text-secondary font-manrope leading-relaxed">
-                Directeurs techniques dans le monde entier avec leurs salles
+              <h4 className="font-oswald text-xl font-bold text-text-primary uppercase mb-3">Sécurité & Éthique</h4>
+              <p className="text-text-secondary font-manrope leading-relaxed mb-3">
+                Évolution responsable du Krav Maga avec des "garde-fous" éthiques
+              </p>
+              <p className="text-text-muted font-manrope text-sm">
+                Une pratique sûre basée sur l'instinct de survie
               </p>
             </div>
 
-            <div className="stat-card text-center" data-testid="feature-card-grades">
+            <div className="stat-card text-center" data-testid="feature-card-accessibilite">
               <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-accent" />
+                <Users className="w-8 h-8 text-accent" />
               </div>
-              <h4 className="font-oswald text-xl font-bold text-text-primary uppercase mb-3">Grades & Performances</h4>
-              <p className="text-text-secondary font-manrope leading-relaxed">
-                Suivi des grades, ceintures et performances de chaque membre
+              <h4 className="font-oswald text-xl font-bold text-text-primary uppercase mb-3">Accessibilité & Communauté</h4>
+              <p className="text-text-secondary font-manrope leading-relaxed mb-3">
+                Conçue pour tous : hommes, femmes, enfants
+              </p>
+              <p className="text-text-muted font-manrope text-sm">
+                Esprit familial avec présence internationale forte
               </p>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="stat-card text-center" data-testid="feature-card-security">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-primary" />
+      {/* Audiences Section */}
+      <section className="py-20 px-6 bg-background">
+        <div className="container mx-auto">
+          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-16 tracking-wide">
+            Pour Qui ?
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div className="stat-card hover:scale-105 transition-transform duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent-glow rounded-full flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 text-white" />
               </div>
-              <h4 className="font-oswald text-xl font-bold text-text-primary uppercase mb-3">Plateforme Sécurisée</h4>
-              <p className="text-text-secondary font-manrope leading-relaxed">
-                Accès sécurisé avec gestion des droits et permissions
+              <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Grand Public</h4>
+              <p className="text-text-secondary font-manrope leading-relaxed mb-4">
+                Hommes, femmes, enfants : développez votre confiance et votre sécurité personnelle
               </p>
+              <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
+                <li>✓ Techniques efficaces et réalistes</li>
+                <li>✓ Discipline et respect</li>
+                <li>✓ Gestion des conflits</li>
+              </ul>
+            </div>
+
+            <div className="stat-card hover:scale-105 transition-transform duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-secondary to-secondary-light rounded-full flex items-center justify-center mb-4">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Self-Défense Féminine</h4>
+              <p className="text-text-secondary font-manrope leading-relaxed mb-4">
+                SFJL : Reprenez le contrôle de votre sécurité avec empowerment
+              </p>
+              <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
+                <li>✓ Scénarios réalistes adaptés</li>
+                <li>✓ Confiance en soi</li>
+                <li>✓ Sans agressivité excessive</li>
+              </ul>
+            </div>
+
+            <div className="stat-card hover:scale-105 transition-transform duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center mb-4">
+                <Globe className="w-8 h-8 text-white" />
+              </div>
+              <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Professionnels</h4>
+              <p className="text-text-secondary font-manrope leading-relaxed mb-4">
+                IPC/ROS : Formation opérationnelle pour forces de l'ordre
+              </p>
+              <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
+                <li>✓ Validé par unités d'élite (ERIS, Spetsnaz)</li>
+                <li>✓ Expertise terrain</li>
+                <li>✓ Excellence opérationnelle</li>
+              </ul>
             </div>
           </div>
         </div>
