@@ -58,11 +58,13 @@ const LandingPage = () => {
         {/* Content */}
         <div className="container mx-auto text-center max-w-4xl relative z-10">
           <h2 className="font-oswald text-5xl md:text-6xl lg:text-7xl font-bold text-text-primary uppercase mb-6 tracking-wide drop-shadow-2xl">
-            Excellence en Self-Défense
+            La Self-Défense Efficace, Réaliste et Sécurisée
           </h2>
-          <p className="text-xl md:text-2xl text-text-secondary font-manrope mb-12 leading-relaxed drop-shadow-lg">
-            La première plateforme mondiale de gestion pour l'Académie Jacques Levinet SPK.
-            Formez-vous avec les meilleurs directeurs techniques internationaux.
+          <p className="text-xl md:text-2xl text-text-secondary font-manrope mb-8 leading-relaxed drop-shadow-lg">
+            Validée par l'Expérience d'Élite du Capitaine Jacques Levinet
+          </p>
+          <p className="text-lg md:text-xl text-text-primary/90 font-manrope mb-12 leading-relaxed drop-shadow-lg max-w-3xl mx-auto">
+            Champion du Monde de Karaté · Capitaine de Gendarmerie · Méthode SPK Brevetée
           </p>
           <div className="flex gap-6 justify-center flex-wrap">
             <Link 
@@ -70,7 +72,7 @@ const LandingPage = () => {
               data-testid="hero-cta-button"
               className="px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-lg tracking-wider rounded-sm transition-smooth glow-effect"
             >
-              Accéder à la Plateforme
+              Rejoindre l'Académie
             </Link>
           </div>
         </div>
