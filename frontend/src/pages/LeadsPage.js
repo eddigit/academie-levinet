@@ -200,7 +200,10 @@ const LeadsPage = () => {
                     <tr key={lead.id} className="border-b border-white/5 hover:bg-white/5 transition-smooth" data-testid={`lead-row-${index}`}>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-2xl">{getPersonTypeIcon(lead.person_type)}</span>
+                          {React.createElement(getPersonTypeIcon(lead.person_type), { 
+                            className: "w-5 h-5 text-primary", 
+                            strokeWidth: 1.5 
+                          })}
                           <span className="text-text-primary font-manrope text-sm">{lead.person_type}</span>
                         </div>
                       </td>
