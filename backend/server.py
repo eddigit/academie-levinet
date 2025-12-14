@@ -191,6 +191,38 @@ class LeadCreate(BaseModel):
     city: str
     country: str
 
+class News(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    content: str
+    excerpt: str
+    category: NewsCategory
+    status: NewsStatus = NewsStatus.DRAFT
+    image_url: Optional[str] = None
+    author_id: str
+    author_name: str
+    views: int = 0
+    published_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class NewsCreate(BaseModel):
+    title: str
+    content: str
+    excerpt: str
+    category: NewsCategory
+    status: NewsStatus = NewsStatus.DRAFT
+    image_url: Optional[str] = None
+
+class NewsUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    excerpt: Optional[str] = None
+    category: Optional[NewsCategory] = None
+    status: Optional[NewsStatus] = None
+    image_url: Optional[str] = None
+
 class DashboardStats(BaseModel):
     total_members: int
     total_revenue: float
