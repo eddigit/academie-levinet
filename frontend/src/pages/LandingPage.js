@@ -138,91 +138,85 @@ const LandingPage = () => {
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Grand Public Card */}
-            <div className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl transition-all duration-500 hover:shadow-accent/20">
+            {/* Grand Public Card - Kinetic Shutter Design */}
+            <div 
+              className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-accent/20 hover:border-accent/50"
+              data-testid="audience-card-public"
+            >
               <div 
                 className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
                 style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/m50t9hgn_Grand%20Public%20Card.jpeg)' }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
               <div className="absolute inset-0 flex flex-col justify-end p-8">
-                <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-md transition-all duration-500 group-hover:bg-white/15 min-h-[200px] flex flex-col justify-between">
-                  <div className="absolute left-0 top-0 h-full w-1 bg-accent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  
-                  <div>
-                    <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
-                      Grand Public
-                    </h4>
-                    
-                    <p className="mt-3 font-manrope text-base text-gray-300 transition-all duration-300">
-                      Développez confiance, forme physique et sécurité pour toute la famille
-                    </p>
-                  </div>
-
-                  <div className="mt-6 flex items-center gap-2 transition-all duration-300">
+                <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
+                  <div className="h-1 w-12 bg-accent mb-4 transition-all duration-500 group-hover:w-24" />
+                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
+                    Grand Public
+                  </h4>
+                  <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
+                    Développez confiance, forme physique et sécurité pour toute la famille
+                  </p>
+                  <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     <span className="font-oswald text-sm font-bold uppercase tracking-wider text-accent">Découvrir</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent transition-transform duration-300 group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent w-5 h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Self-Défense Féminine Card */}
-            <div className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl transition-all duration-500 hover:shadow-secondary/20">
+            {/* Self-Défense Féminine Card - Kinetic Shutter Design */}
+            <div 
+              className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-secondary/20 hover:border-secondary/50"
+              data-testid="audience-card-women"
+            >
               <div 
                 className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
                 style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg)' }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
               <div className="absolute inset-0 flex flex-col justify-end p-8">
-                <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-md transition-all duration-500 group-hover:bg-white/15 min-h-[200px] flex flex-col justify-between">
-                  <div className="absolute left-0 top-0 h-full w-1 bg-secondary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  
-                  <div>
-                    <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
-                      Self-Défense Féminine
-                    </h4>
-                    
-                    <p className="mt-3 font-manrope text-base text-gray-300 transition-all duration-300">
-                      SFJL : Techniques spécifiques pour l'autonomie et la sécurité des femmes
-                    </p>
-                  </div>
-
-                  <div className="mt-6 flex items-center gap-2 transition-all duration-300">
+                <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
+                  <div className="h-1 w-12 bg-secondary mb-4 transition-all duration-500 group-hover:w-24" />
+                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
+                    Self-Défense Féminine
+                  </h4>
+                  <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
+                    SFJL : Techniques spécifiques pour l'autonomie et la sécurité des femmes
+                  </p>
+                  <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     <span className="font-oswald text-sm font-bold uppercase tracking-wider text-secondary">En savoir plus</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary transition-transform duration-300 group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary w-5 h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Professionnels Card */}
-            <div className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-2xl transition-all duration-500 hover:shadow-primary/20">
+            {/* Professionnels Card - Kinetic Shutter Design */}
+            <div 
+              className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50"
+              data-testid="audience-card-pro"
+            >
               <div 
                 className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
                 style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/vjnvljgu_Professionnels%20Card.jpeg)' }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-90" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
               <div className="absolute inset-0 flex flex-col justify-end p-8">
-                <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/10 p-6 backdrop-blur-md transition-all duration-500 group-hover:bg-white/15 min-h-[200px] flex flex-col justify-between">
-                  <div className="absolute left-0 top-0 h-full w-1 bg-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  
-                  <div>
-                    <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white">
-                      Professionnels
-                    </h4>
-                    
-                    <p className="mt-3 font-manrope text-base text-gray-300 transition-all duration-300">
-                      IPC/ROS : Formation tactique avancée pour les forces de l'ordre et agents de sécurité
-                    </p>
-                  </div>
-
-                  <div className="mt-6 flex items-center gap-2 transition-all duration-300">
+                <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
+                  <div className="h-1 w-12 bg-primary mb-4 transition-all duration-500 group-hover:w-24" />
+                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
+                    Professionnels
+                  </h4>
+                  <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
+                    IPC/ROS : Formation tactique avancée pour les forces de l'ordre et agents de sécurité
+                  </p>
+                  <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     <span className="font-oswald text-sm font-bold uppercase tracking-wider text-primary">Formation Pro</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary transition-transform duration-300 group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary w-5 h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                 </div>
               </div>
