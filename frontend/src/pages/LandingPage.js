@@ -132,47 +132,41 @@ const LandingPage = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="stat-card hover:scale-105 transition-transform duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent-glow rounded-full flex items-center justify-center mb-4">
-                <Users className="w-8 h-8 text-white" />
-              </div>
+              <Users className="w-12 h-12 text-accent mb-4" strokeWidth={1} />
               <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Grand Public</h4>
               <p className="text-text-secondary font-manrope leading-relaxed mb-4">
                 Hommes, femmes, enfants : développez votre confiance et votre sécurité personnelle
               </p>
               <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
-                <li>✓ Techniques efficaces et réalistes</li>
-                <li>✓ Discipline et respect</li>
-                <li>✓ Gestion des conflits</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Techniques efficaces et réalistes</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Discipline et respect</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Gestion des conflits</li>
               </ul>
             </div>
 
             <div className="stat-card hover:scale-105 transition-transform duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-secondary to-secondary-light rounded-full flex items-center justify-center mb-4">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
+              <Shield className="w-12 h-12 text-secondary mb-4" strokeWidth={1} />
               <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Self-Défense Féminine</h4>
               <p className="text-text-secondary font-manrope leading-relaxed mb-4">
                 SFJL : Reprenez le contrôle de votre sécurité avec empowerment
               </p>
               <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
-                <li>✓ Scénarios réalistes adaptés</li>
-                <li>✓ Confiance en soi</li>
-                <li>✓ Sans agressivité excessive</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Scénarios réalistes adaptés</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Confiance en soi</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Sans agressivité excessive</li>
               </ul>
             </div>
 
             <div className="stat-card hover:scale-105 transition-transform duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-light rounded-full flex items-center justify-center mb-4">
-                <Globe className="w-8 h-8 text-white" />
-              </div>
+              <Globe className="w-12 h-12 text-primary mb-4" strokeWidth={1} />
               <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-3">Professionnels</h4>
               <p className="text-text-secondary font-manrope leading-relaxed mb-4">
                 IPC/ROS : Formation opérationnelle pour forces de l'ordre
               </p>
               <ul className="text-left space-y-2 text-text-muted font-manrope text-sm">
-                <li>✓ Validé par unités d'élite (ERIS, Spetsnaz)</li>
-                <li>✓ Expertise terrain</li>
-                <li>✓ Excellence opérationnelle</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Validé par unités d'élite (ERIS, Spetsnaz)</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Expertise terrain</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} /> Excellence opérationnelle</li>
               </ul>
             </div>
           </div>
