@@ -133,7 +133,7 @@ const MessagingPage = () => {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
       
-      <div className="flex-1 flex">
+      <div className="flex-1 flex ml-64">
         {/* Conversations List */}
         <div className={`w-full md:w-96 border-r border-white/5 flex flex-col ${selectedConversation ? 'hidden md:flex' : 'flex'}`}>
           {/* Header */}
