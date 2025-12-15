@@ -258,3 +258,64 @@ def get_lead_confirmation_html(lead_name: str) -> str:
     </body>
     </html>
     """
+
+
+def get_new_message_notification_html(recipient_name: str, sender_name: str, message_preview: str) -> str:
+    """Template d'email de notification de nouveau message"""
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{ font-family: 'Arial', sans-serif; background-color: #0B1120; color: #F3F4F6; margin: 0; padding: 0; }}
+            .container {{ max-width: 600px; margin: 0 auto; background-color: #111827; }}
+            .header {{ background: linear-gradient(135deg, #10B981 0%, #059669 100%); padding: 30px 20px; text-align: center; }}
+            .title {{ font-size: 20px; font-weight: bold; color: white; }}
+            .content {{ padding: 30px; }}
+            .message-box {{ background-color: #1F2937; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10B981; }}
+            .sender {{ font-size: 14px; color: #10B981; font-weight: bold; margin-bottom: 10px; }}
+            .message-content {{ font-size: 16px; color: #D1D5DB; line-height: 1.6; }}
+            .button {{ display: inline-block; background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; }}
+            .footer {{ background-color: #0B1120; padding: 20px; text-align: center; color: #6B7280; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="title">💬 Nouveau Message</div>
+            </div>
+            
+            <div class="content">
+                <p style="color: #9CA3AF; margin-bottom: 20px;">
+                    Bonjour {recipient_name},
+                </p>
+                
+                <p style="color: #9CA3AF; margin-bottom: 20px;">
+                    Vous avez reçu un nouveau message sur la plateforme de l'Académie Jacques Levinet.
+                </p>
+                
+                <div class="message-box">
+                    <div class="sender">De : {sender_name}</div>
+                    <div class="message-content">{message_preview}...</div>
+                </div>
+                
+                <p style="color: #9CA3AF;">
+                    Connectez-vous à votre espace membre pour lire et répondre à ce message.
+                </p>
+                
+                <div style="text-align: center;">
+                    <a href="#" class="button">Voir le message</a>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>Académie Jacques Levinet - Messagerie Interne</p>
+                <p style="margin-top: 10px; font-size: 11px; color: #4B5563;">
+                    Vous recevez cet email car vous avez un compte sur notre plateforme.
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
