@@ -52,8 +52,8 @@ const MegaMenu = () => {
       {/* Mega Menu Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-[100] animate-fadeIn"
-          style={{ backgroundColor: '#0B1120' }}
+          className="fixed inset-0 animate-fadeIn overflow-auto"
+          style={{ backgroundColor: '#0B1120', zIndex: 9999 }}
           data-testid="mega-menu-overlay"
         >
           {/* Close Button */}
