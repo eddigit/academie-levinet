@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 import bcrypt
 import jwt
 from enum import Enum
-from email_service import send_email, get_welcome_email_html, get_lead_notification_html, get_lead_confirmation_html
+from email_service import send_email, get_welcome_email_html, get_lead_notification_html, get_lead_confirmation_html, get_new_message_notification_html
 import asyncio
 
 ROOT_DIR = Path(__file__).parent
