@@ -59,14 +59,14 @@ const MegaMenu = () => {
           {/* Close Button */}
           <button
             onClick={() => setIsOpen(false)}
-            className="absolute top-6 right-6 p-3 border border-white/20 hover:border-secondary rounded-sm transition-colors group"
+            className="absolute top-6 right-6 p-3 border border-white/20 hover:border-secondary rounded-sm transition-colors group z-10"
             data-testid="mega-menu-close"
           >
             <X className="w-6 h-6 text-white group-hover:text-secondary transition-colors" strokeWidth={1.5} />
           </button>
 
           {/* Header */}
-          <div className="container mx-auto px-6 pt-8">
+          <div className="container mx-auto px-6 pt-8 relative z-10">
             <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
               <img 
                 src="https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/e712cc50_LOGO-WORLD-KRAV-MAGA-ORGANIZATION-150x150.png" 
@@ -74,16 +74,16 @@ const MegaMenu = () => {
                 className="w-12 h-12"
               />
               <div>
-                <h1 className="font-oswald text-xl font-bold text-text-primary uppercase tracking-wide">
+                <h1 className="font-oswald text-xl font-bold text-white uppercase tracking-wide">
                   Académie Jacques Levinet
                 </h1>
-                <p className="text-xs text-text-secondary font-manrope">Self-Pro Krav</p>
+                <p className="text-xs text-gray-400 font-manrope">Self-Pro Krav</p>
               </div>
             </Link>
           </div>
 
           {/* Menu Content */}
-          <div className="container mx-auto px-6 py-16">
+          <div className="container mx-auto px-6 py-16 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
               {menuSections.map((section, idx) => (
                 <div key={idx} className="space-y-6">
@@ -99,14 +99,14 @@ const MegaMenu = () => {
                           className="group flex items-start gap-4 p-3 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/10 transition-all duration-300"
                         >
                           <div className="p-2 bg-white/5 rounded-lg group-hover:bg-primary/20 transition-colors">
-                            <item.icon className="w-5 h-5 text-text-secondary group-hover:text-primary transition-colors" strokeWidth={1.5} />
+                            <item.icon className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors" strokeWidth={1.5} />
                           </div>
                           <div>
                             <span className="font-oswald text-lg text-white group-hover:text-primary transition-colors flex items-center gap-2">
                               {item.name}
                               <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" strokeWidth={2} />
                             </span>
-                            <p className="text-sm text-text-muted font-manrope mt-1">{item.description}</p>
+                            <p className="text-sm text-gray-500 font-manrope mt-1">{item.description}</p>
                           </div>
                         </Link>
                       </li>
@@ -118,13 +118,13 @@ const MegaMenu = () => {
 
             {/* Bottom CTA */}
             <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6">
-              <p className="text-text-secondary font-manrope">
+              <p className="text-gray-400 font-manrope">
                 Prêt à rejoindre l'élite de la self-défense mondiale ?
               </p>
               <Link
                 to="/onboarding"
                 onClick={() => setIsOpen(false)}
-                className="px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-widest rounded-sm shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all hover:scale-105"
+                className="px-8 py-4 bg-primary hover:bg-blue-700 text-white font-oswald uppercase tracking-widest rounded-sm shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all hover:scale-105"
               >
                 Commencer Maintenant
               </Link>
