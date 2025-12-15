@@ -928,6 +928,333 @@ async def unregister_from_event(event_id: str, current_user: dict = Depends(get_
     
     return {"message": "Unregistered successfully"}
 
+# =====================
+# MESSAGING ROUTES
+# =====================
+
+@api_router.get("/users/search")
+async def search_users(q: str = "", current_user: dict = Depends(get_current_user)):
+    """Search users by name or email for starting conversations"""
+    if len(q) < 2:
+        return []
+    
+    # Search in users (admins), members, and technical directors
+    results = []
+    
+    # Search users
+    users = await db.users.find({
+        "$and": [
+            {"id": {"$ne": current_user['id']}},
+            {"$or": [
+                {"full_name": {"$regex": q, "$options": "i"}},
+                {"email": {"$regex": q, "$options": "i"}}
+            ]}
+        ]
+    }, {"_id": 0, "password_hash": 0}).to_list(10)
+    
+    for u in users:
+        results.append({
+            "id": u['id'],
+            "name": u['full_name'],
+            "email": u['email'],
+            "type": "Admin"
+        })
+    
+    # Search members
+    members = await db.members.find({
+        "$or": [
+            {"first_name": {"$regex": q, "$options": "i"}},
+            {"last_name": {"$regex": q, "$options": "i"}},
+            {"email": {"$regex": q, "$options": "i"}}
+        ]
+    }, {"_id": 0}).to_list(10)
+    
+    for m in members:
+        if m['id'] != current_user['id']:
+            results.append({
+                "id": m['id'],
+                "name": f"{m['first_name']} {m['last_name']}",
+                "email": m['email'],
+                "type": "Membre"
+            })
+    
+    # Search technical directors
+    directors = await db.technical_directors.find({
+        "$or": [
+            {"name": {"$regex": q, "$options": "i"}},
+            {"email": {"$regex": q, "$options": "i"}}
+        ]
+    }, {"_id": 0}).to_list(10)
+    
+    for d in directors:
+        if d['id'] != current_user['id']:
+            results.append({
+                "id": d['id'],
+                "name": d['name'],
+                "email": d['email'],
+                "type": "Directeur Technique"
+            })
+    
+    return results[:15]  # Limit total results
+
+@api_router.get("/conversations")
+async def get_conversations(current_user: dict = Depends(get_current_user)):
+    """Get all conversations for the current user"""
+    conversations = await db.conversations.find(
+        {"participants": current_user['id']},
+        {"_id": 0}
+    ).sort("updated_at", -1).to_list(100)
+    
+    # Convert datetime strings and add unread count
+    for conv in conversations:
+        if isinstance(conv.get('created_at'), str):
+            conv['created_at'] = datetime.fromisoformat(conv['created_at'])
+        if isinstance(conv.get('updated_at'), str):
+            conv['updated_at'] = datetime.fromisoformat(conv['updated_at'])
+        if conv.get('last_message_at') and isinstance(conv.get('last_message_at'), str):
+            conv['last_message_at'] = datetime.fromisoformat(conv['last_message_at'])
+        
+        # Get unread count for this conversation
+        unread_count = await db.messages.count_documents({
+            "conversation_id": conv['id'],
+            "sender_id": {"$ne": current_user['id']},
+            "read": False
+        })
+        conv['unread_count'] = unread_count
+        
+        # Get the other participant's name
+        other_participant_idx = 1 if conv['participants'][0] == current_user['id'] else 0
+        conv['other_participant_name'] = conv['participant_names'][other_participant_idx] if len(conv['participant_names']) > other_participant_idx else "Utilisateur"
+        conv['other_participant_id'] = conv['participants'][other_participant_idx] if len(conv['participants']) > other_participant_idx else None
+    
+    return conversations
+
+@api_router.post("/conversations")
+async def create_conversation(data: ConversationCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new conversation or return existing one"""
+    # Check if conversation already exists between these users
+    existing = await db.conversations.find_one({
+        "participants": {"$all": [current_user['id'], data.recipient_id]}
+    }, {"_id": 0})
+    
+    if existing:
+        if isinstance(existing.get('created_at'), str):
+            existing['created_at'] = datetime.fromisoformat(existing['created_at'])
+        if isinstance(existing.get('updated_at'), str):
+            existing['updated_at'] = datetime.fromisoformat(existing['updated_at'])
+        return existing
+    
+    # Get recipient name
+    recipient_name = "Utilisateur"
+    
+    # Check in users
+    recipient = await db.users.find_one({"id": data.recipient_id}, {"_id": 0})
+    if recipient:
+        recipient_name = recipient['full_name']
+    else:
+        # Check in members
+        recipient = await db.members.find_one({"id": data.recipient_id}, {"_id": 0})
+        if recipient:
+            recipient_name = f"{recipient['first_name']} {recipient['last_name']}"
+        else:
+            # Check in technical directors
+            recipient = await db.technical_directors.find_one({"id": data.recipient_id}, {"_id": 0})
+            if recipient:
+                recipient_name = recipient['name']
+    
+    if not recipient:
+        raise HTTPException(status_code=404, detail="Recipient not found")
+    
+    # Create conversation
+    conversation = Conversation(
+        participants=[current_user['id'], data.recipient_id],
+        participant_names=[current_user['full_name'], recipient_name]
+    )
+    
+    doc = conversation.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    
+    await db.conversations.insert_one(doc)
+    
+    return conversation
+
+@api_router.get("/conversations/{conversation_id}/messages")
+async def get_messages(conversation_id: str, current_user: dict = Depends(get_current_user)):
+    """Get messages for a conversation"""
+    # Verify user is participant
+    conversation = await db.conversations.find_one({
+        "id": conversation_id,
+        "participants": current_user['id']
+    }, {"_id": 0})
+    
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    messages = await db.messages.find(
+        {"conversation_id": conversation_id},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(500)
+    
+    # Mark messages as read
+    await db.messages.update_many(
+        {
+            "conversation_id": conversation_id,
+            "sender_id": {"$ne": current_user['id']},
+            "read": False
+        },
+        {"$set": {"read": True}}
+    )
+    
+    for msg in messages:
+        if isinstance(msg.get('created_at'), str):
+            msg['created_at'] = datetime.fromisoformat(msg['created_at'])
+    
+    return messages
+
+@api_router.post("/conversations/{conversation_id}/messages")
+async def send_message(conversation_id: str, data: MessageCreate, current_user: dict = Depends(get_current_user)):
+    """Send a message in a conversation"""
+    # Verify user is participant
+    conversation = await db.conversations.find_one({
+        "id": conversation_id,
+        "participants": current_user['id']
+    }, {"_id": 0})
+    
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    
+    # Create message
+    message = Message(
+        conversation_id=conversation_id,
+        sender_id=current_user['id'],
+        sender_name=current_user['full_name'],
+        content=data.content
+    )
+    
+    doc = message.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.messages.insert_one(doc)
+    
+    # Update conversation
+    await db.conversations.update_one(
+        {"id": conversation_id},
+        {
+            "$set": {
+                "last_message": data.content[:100],  # Truncate for preview
+                "last_message_at": datetime.now(timezone.utc).isoformat(),
+                "last_sender_id": current_user['id'],
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    # Send email notification to recipient (non-blocking)
+    other_participant_id = conversation['participants'][1] if conversation['participants'][0] == current_user['id'] else conversation['participants'][0]
+    
+    # Find recipient email
+    recipient = await db.users.find_one({"id": other_participant_id}, {"_id": 0})
+    if not recipient:
+        recipient = await db.members.find_one({"id": other_participant_id}, {"_id": 0})
+    if not recipient:
+        recipient = await db.technical_directors.find_one({"id": other_participant_id}, {"_id": 0})
+    
+    if recipient and recipient.get('email'):
+        recipient_name = recipient.get('full_name') or recipient.get('name') or f"{recipient.get('first_name', '')} {recipient.get('last_name', '')}".strip()
+        asyncio.create_task(send_email(
+            to_email=recipient['email'],
+            subject=f"Nouveau message de {current_user['full_name']}",
+            html_content=get_new_message_notification_html(
+                recipient_name=recipient_name,
+                sender_name=current_user['full_name'],
+                message_preview=data.content[:200]
+            ),
+            text_content=f"Vous avez reçu un nouveau message de {current_user['full_name']}: {data.content[:200]}"
+        ))
+    
+    return message
+
+@api_router.get("/conversations/unread-count")
+async def get_unread_count(current_user: dict = Depends(get_current_user)):
+    """Get total unread message count for the current user"""
+    # Get all conversation IDs for this user
+    conversations = await db.conversations.find(
+        {"participants": current_user['id']},
+        {"id": 1}
+    ).to_list(1000)
+    
+    conversation_ids = [c['id'] for c in conversations]
+    
+    unread_count = await db.messages.count_documents({
+        "conversation_id": {"$in": conversation_ids},
+        "sender_id": {"$ne": current_user['id']},
+        "read": False
+    })
+    
+    return {"unread_count": unread_count}
+
+# Admin Messaging Routes (Moderation)
+@api_router.get("/admin/messages")
+async def admin_get_all_messages(
+    limit: int = 100,
+    skip: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """Admin: Get all messages for moderation"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    messages = await db.messages.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    for msg in messages:
+        if isinstance(msg.get('created_at'), str):
+            msg['created_at'] = datetime.fromisoformat(msg['created_at'])
+    
+    total = await db.messages.count_documents({})
+    
+    return {"messages": messages, "total": total}
+
+@api_router.delete("/admin/messages/{message_id}")
+async def admin_delete_message(message_id: str, current_user: dict = Depends(get_current_user)):
+    """Admin: Delete a message (moderation)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.messages.delete_one({"id": message_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    return {"message": "Message deleted successfully"}
+
+@api_router.get("/admin/conversations")
+async def admin_get_all_conversations(
+    limit: int = 50,
+    skip: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """Admin: Get all conversations for moderation"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    conversations = await db.conversations.find({}, {"_id": 0}).sort("updated_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    for conv in conversations:
+        if isinstance(conv.get('created_at'), str):
+            conv['created_at'] = datetime.fromisoformat(conv['created_at'])
+        if isinstance(conv.get('updated_at'), str):
+            conv['updated_at'] = datetime.fromisoformat(conv['updated_at'])
+        if conv.get('last_message_at') and isinstance(conv.get('last_message_at'), str):
+            conv['last_message_at'] = datetime.fromisoformat(conv['last_message_at'])
+        
+        # Count messages in conversation
+        msg_count = await db.messages.count_documents({"conversation_id": conv['id']})
+        conv['message_count'] = msg_count
+    
+    total = await db.conversations.count_documents({})
+    
+    return {"conversations": conversations, "total": total}
+
 app.include_router(api_router)
 
 app.add_middleware(
