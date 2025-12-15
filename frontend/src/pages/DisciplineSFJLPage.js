@@ -1,0 +1,193 @@
+import React from 'react';
+import PublicLayout from '../components/PublicLayout';
+import { Link } from 'react-router-dom';
+import { Shield, Heart, Sparkles, Target, Users, ChevronRight, CheckCircle } from 'lucide-react';
+
+const DisciplineSFJLPage = () => {
+  const pillars = [
+    { icon: Sparkles, title: 'Empowerment', description: 'Développez votre confiance et votre force intérieure. Reprenez le contrôle.' },
+    { icon: Target, title: 'Scénarios Réalistes', description: 'Techniques adaptées aux situations réelles auxquelles les femmes peuvent faire face.' },
+    { icon: Shield, title: 'Sans Agressivité', description: 'Pratique sûre et respectueuse dans un environnement bienveillant.' },
+    { icon: Users, title: 'Entre Femmes', description: 'Cours dédiés dans une atmosphère de soutien et de solidarité.' },
+  ];
+
+  const scenarios = [
+    'Agressions dans la rue',
+    'Harcèlement et suivis',
+    'Tentatives de vol à l\'arraché',
+    'Situations dans les transports',
+    'Défense en position assise',
+    'Libération de saisies',
+    'Gestion du stress',
+    'Prise de parole assertive',
+  ];
+
+  return (
+    <PublicLayout>
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6 relative overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-20"
+          style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg)' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
+        
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
+          <div className="inline-block px-4 py-2 bg-secondary/10 border border-secondary/30 rounded-sm mb-6">
+            <span className="text-secondary font-oswald text-sm uppercase tracking-wider">Spécial Femmes</span>
+          </div>
+          
+          <h1 className="font-oswald text-5xl md:text-7xl font-bold text-text-primary uppercase mb-6 tracking-tight">
+            <span className="text-secondary">SFJL</span>
+          </h1>
+          <p className="font-oswald text-2xl text-text-secondary uppercase tracking-wide mb-6">
+            Self-Défense Féminine Jacques Levinet
+          </p>
+          
+          <p className="text-xl text-text-secondary font-manrope mb-8 leading-relaxed max-w-3xl mx-auto">
+            Reprenez le contrôle de votre sécurité. Un programme conçu spécifiquement 
+            pour les femmes, par des femmes, dans un environnement bienveillant.
+          </p>
+          
+          <Link
+            to="/onboarding"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-secondary hover:bg-secondary/80 text-white font-oswald uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+          >
+            Rejoindre le Programme
+            <ChevronRight className="w-5 h-5" strokeWidth={2} />
+          </Link>
+        </div>
+      </section>
+
+      {/* Why SFJL Section */}
+      <section className="py-20 px-6 bg-paper">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="font-oswald text-4xl font-bold text-text-primary uppercase mb-6 tracking-tight">
+                Pourquoi le <span className="text-secondary">SFJL</span> ?
+              </h2>
+              <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
+                Dans un contexte où la sécurité personnelle est plus importante que jamais, 
+                le programme SFJL vous donne les outils pour vous défendre efficacement tout 
+                en respectant votre bien-être.
+              </p>
+              <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
+                Développé par des instructrices expérimentées sous la supervision de l'Académie 
+                Jacques Levinet, ce programme allie efficacité technique et approche psychologique.
+              </p>
+              <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-6">
+                <p className="text-secondary font-oswald uppercase tracking-wide mb-2">Notre Philosophie</p>
+                <p className="text-text-secondary font-manrope italic">
+                  "La vraie force n'est pas dans la violence, mais dans la capacité à se protéger 
+                  et à protéger les autres avec intelligence et détermination."
+                </p>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <div className="aspect-square rounded-lg overflow-hidden border border-white/10">
+                <div 
+                  className="w-full h-full bg-cover bg-center bg-gray-800"
+                  style={{ backgroundImage: 'url(https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg)' }}
+                  data-placeholder="sfjl-women-training"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4 Pillars Section */}
+      <section className="py-20 px-6 bg-background">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-12 tracking-tight">
+            Les <span className="text-secondary">4 Piliers</span> du SFJL
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {pillars.map((item, idx) => (
+              <div key={idx} className="bg-white/5 border border-white/10 rounded-lg p-6 hover:border-secondary/50 transition-colors text-center">
+                <div className="w-16 h-16 rounded-lg bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="w-8 h-8 text-secondary" strokeWidth={1.5} />
+                </div>
+                <h3 className="font-oswald text-lg font-bold text-white uppercase mb-2">{item.title}</h3>
+                <p className="text-text-muted font-manrope text-sm">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Scenarios Section */}
+      <section className="py-20 px-6 bg-paper">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-12 tracking-tight">
+            Scénarios <span className="text-secondary">Travaillés</span>
+          </h2>
+          
+          <div className="bg-white/5 border border-white/10 rounded-lg p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {scenarios.map((scenario, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors">
+                  <CheckCircle className="w-5 h-5 text-secondary flex-shrink-0" strokeWidth={1.5} />
+                  <span className="text-text-secondary font-manrope">{scenario}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <p className="text-center text-text-muted font-manrope mt-6">
+            Tous les scénarios sont adaptés aux réalités quotidiennes des femmes.
+          </p>
+        </div>
+      </section>
+
+      {/* Testimonial Section */}
+      <section className="py-20 px-6 bg-background">
+        <div className="container mx-auto max-w-3xl">
+          <div className="bg-gradient-to-br from-secondary/10 to-transparent border border-secondary/20 rounded-lg p-8 md:p-12 text-center">
+            <Heart className="w-12 h-12 text-secondary mx-auto mb-6" strokeWidth={1.5} />
+            <blockquote className="text-xl md:text-2xl text-text-secondary font-manrope italic leading-relaxed mb-6">
+              "Le SFJL m'a donné bien plus que des techniques de défense. 
+              Il m'a donné la confiance de marcher la tête haute."
+            </blockquote>
+            <p className="text-secondary font-oswald uppercase tracking-wider">
+              — Une pratiquante SFJL
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-6 bg-gradient-to-b from-background to-secondary/10">
+        <div className="container mx-auto max-w-3xl text-center">
+          <h2 className="font-oswald text-4xl font-bold text-text-primary uppercase mb-6 tracking-tight">
+            Rejoignez-Nous
+          </h2>
+          <p className="text-text-secondary font-manrope text-lg mb-8">
+            Prenez le premier pas vers votre autonomie et votre sécurité.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/onboarding"
+              className="px-8 py-4 bg-secondary hover:bg-secondary/80 text-white font-oswald uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] flex items-center justify-center gap-2"
+            >
+              S'inscrire au SFJL
+              <ChevronRight className="w-5 h-5" strokeWidth={2} />
+            </Link>
+            <Link
+              to="/international"
+              className="px-8 py-4 border border-white/20 hover:border-white/50 text-white font-oswald uppercase tracking-wider rounded-sm transition-all flex items-center justify-center gap-2"
+            >
+              Trouver un Cours
+              <ChevronRight className="w-5 h-5" strokeWidth={2} />
+            </Link>
+          </div>
+        </div>
+      </section>
+    </PublicLayout>
+  );
+};
+
+export default DisciplineSFJLPage;
