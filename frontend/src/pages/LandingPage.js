@@ -437,11 +437,65 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-paper py-8 px-6 border-t border-white/5" data-testid="footer">
-        <div className="container mx-auto text-center">
-          <p className="text-text-secondary font-manrope">
-            © 2025 Académie Jacques Levinet. Tous droits réservés.
-          </p>
+      <footer className="bg-paper py-16 px-6 border-t border-white/5" data-testid="footer">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/e712cc50_LOGO-WORLD-KRAV-MAGA-ORGANIZATION-150x150.png" 
+                  alt="Logo" 
+                  className="w-10 h-10"
+                />
+                <div>
+                  <h3 className="font-oswald text-lg font-bold text-text-primary uppercase">AJL</h3>
+                  <p className="text-xs text-text-muted">Depuis 1998</p>
+                </div>
+              </div>
+              <p className="text-text-secondary font-manrope text-sm leading-relaxed">
+                L'Académie Jacques Levinet forme l'élite de la self-défense mondiale depuis plus de 25 ans.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Navigation</h4>
+              <ul className="space-y-3">
+                <li><Link to="/founder" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Le Fondateur</Link></li>
+                <li><Link to="/about" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">À Propos</Link></li>
+                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self-Pro Krav</Link></li>
+                <li><Link to="/pedagogy" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Pédagogie</Link></li>
+              </ul>
+            </div>
+
+            {/* Disciplines */}
+            <div>
+              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Disciplines</h4>
+              <ul className="space-y-3">
+                <li><Link to="/disciplines/wkmo" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">WKMO - Grand Public</Link></li>
+                <li><Link to="/disciplines/sfjl" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">SFJL - Défense Féminine</Link></li>
+                <li><Link to="/disciplines/ipc" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">IPC - Professionnels</Link></li>
+                <li><Link to="/international" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Présence Internationale</Link></li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Rejoindre</h4>
+              <ul className="space-y-3">
+                <li><Link to="/join" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Devenir Membre</Link></li>
+                <li><Link to="/onboarding" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">S'inscrire</Link></li>
+                <li><Link to="/international" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Trouver un Club</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 text-center">
+            <p className="text-text-muted font-manrope text-sm">
+              © 2025 Académie Jacques Levinet. Tous droits réservés.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
