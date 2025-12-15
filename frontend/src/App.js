@@ -12,6 +12,16 @@ import SubscriptionsPage from './pages/SubscriptionsPage';
 import LeadsPage from './pages/LeadsPage';
 import NewsPage from './pages/NewsPage';
 import EventsPage from './pages/EventsPage';
+// New public pages
+import FounderPage from './pages/FounderPage';
+import AboutPage from './pages/AboutPage';
+import DisciplineSPKPage from './pages/DisciplineSPKPage';
+import DisciplineWKMOPage from './pages/DisciplineWKMOPage';
+import DisciplineSFJLPage from './pages/DisciplineSFJLPage';
+import DisciplineIPCPage from './pages/DisciplineIPCPage';
+import PedagogyPage from './pages/PedagogyPage';
+import InternationalPage from './pages/InternationalPage';
+import JoinPage from './pages/JoinPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
