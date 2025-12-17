@@ -1,16 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import DashboardLayout from '../components/DashboardLayout';
-import { api } from '../utils/api';
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, Award, Edit, Trash2 } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import api from '../utils/api';
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, Award, User, MessageSquare, RefreshCw, Trash2, Edit } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
+
+// Belt grade to color mapping
+const beltColors = {
+  'Ceinture Blanche': { bg: 'from-gray-100 to-white', ring: 'ring-gray-200', text: 'text-gray-800', accent: '#E5E7EB' },
+  'Ceinture Jaune': { bg: 'from-yellow-400 to-yellow-300', ring: 'ring-yellow-400', text: 'text-yellow-900', accent: '#FBBF24' },
+  'Ceinture Orange': { bg: 'from-orange-500 to-orange-400', ring: 'ring-orange-500', text: 'text-orange-900', accent: '#F97316' },
+  'Ceinture Verte': { bg: 'from-green-500 to-green-400', ring: 'ring-green-500', text: 'text-green-900', accent: '#22C55E' },
+  'Ceinture Bleue': { bg: 'from-blue-500 to-blue-400', ring: 'ring-blue-500', text: 'text-blue-900', accent: '#3B82F6' },
+  'Ceinture Marron': { bg: 'from-amber-700 to-amber-600', ring: 'ring-amber-700', text: 'text-amber-100', accent: '#B45309' },
+  'Ceinture Noire': { bg: 'from-gray-900 to-gray-800', ring: 'ring-gray-900', text: 'text-white', accent: '#1F2937' },
+};
+
+const getBeltColor = (grade) => {
+  return beltColors[grade] || beltColors['Ceinture Blanche'];
+};
 
 const MemberDetailPage = () => {
   const { memberId } = useParams();
   const navigate = useNavigate();
   const [member, setMember] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [startingConversation, setStartingConversation] = useState(false);
 
   useEffect(() => {
     fetchMember();
@@ -18,8 +34,8 @@ const MemberDetailPage = () => {
 
   const fetchMember = async () => {
     try {
-      const data = await api.getMember(memberId);
-      setMember(data);
+      const response = await api.get(`/members/${memberId}`);
+      setMember(response.data);
     } catch (error) {
       console.error('Error fetching member:', error);
       toast.error('Erreur lors du chargement du membre');
@@ -31,7 +47,7 @@ const MemberDetailPage = () => {
   const handleDelete = async () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce membre?')) {
       try {
-        await api.deleteMember(memberId);
+        await api.delete(`/members/${memberId}`);
         toast.success('Membre supprimé avec succès');
         navigate('/members');
       } catch (error) {
@@ -41,171 +57,317 @@ const MemberDetailPage = () => {
     }
   };
 
+  const handleSendMessage = async () => {
+    setStartingConversation(true);
+    try {
+      // Create or get existing conversation with this member
+      const response = await api.post('/conversations', { recipient_id: member.id });
+      // Navigate to messages page with this conversation
+      navigate('/messages', { state: { conversationId: response.data.id } });
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+      toast.error('Erreur lors de la création de la conversation');
+    } finally {
+      setStartingConversation(false);
+    }
+  };
+
+  const handleRenewMembership = () => {
+    toast.info('Fonctionnalité de renouvellement à venir');
+  };
+
   if (loading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-text-primary font-oswald text-xl">Chargement...</div>
+      <div className="flex min-h-screen bg-background">
+        <Sidebar />
+        <div className="flex-1 ml-64 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
   if (!member) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-text-secondary font-manrope">Membre non trouvé</div>
+      <div className="flex min-h-screen bg-background">
+        <Sidebar />
+        <div className="flex-1 ml-64 flex items-center justify-center">
+          <div className="text-center">
+            <User className="w-16 h-16 text-text-muted mx-auto mb-4" strokeWidth={1} />
+            <p className="text-text-secondary font-manrope text-lg">Membre non trouvé</p>
+            <Button onClick={() => navigate('/members')} variant="outline" className="mt-4">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Retour aux membres
+            </Button>
+          </div>
         </div>
-      </DashboardLayout>
+      </div>
     );
   }
 
+  const beltStyle = getBeltColor(member.belt_grade);
+
   return (
-    <DashboardLayout>
-      <div className="space-y-8" data-testid="member-detail-page">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+    <div className="flex min-h-screen bg-background">
+      <Sidebar />
+      
+      <div className="flex-1 ml-64 p-6" data-testid="member-detail-page">
+        {/* Header with Back Button */}
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Button 
               onClick={() => navigate('/members')} 
+              variant="ghost"
+              className="text-text-secondary hover:text-text-primary"
               data-testid="back-button"
-              variant="outline" 
-              className="border-border text-text-secondary hover:text-text-primary"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" /> Retour
+              <ArrowLeft className="w-5 h-5 mr-2" strokeWidth={1.5} /> Retour
             </Button>
-            <div>
-              <h1 className="font-oswald text-4xl font-bold text-text-primary uppercase tracking-wide" data-testid="member-name">
-                {member.first_name} {member.last_name}
-              </h1>
-              <p className="text-text-secondary font-manrope mt-2">Profil du membre</p>
-            </div>
+            <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide">
+              Fiche Adhérent
+            </h1>
           </div>
-          <div className="flex gap-3">
-            <Button data-testid="delete-button" variant="destructive" onClick={handleDelete} className="bg-secondary/20 hover:bg-secondary/30 text-secondary">
-              <Trash2 className="w-4 h-4" />
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              className="text-text-secondary hover:text-text-primary"
+              onClick={() => toast.info('Édition à venir')}
+            >
+              <Edit className="w-5 h-5" strokeWidth={1.5} />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
+              onClick={handleDelete}
+              data-testid="delete-button"
+            >
+              <Trash2 className="w-5 h-5" strokeWidth={1.5} />
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Profile Card */}
-          <div className="lg:col-span-1 space-y-6">
-            <div className="stat-card text-center" data-testid="profile-card">
-              <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-accent to-accent-glow flex items-center justify-center">
-                <span className="text-5xl font-oswald font-bold text-white">
-                  {member.first_name[0]}{member.last_name[0]}
-                </span>
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column - Profile Photo with Belt Color Background */}
+          <div className="lg:col-span-5">
+            <div className="bg-paper rounded-xl border border-white/5 overflow-hidden" data-testid="profile-card">
+              {/* Belt Color Background with Photo */}
+              <div 
+                className={`relative h-80 bg-gradient-to-br ${beltStyle.bg} flex items-center justify-center overflow-hidden`}
+                style={{ background: `radial-gradient(circle at center, ${beltStyle.accent}40 0%, ${beltStyle.accent}20 30%, transparent 70%)` }}
+              >
+                {/* Concentric circles decoration */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="w-72 h-72 rounded-full border-2 opacity-20"
+                    style={{ borderColor: beltStyle.accent }}
+                  ></div>
+                  <div 
+                    className="absolute w-56 h-56 rounded-full border-2 opacity-30"
+                    style={{ borderColor: beltStyle.accent }}
+                  ></div>
+                  <div 
+                    className="absolute w-40 h-40 rounded-full border-2 opacity-40"
+                    style={{ borderColor: beltStyle.accent }}
+                  ></div>
+                </div>
+                
+                {/* Profile Photo */}
+                <div 
+                  className={`relative z-10 w-48 h-48 rounded-xl overflow-hidden border-4 shadow-2xl`}
+                  style={{ borderColor: beltStyle.accent }}
+                >
+                  {member.photo_url ? (
+                    <img 
+                      src={member.photo_url} 
+                      alt={`${member.first_name} ${member.last_name}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                      <span className="text-6xl font-oswald font-bold text-white">
+                        {member.first_name[0]}{member.last_name[0]}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <h2 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-2">
-                {member.first_name} {member.last_name}
-              </h2>
-              <p className="text-text-secondary font-manrope mb-4">{member.email}</p>
-              <div className="inline-block px-4 py-2 bg-accent/20 text-accent rounded-full text-sm font-manrope font-medium mb-6">
-                {member.belt_grade}
+              
+              {/* Grade Badge */}
+              <div className="p-4 text-center bg-paper border-t border-white/5">
+                <div 
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                  style={{ backgroundColor: `${beltStyle.accent}20`, color: beltStyle.accent }}
+                >
+                  <Award className="w-5 h-5" strokeWidth={1.5} />
+                  <span className="font-oswald uppercase tracking-wide">
+                    Grade: SPK - {member.belt_grade}
+                  </span>
+                </div>
               </div>
-              <div className={`inline-block px-4 py-2 rounded-full text-sm font-manrope font-medium ml-2 ${
-                member.membership_status === 'Actif' ? 'bg-primary/20 text-primary' :
-                member.membership_status === 'Expiré' ? 'bg-secondary/20 text-secondary' :
-                'bg-text-muted/20 text-text-muted'
-              }`}>
-                {member.membership_status}
+
+              {/* Quick Actions */}
+              <div className="p-4 border-t border-white/5 flex gap-3">
+                <Button 
+                  onClick={handleSendMessage}
+                  disabled={startingConversation}
+                  className="flex-1 bg-primary hover:bg-primary-dark"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                  {startingConversation ? 'Chargement...' : 'Envoyer un Message'}
+                </Button>
               </div>
             </div>
 
-            {/* Contact Info */}
-            <div className="stat-card" data-testid="contact-info">
-              <h3 className="font-oswald text-lg font-bold text-text-primary uppercase mb-4 tracking-wide">
-                Informations de Contact
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-1">Email</p>
-                    <p className="text-text-primary font-manrope">{member.email}</p>
+            {/* Other Members Carousel (placeholder) */}
+            <div className="mt-6 bg-paper rounded-xl border border-white/5 p-4">
+              <h4 className="font-oswald text-sm text-text-muted uppercase tracking-wide mb-3">
+                Autres Adhérents
+              </h4>
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div 
+                    key={i} 
+                    className="w-12 h-12 rounded-lg bg-white/5 flex-shrink-0 flex items-center justify-center"
+                  >
+                    <User className="w-6 h-6 text-text-muted" strokeWidth={1} />
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-1">Téléphone</p>
-                    <p className="text-text-primary font-manrope">{member.phone}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-1">Localisation</p>
-                    <p className="text-text-primary font-manrope">{member.city}, {member.country}</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-primary mt-1" />
-                  <div>
-                    <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-1">Date de naissance</p>
-                    <p className="text-text-primary font-manrope">{member.date_of_birth}</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Right Column - Details */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Membership Info */}
-            <div className="stat-card" data-testid="membership-info">
-              <h3 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-6 tracking-wide">
-                Adhésion
+          {/* Right Column - Information Sections */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Informations Personnelles */}
+            <div className="bg-paper rounded-xl border border-white/5 p-6" data-testid="personal-info">
+              <h3 className="font-oswald text-xl font-bold text-text-primary uppercase mb-6 tracking-wide">
+                Informations Personnelles
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="p-4 bg-background/50 rounded-lg border border-white/5">
-                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-2">Type d'adhésion</p>
-                  <p className="text-xl font-oswald font-bold text-text-primary">{member.membership_type}</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Nom</p>
+                  <p className="text-lg text-text-primary font-manrope">{member.last_name}</p>
                 </div>
-                <div className="p-4 bg-background/50 rounded-lg border border-white/5">
-                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-2">Statut</p>
-                  <p className="text-xl font-oswald font-bold text-text-primary">{member.membership_status}</p>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Prénom</p>
+                  <p className="text-lg text-text-primary font-manrope">{member.first_name}</p>
                 </div>
-                <div className="p-4 bg-background/50 rounded-lg border border-white/5">
-                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-2">Date de début</p>
-                  <p className="text-xl font-oswald font-bold text-text-primary">{member.membership_start_date}</p>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Date de naissance</p>
+                  <p className="text-lg text-text-primary font-manrope">{member.date_of_birth || 'Non renseigné'}</p>
                 </div>
-                <div className="p-4 bg-background/50 rounded-lg border border-white/5">
-                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide mb-2">Date de fin</p>
-                  <p className="text-xl font-oswald font-bold text-text-primary">{member.membership_end_date}</p>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Email</p>
+                  <p className="text-lg text-text-primary font-manrope flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                    {member.email}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Téléphone</p>
+                  <p className="text-lg text-text-primary font-manrope flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                    {member.phone || 'Non renseigné'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Localisation</p>
+                  <p className="text-lg text-text-primary font-manrope flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                    {member.city}, {member.country}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Type</p>
+                  <p className="text-lg text-text-primary font-manrope">{member.membership_type || 'Standard'}</p>
                 </div>
               </div>
             </div>
 
-            {/* Performance Stats */}
-            <div className="stat-card" data-testid="performance-stats">
-              <h3 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-6 tracking-wide">
-                Performances
+            {/* Adhésion */}
+            <div className="bg-paper rounded-xl border border-white/5 p-6" data-testid="membership-info">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-oswald text-xl font-bold text-text-primary uppercase tracking-wide">
+                  Adhésion
+                </h3>
+                <div className={`px-3 py-1 rounded-full text-sm font-manrope ${
+                  member.membership_status === 'Actif' 
+                    ? 'bg-green-500/20 text-green-400' 
+                    : 'bg-red-500/20 text-red-400'
+                }`}>
+                  {member.membership_status || 'Actif'}
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Statut</p>
+                  <p className="text-lg text-text-primary font-manrope">{member.membership_status || 'Actif'}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Type</p>
+                  <p className="text-lg text-text-primary font-manrope">{member.membership_type || 'Annuelle'}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Date début</p>
+                  <p className="text-lg text-text-primary font-manrope flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                    {member.membership_start_date || 'Non renseigné'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Date fin</p>
+                  <p className="text-lg text-text-primary font-manrope flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-secondary" strokeWidth={1.5} />
+                    {member.membership_end_date || 'Non renseigné'}
+                  </p>
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleRenewMembership}
+                className="w-full md:w-auto bg-primary hover:bg-primary-dark"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" strokeWidth={1.5} />
+                Renouveler
+              </Button>
+            </div>
+
+            {/* Historique des Cours (placeholder) */}
+            <div className="bg-paper rounded-xl border border-white/5 p-6">
+              <h3 className="font-oswald text-xl font-bold text-text-primary uppercase mb-6 tracking-wide">
+                Historique des Cours
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-6 bg-background/50 rounded-lg border border-white/5">
-                  <Award className="w-8 h-8 text-primary mx-auto mb-3" />
-                  <p className="text-3xl font-oswald font-bold text-text-primary mb-2">{member.belt_grade}</p>
-                  <p className="text-sm text-text-secondary font-manrope">Grade actuel</p>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                  <div>
+                    <p className="text-text-primary font-manrope">Stage SPK Avancé</p>
+                    <p className="text-xs text-text-muted">15/12/2025</p>
+                  </div>
+                  <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Présent</span>
                 </div>
-                <div className="text-center p-6 bg-background/50 rounded-lg border border-white/5">
-                  <Calendar className="w-8 h-8 text-accent mx-auto mb-3" />
-                  <p className="text-3xl font-oswald font-bold text-text-primary mb-2">{member.sessions_attended}</p>
-                  <p className="text-sm text-text-secondary font-manrope">Sessions</p>
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                  <div>
+                    <p className="text-text-primary font-manrope">Cours Hebdomadaire</p>
+                    <p className="text-xs text-text-muted">12/12/2025</p>
+                  </div>
+                  <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Présent</span>
                 </div>
-                <div className="text-center p-6 bg-background/50 rounded-lg border border-white/5">
-                  <Award className="w-8 h-8 text-secondary mx-auto mb-3" />
-                  <p className="text-3xl font-oswald font-bold text-text-primary mb-2">5</p>
-                  <p className="text-sm text-text-secondary font-manrope">Victoires</p>
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                  <div>
+                    <p className="text-text-primary font-manrope">Passage de Grade</p>
+                    <p className="text-xs text-text-muted">01/12/2025</p>
+                  </div>
+                  <span className="px-2 py-1 bg-primary/20 text-primary text-xs rounded">Réussi</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 };
 
