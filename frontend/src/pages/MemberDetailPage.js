@@ -196,10 +196,10 @@ const MemberDetailPage = () => {
               <div className="p-4 text-center bg-paper border-t border-white/5">
                 <div 
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                  style={{ backgroundColor: `${beltStyle.accent}20`, color: beltStyle.accent }}
+                  style={{ backgroundColor: beltStyle.badgeBg, color: beltStyle.badgeText }}
                 >
                   <Award className="w-5 h-5" strokeWidth={1.5} />
-                  <span className="font-oswald uppercase tracking-wide">
+                  <span className="font-oswald uppercase tracking-wide font-bold">
                     Grade: SPK - {member.belt_grade}
                   </span>
                 </div>
