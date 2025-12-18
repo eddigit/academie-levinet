@@ -140,7 +140,7 @@ const LandingPage = () => {
             </h3>
             <div className="h-1 w-24 bg-accent mb-6" />
             <p className="font-manrope text-lg text-text-secondary">
-              L'Académie Jacques Levinet propose des formations adaptées à chaque profil, du débutant au professionnel aguerri.
+              L'Académie Jacques Levinet, organisme certifié, propose des parcours adaptés à chaque profil, du débutant au professionnel aguerri.
             </p>
           </div>
 
