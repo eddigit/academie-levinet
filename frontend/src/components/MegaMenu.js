@@ -71,7 +71,7 @@ const MegaMenu = () => {
             <h1 className="font-oswald text-xl font-bold text-white uppercase tracking-wide">
               Académie Jacques Levinet
             </h1>
-            <p className="text-xs text-gray-400 font-manrope">Self-Pro Krav</p>
+            <p className="text-xs text-gray-400 font-manrope">(École Internationale de Self-Défense)</p>
           </div>
         </Link>
       </div>
