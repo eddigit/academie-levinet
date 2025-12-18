@@ -126,7 +126,10 @@ class User(BaseModel):
     email: EmailStr
     password_hash: str
     full_name: str
-    role: str = "admin"
+    role: str = "member"  # Default role for new users is member
+    has_paid_license: bool = False  # Track license payment status
+    is_premium: bool = False  # Track premium subscription status
+    stripe_customer_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
