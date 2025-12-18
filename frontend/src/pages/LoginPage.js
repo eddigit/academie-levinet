@@ -74,9 +74,9 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img 
-              src="https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/e712cc50_LOGO-WORLD-KRAV-MAGA-ORGANIZATION-150x150.png" 
-              alt="Logo" 
-              className="w-20 h-20 mx-auto mb-4"
+              src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
+              alt="Logo Académie Jacques Levinet" 
+              className="w-20 h-20 mx-auto mb-4 rounded-full object-cover"
               data-testid="login-logo"
             />
             <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide mb-2">
