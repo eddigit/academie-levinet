@@ -122,6 +122,7 @@ const ShopPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const cartCount = getItemCount();
 
   useEffect(() => {
     fetchProducts();
