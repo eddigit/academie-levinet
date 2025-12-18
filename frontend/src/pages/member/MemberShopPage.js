@@ -167,13 +167,29 @@ const MemberShopPage = () => {
       
       <div className="flex-1 ml-64 p-6">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide">
-            Boutique Officielle
-          </h1>
-          <p className="text-text-secondary font-manrope mt-2">
-            Équipement professionnel certifié Académie Jacques Levinet
-          </p>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide">
+              Boutique Officielle
+            </h1>
+            <p className="text-text-secondary font-manrope mt-2">
+              Équipement professionnel certifié Académie Jacques Levinet
+            </p>
+          </div>
+          
+          {/* Cart Button */}
+          <button
+            onClick={openCart}
+            className="relative flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors"
+          >
+            <ShoppingBag className="w-5 h-5" />
+            <span>Panier</span>
+            {getItemCount() > 0 && (
+              <span className="absolute -top-2 -right-2 w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                {getItemCount()}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Premium Banner */}
