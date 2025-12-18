@@ -366,7 +366,7 @@ const LandingPage = () => {
               <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-white/10 text-center">
                 <Shield className="w-12 h-12 text-primary mx-auto mb-3" strokeWidth={1} />
                 <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Sans Agressivité</h5>
-                <p className="text-text-secondary font-manrope text-sm">Pratique sûre et respectueuse</p>
+                <p className="text-text-secondary font-manrope text-sm">Pratique sûre et respectueuse des lois</p>
               </div>
             </div>
             <p className="text-lg text-text-primary/90 font-manrope mb-8 max-w-2xl mx-auto">
