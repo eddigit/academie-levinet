@@ -408,7 +408,7 @@ const LandingPage = () => {
               <CheckCircle className="w-8 h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
                 <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Pratique Sécurisée</h5>
-                <p className="text-text-secondary font-manrope text-sm">Garde-fous éthiques pour une formation responsable</p>
+                <p className="text-text-secondary font-manrope text-sm">Déontologie, Moralité, Professionnalisme</p>
               </div>
             </div>
             <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
