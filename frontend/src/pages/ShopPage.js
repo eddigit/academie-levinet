@@ -152,13 +152,27 @@ const ShopPage = () => {
       {/* Hero Section */}
       <section className="pt-24 pb-12 px-6 bg-gradient-to-b from-paper to-background">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center">
+          <div className="text-center relative">
             <h1 className="font-oswald text-4xl md:text-5xl font-bold text-text-primary uppercase tracking-wide mb-4">
               Boutique Officielle
             </h1>
             <p className="text-text-secondary font-manrope text-lg max-w-2xl mx-auto">
               Équipement professionnel certifié Académie Jacques Levinet
             </p>
+            
+            {/* Cart Button */}
+            <button
+              onClick={openCart}
+              className="absolute right-0 top-0 flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              <span className="hidden sm:inline">Panier</span>
+              {cartCount > 0 && (
+                <span className="w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </section>
