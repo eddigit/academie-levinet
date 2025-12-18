@@ -279,7 +279,7 @@ const LandingPage = () => {
                   Formations en Ligne
                 </h3>
                 <p className="text-text-secondary font-manrope text-lg mb-6 leading-relaxed">
-                  Accédez à une bibliothèque complète de cours vidéo pour vous former où que vous soyez, à votre rythme.
+                  Accédez à une bibliothèque complète de cours vidéo et cahiers techniques pour vous former où que vous soyez, à votre rythme.
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start gap-3">
