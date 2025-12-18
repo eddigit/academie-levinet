@@ -30,7 +30,12 @@ const LoginPage = () => {
       }
 
       if (result.success) {
-        navigate('/dashboard');
+        // Redirect based on user role
+        if (result.user?.role === 'admin') {
+          navigate('/dashboard');
+        } else {
+          navigate('/member/dashboard');
+        }
       } else {
         setError(result.error);
       }
