@@ -11,16 +11,16 @@ const LandingPage = () => {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
             <img 
-              src="https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/e712cc50_LOGO-WORLD-KRAV-MAGA-ORGANIZATION-150x150.png" 
-              alt="Logo" 
-              className="w-12 h-12"
+              src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
+              alt="Logo Académie Jacques Levinet" 
+              className="w-12 h-12 rounded-full object-cover"
               data-testid="header-logo"
             />
             <div>
               <h1 className="font-oswald text-xl font-bold text-text-primary uppercase tracking-wide">
                 Académie Jacques Levinet
               </h1>
-              <p className="text-xs text-text-secondary font-manrope">Self-Pro Krav</p>
+              <p className="text-xs text-text-secondary font-manrope">(École Internationale de Self-Défense)</p>
             </div>
           </Link>
           <div className="flex items-center gap-4">
