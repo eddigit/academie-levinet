@@ -32,6 +32,7 @@ import MemberPrograms from './pages/member/MemberPrograms';
 import MemberCourses from './pages/member/MemberCourses';
 import MemberCommunity from './pages/member/MemberCommunity';
 import MemberGrades from './pages/member/MemberGrades';
+import MemberShopPage from './pages/member/MemberShopPage';
 // Shop pages
 import ShopPage from './pages/ShopPage';
 import AdminProductsPage from './pages/AdminProductsPage';
