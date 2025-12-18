@@ -240,8 +240,13 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          {/* Payment pages */}
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/cancel" element={<PaymentCancelPage />} />
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+      </CartProvider>
     </AuthProvider>
   );
 }
