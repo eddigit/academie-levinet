@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PublicHeader from '../components/PublicHeader';
 import PublicFooter from '../components/PublicFooter';
+import { useCart } from '../context/CartContext';
 import api from '../utils/api';
-import { ShoppingBag, Filter, Search, Star, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Filter, Search, Star, ChevronRight, Check } from 'lucide-react';
 
 const CATEGORIES = [
   { id: 'all', name: 'Tous les produits' },
