@@ -1270,6 +1270,261 @@ async def admin_get_all_conversations(
     
     return {"conversations": conversations, "total": total}
 
+# ==================== SOCIAL WALL ENDPOINTS ====================
+
+# Models for social wall
+class PostCreate(BaseModel):
+    content: str = Field(..., min_length=1, max_length=5000)
+    post_type: str = "text"
+    image_url: Optional[str] = None
+    video_url: Optional[str] = None
+
+class CommentCreate(BaseModel):
+    content: str = Field(..., min_length=1, max_length=1000)
+
+class ReactionCreate(BaseModel):
+    reaction_type: str = "like"
+
+@api_router.get("/wall/posts")
+async def get_wall_posts(
+    limit: int = 20,
+    skip: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all posts for the community wall"""
+    posts = await db.posts.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Enrich posts with author info, comments count, reactions
+    for post in posts:
+        # Get author info
+        author = await db.users.find_one({"id": post.get("author_id")}, {"_id": 0, "password_hash": 0})
+        post["author"] = author
+        
+        # Get comments count
+        comments_count = await db.post_comments.count_documents({"post_id": post["id"]})
+        post["comments_count"] = comments_count
+        
+        # Get reactions summary
+        reactions = await db.post_reactions.find({"post_id": post["id"]}, {"_id": 0}).to_list(100)
+        reaction_summary = {}
+        user_reaction = None
+        for r in reactions:
+            rt = r.get("reaction_type", "like")
+            reaction_summary[rt] = reaction_summary.get(rt, 0) + 1
+            if r.get("user_id") == current_user.get("id"):
+                user_reaction = rt
+        post["reactions"] = reaction_summary
+        post["reactions_count"] = len(reactions)
+        post["user_reaction"] = user_reaction
+    
+    total = await db.posts.count_documents({})
+    return {"posts": posts, "total": total}
+
+@api_router.post("/wall/posts")
+async def create_post(
+    post_data: PostCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a new post on the community wall"""
+    post = {
+        "id": str(uuid.uuid4()),
+        "author_id": current_user.get("id"),
+        "content": post_data.content,
+        "post_type": post_data.post_type,
+        "image_url": post_data.image_url,
+        "video_url": post_data.video_url,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.posts.insert_one(post)
+    
+    # Return with author info
+    post["author"] = {
+        "id": current_user.get("id"),
+        "full_name": current_user.get("full_name"),
+        "email": current_user.get("email"),
+        "role": current_user.get("role")
+    }
+    post["comments_count"] = 0
+    post["reactions"] = {}
+    post["reactions_count"] = 0
+    post["user_reaction"] = None
+    
+    return post
+
+@api_router.delete("/wall/posts/{post_id}")
+async def delete_post(
+    post_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a post (author or admin only)"""
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post.get("author_id") != current_user.get("id") and current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to delete this post")
+    
+    await db.posts.delete_one({"id": post_id})
+    await db.post_comments.delete_many({"post_id": post_id})
+    await db.post_reactions.delete_many({"post_id": post_id})
+    
+    return {"message": "Post deleted successfully"}
+
+@api_router.get("/wall/posts/{post_id}/comments")
+async def get_post_comments(
+    post_id: str,
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get comments for a specific post"""
+    comments = await db.post_comments.find({"post_id": post_id}, {"_id": 0}).sort("created_at", 1).limit(limit).to_list(limit)
+    
+    # Enrich with author info
+    for comment in comments:
+        author = await db.users.find_one({"id": comment.get("author_id")}, {"_id": 0, "password_hash": 0})
+        comment["author"] = author
+    
+    return {"comments": comments}
+
+@api_router.post("/wall/posts/{post_id}/comments")
+async def create_comment(
+    post_id: str,
+    comment_data: CommentCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Add a comment to a post"""
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    comment = {
+        "id": str(uuid.uuid4()),
+        "post_id": post_id,
+        "author_id": current_user.get("id"),
+        "content": comment_data.content,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.post_comments.insert_one(comment)
+    
+    comment["author"] = {
+        "id": current_user.get("id"),
+        "full_name": current_user.get("full_name"),
+        "email": current_user.get("email")
+    }
+    
+    return comment
+
+@api_router.delete("/wall/posts/{post_id}/comments/{comment_id}")
+async def delete_comment(
+    post_id: str,
+    comment_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a comment (author or admin only)"""
+    comment = await db.post_comments.find_one({"id": comment_id, "post_id": post_id})
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    
+    if comment.get("author_id") != current_user.get("id") and current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to delete this comment")
+    
+    await db.post_comments.delete_one({"id": comment_id})
+    return {"message": "Comment deleted successfully"}
+
+@api_router.post("/wall/posts/{post_id}/reactions")
+async def toggle_reaction(
+    post_id: str,
+    reaction_data: ReactionCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Toggle a reaction on a post"""
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    existing = await db.post_reactions.find_one({
+        "post_id": post_id,
+        "user_id": current_user.get("id")
+    })
+    
+    if existing:
+        if existing.get("reaction_type") == reaction_data.reaction_type:
+            # Remove reaction
+            await db.post_reactions.delete_one({"id": existing["id"]})
+            return {"action": "removed", "reaction_type": None}
+        else:
+            # Update reaction
+            await db.post_reactions.update_one(
+                {"id": existing["id"]},
+                {"$set": {"reaction_type": reaction_data.reaction_type}}
+            )
+            return {"action": "updated", "reaction_type": reaction_data.reaction_type}
+    else:
+        # Add reaction
+        reaction = {
+            "id": str(uuid.uuid4()),
+            "post_id": post_id,
+            "user_id": current_user.get("id"),
+            "reaction_type": reaction_data.reaction_type,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.post_reactions.insert_one(reaction)
+        return {"action": "added", "reaction_type": reaction_data.reaction_type}
+
+@api_router.get("/wall/online-users")
+async def get_online_users(current_user: dict = Depends(get_current_user)):
+    """Get recently active users (active in last 15 minutes)"""
+    # Update current user's last activity
+    await db.user_activity.update_one(
+        {"user_id": current_user.get("id")},
+        {"$set": {
+            "user_id": current_user.get("id"),
+            "last_active": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    # Get users active in last 15 minutes
+    threshold = (datetime.now(timezone.utc) - timedelta(minutes=15)).isoformat()
+    active_records = await db.user_activity.find(
+        {"last_active": {"$gte": threshold}},
+        {"_id": 0}
+    ).to_list(100)
+    
+    online_users = []
+    for record in active_records:
+        user = await db.users.find_one(
+            {"id": record.get("user_id")},
+            {"_id": 0, "password_hash": 0}
+        )
+        if user:
+            online_users.append(user)
+    
+    return {"online_users": online_users, "count": len(online_users)}
+
+@api_router.get("/wall/stats")
+async def get_wall_stats(current_user: dict = Depends(get_current_user)):
+    """Get community statistics"""
+    total_members = await db.users.count_documents({})
+    total_posts = await db.posts.count_documents({})
+    total_comments = await db.post_comments.count_documents({})
+    
+    # Posts this week
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    posts_this_week = await db.posts.count_documents({"created_at": {"$gte": week_ago}})
+    
+    # Get recent achievements/milestones
+    recent_members = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(5).to_list(5)
+    
+    return {
+        "total_members": total_members,
+        "total_posts": total_posts,
+        "total_comments": total_comments,
+        "posts_this_week": posts_this_week,
+        "recent_members": recent_members
+    }
+
 # ==================== STRIPE PAYMENT ENDPOINTS ====================
 
 # Payment packages (fixed prices - never accept amounts from frontend)
