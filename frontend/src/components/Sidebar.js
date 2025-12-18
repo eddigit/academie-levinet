@@ -48,7 +48,7 @@ const Sidebar = () => {
           <img 
             src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
             alt="Académie Levinet Logo" 
-            className="w-12 h-12 object-contain"
+            className="w-12 h-12 rounded-full object-cover"
             data-testid="sidebar-logo"
           />
           <div>

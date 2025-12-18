@@ -13,7 +13,7 @@ const PublicFooter = () => {
               <img 
                 src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
                 alt="Logo" 
-                className="w-10 h-10"
+                className="w-10 h-10 rounded-full object-cover"
               />
               <div>
                 <h3 className="font-oswald text-lg font-bold text-text-primary uppercase">AJL</h3>

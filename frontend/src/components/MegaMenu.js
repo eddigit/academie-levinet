@@ -65,7 +65,7 @@ const MegaMenu = () => {
           <img 
             src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
             alt="Logo" 
-            className="w-12 h-12"
+            className="w-12 h-12 rounded-full object-cover"
           />
           <div>
             <h1 className="font-oswald text-xl font-bold text-white uppercase tracking-wide">

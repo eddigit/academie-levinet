@@ -85,7 +85,7 @@ const OnboardingPage = () => {
             <img 
               src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
               alt="Logo" 
-              className="w-20 h-20 mx-auto"
+              className="w-20 h-20 mx-auto rounded-full object-cover"
             />
           </Link>
           <h1 className="font-oswald text-4xl font-bold text-text-primary uppercase tracking-wide mb-2">
