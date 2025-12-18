@@ -86,10 +86,13 @@ const LandingPage = () => {
       <section className="py-20 px-6 bg-paper" data-testid="features-section">
         <div className="container mx-auto">
           <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-4 tracking-wide">
-            Les 3 Piliers du SPK
+            Les 3 Piliers de Nos Méthodes
           </h3>
-          <p className="text-center text-text-secondary font-manrope text-lg mb-16 max-w-3xl mx-auto">
-            Self-Pro Krav : L'évolution responsable du Krav Maga, conçue pour tous
+          <p className="text-center text-text-secondary font-manrope text-lg mb-2 max-w-3xl mx-auto">
+            Self Pro Krav - Canne défense - Bâton défense - Self Féminine - Self Enfants
+          </p>
+          <p className="text-center text-primary font-manrope text-base mb-16 max-w-3xl mx-auto">
+            Pour les professionnels sécurités et Forces de l'ordre : Real Operational System
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="stat-card text-center" data-testid="feature-card-legitimite">
