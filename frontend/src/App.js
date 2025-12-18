@@ -141,6 +141,14 @@ function App() {
             }
           />
           <Route
+            path="/admin/products"
+            element={
+              <ProtectedRoute>
+                <AdminProductsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/messages"
             element={
               <ProtectedRoute>
