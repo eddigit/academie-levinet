@@ -131,13 +131,14 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
 
 const MemberShopPage = () => {
   const { user } = useAuth();
+  const { addItem, getItemCount, openCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Check if user is premium (placeholder - you can implement real check)
-  const isPremium = user?.role === 'premium' || false;
+  // Check if user is premium
+  const isPremium = user?.is_premium || false;
 
   useEffect(() => {
     fetchProducts();
