@@ -201,7 +201,7 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Professionnels Card - Kinetic Shutter Design */}
+            {/* Forces de Sécurité Card - Kinetic Shutter Design */}
             <div 
               className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50"
               data-testid="audience-card-pro"
@@ -216,10 +216,10 @@ const LandingPage = () => {
                 <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
                   <div className="h-1 w-12 bg-primary mb-4 transition-all duration-500 group-hover:w-24" />
                   <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
-                    Professionnels
+                    Forces de Sécurité
                   </h4>
                   <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
-                    IPC/ROS : Formation tactique avancée pour les forces de l'ordre et agents de sécurité
+                    Formation opérationnelle pour forces de l'ordre et agents de sécurité
                   </p>
                   <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                     <span className="font-oswald text-sm font-bold uppercase tracking-wider text-primary">Formation Pro</span>
