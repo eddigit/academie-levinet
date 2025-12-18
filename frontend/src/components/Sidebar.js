@@ -38,6 +38,7 @@ const Sidebar = () => {
 
   // Admin-only menu items
   const adminItems = [
+    { path: '/admin/products', icon: ShoppingBag, label: 'Boutique', testId: 'nav-products' },
     { path: '/admin/messages', icon: Shield, label: 'Modération', testId: 'nav-moderation' },
   ];
 
