@@ -224,6 +224,8 @@ class Lead(BaseModel):
     phone: str
     city: str
     country: str
+    training_mode: Optional[str] = None  # 'online', 'club', 'both'
+    nearest_club_city: Optional[str] = None
     status: LeadStatus = LeadStatus.NEW
     notes: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -236,6 +238,8 @@ class LeadCreate(BaseModel):
     phone: str
     city: str
     country: str
+    training_mode: Optional[str] = None  # 'online', 'club', 'both'
+    nearest_club_city: Optional[str] = None
 
 class News(BaseModel):
     model_config = ConfigDict(extra="ignore")
