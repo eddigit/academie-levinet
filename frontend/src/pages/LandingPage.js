@@ -434,7 +434,7 @@ const LandingPage = () => {
       >
         <div className="container mx-auto text-center max-w-3xl">
           <h3 className="font-oswald text-4xl md:text-5xl font-bold text-text-primary uppercase mb-6 tracking-wide">
-            Maîtrisez l'Autodéfense la Plus Réaliste au Monde
+            Rejoignez l'Académie Jacques Levinet
           </h3>
           <p className="text-lg text-text-secondary font-manrope mb-10 leading-relaxed">
             Rejoignez l'Académie Jacques Levinet et développez votre confiance, votre sécurité et vos capacités
