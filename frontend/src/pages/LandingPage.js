@@ -371,7 +371,7 @@ const LandingPage = () => {
             </div>
             <p className="text-lg text-text-primary/90 font-manrope mb-8 max-w-2xl mx-auto">
               <strong>Dans un contexte où la sécurité personnelle est plus importante que jamais</strong>, 
-              le programme SFJL vous donne les outils pour vous défendre efficacement tout en respectant votre bien-être.
+              notre programme vous donne les outils pour vous défendre efficacement contre toutes formes de violences.
             </p>
           </div>
         </div>
