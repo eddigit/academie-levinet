@@ -90,6 +90,21 @@ class ReactionType(str, Enum):
     CLAP = "clap"
     STRONG = "strong"
 
+class ProductCategory(str, Enum):
+    MITTENS = "Mittens"
+    GANTS = "Gants de Combat"
+    CASQUES = "Casques"
+    PROTECTIONS = "Protections"
+    KIMONOS = "Kimonos"
+    ACCESSOIRES = "Accessoires"
+
+class OrderStatus(str, Enum):
+    PENDING = "En attente"
+    PAID = "Payé"
+    SHIPPED = "Expédié"
+    DELIVERED = "Livré"
+    CANCELLED = "Annulé"
+
 class EventType(str, Enum):
     STAGE = "Stage"
     COURSE = "Cours"
