@@ -1410,6 +1410,9 @@ async def create_comment(
     }
     await db.post_comments.insert_one(comment)
     
+    # Remove MongoDB _id for response
+    comment.pop("_id", None)
+    
     comment["author"] = {
         "id": current_user.get("id"),
         "full_name": current_user.get("full_name"),
