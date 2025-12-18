@@ -1338,6 +1338,9 @@ async def create_post(
     }
     await db.posts.insert_one(post)
     
+    # Remove MongoDB _id for response
+    post.pop("_id", None)
+    
     # Return with author info
     post["author"] = {
         "id": current_user.get("id"),
