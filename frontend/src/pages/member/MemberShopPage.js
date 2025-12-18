@@ -15,10 +15,17 @@ const CATEGORIES = [
   { id: 'Accessoires', name: 'Accessoires' },
 ];
 
-const ProductCard = ({ product, isPremium }) => {
+const ProductCard = ({ product, isPremium, onAddToCart }) => {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
+  const [added, setAdded] = useState(false);
   
   const discountedPrice = isPremium ? (product.price * 0.9).toFixed(2) : null;
+
+  const handleAddToCart = () => {
+    onAddToCart(product, 1, selectedSize);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
     <div className="group bg-paper rounded-xl border border-white/5 overflow-hidden hover:border-primary/30 transition-all duration-300">
@@ -96,11 +103,25 @@ const ProductCard = ({ product, isPremium }) => {
             )}
           </div>
           <button
-            disabled={product.stock === 0}
-            className="flex items-center gap-1 px-3 py-2 bg-primary text-white rounded-lg font-semibold text-xs hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleAddToCart}
+            disabled={product.stock === 0 || added}
+            className={`flex items-center gap-1 px-3 py-2 rounded-lg font-semibold text-xs transition-all disabled:cursor-not-allowed ${
+              added 
+                ? 'bg-green-500 text-white' 
+                : 'bg-primary text-white hover:bg-primary-dark disabled:opacity-50'
+            }`}
           >
-            <ShoppingBag className="w-3 h-3" />
-            Ajouter
+            {added ? (
+              <>
+                <Check className="w-3 h-3" />
+                Ajouté !
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-3 h-3" />
+                Ajouter
+              </>
+            )}
           </button>
         </div>
       </div>
