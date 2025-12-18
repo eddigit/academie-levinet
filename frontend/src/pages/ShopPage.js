@@ -16,8 +16,15 @@ const CATEGORIES = [
   { id: 'Accessoires', name: 'Accessoires' },
 ];
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, onAddToCart }) => {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '');
+  const [added, setAdded] = useState(false);
+
+  const handleAddToCart = () => {
+    onAddToCart(product, 1, selectedSize);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+  };
 
   return (
     <div className="group bg-paper rounded-2xl border border-white/5 overflow-hidden hover:border-primary/30 transition-all duration-300">
