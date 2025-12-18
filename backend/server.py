@@ -1996,8 +1996,8 @@ async def stripe_webhook(request: Request):
                     await db.users.update_one(
                         {"id": user_id},
                         {"$set": {
-                            "licence_paid": True,
-                            "licence_date": datetime.now(timezone.utc).isoformat()
+                            "has_paid_license": True,
+                            "license_paid_at": datetime.now(timezone.utc).isoformat()
                         }}
                     )
                     logger.info(f"Licence activated for user {user_id}")
