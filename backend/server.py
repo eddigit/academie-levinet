@@ -3825,49 +3825,89 @@ async def get_instructors_list():
     ).to_list(1000)
     return {"instructors": instructors}
 
-# ==================== CHAT ALIASES (for compatibility) ====================
+# ==================== CHAT ENDPOINTS (Real AI Integration) ====================
 
 @api_router.post("/chat/visitor")
-async def chat_visitor_alias(message: dict):
-    """Alias for /assistant/visitor - Chat with AI assistant (public)"""
-    from pydantic import BaseModel
-    class ChatRequest(BaseModel):
-        message: str
-        session_id: Optional[str] = None
-    
+async def chat_visitor_endpoint(message: dict):
+    """AI Chat for visitors - Sales-oriented assistant"""
     try:
-        # Get AI config for visitor
-        config = await db.settings.find_one({"key": "ai_config"}, {"_id": 0})
-        visitor_prompt = config.get("value", {}).get("visitor_prompt", "") if config else ""
+        session_id = message.get("session_id", str(uuid.uuid4()))
+        user_message = message.get("message", "")
         
-        system_prompt = f"""Tu es l'assistant virtuel de l'Académie Jacques Levinet, une fédération internationale de self-défense.
-Tu aides les visiteurs à découvrir nos méthodes (SPK, SFJL, WKMO, IPC) et à rejoindre l'académie.
-Sois accueillant, professionnel et encourage les visiteurs à s'inscrire.
-{visitor_prompt}"""
+        if not user_message:
+            return {
+                "response": "👋 Bonjour et bienvenue à l'Académie Jacques Levinet ! Je suis Léo, votre guide. Qu'est-ce qui vous amène vers la self-défense aujourd'hui ?",
+                "session_id": session_id
+            }
         
-        # Simple response for now
+        # Get or create session
+        if session_id not in chat_sessions:
+            chat_sessions[session_id] = LlmChat(
+                api_key=EMERGENT_API_KEY,
+                system_message=VISITOR_ASSISTANT_PROMPT
+            )
+        
+        chat = chat_sessions[session_id]
+        response = chat.send_message(user_message)
+        
         return {
-            "response": "Bienvenue à l'Académie Jacques Levinet ! Je suis l'assistant virtuel. Comment puis-je vous aider à découvrir nos méthodes de self-défense ?",
-            "session_id": message.get("session_id", str(uuid.uuid4()))
+            "response": response,
+            "session_id": session_id
         }
     except Exception as e:
-        return {"response": "Bienvenue ! Comment puis-je vous aider ?", "session_id": str(uuid.uuid4())}
+        logger.error(f"Chat visitor error: {str(e)}")
+        # Fallback response if AI fails
+        return {
+            "response": "👋 Bienvenue à l'Académie Jacques Levinet ! Je suis là pour vous aider à découvrir notre méthode de Krav Maga Self-Défense. Que souhaitez-vous savoir ? 💪",
+            "session_id": message.get("session_id", str(uuid.uuid4()))
+        }
 
 @api_router.post("/chat/member")
-async def chat_member_alias(message: dict, current_user: dict = Depends(get_current_user)):
-    """Alias for /assistant/member - Chat with AI assistant (authenticated)"""
+async def chat_member_endpoint(message: dict, current_user: dict = Depends(get_current_user)):
+    """AI Chat for members - Platform guide assistant"""
     try:
-        # Get AI config for member
-        config = await db.settings.find_one({"key": "ai_config"}, {"_id": 0})
-        member_prompt = config.get("value", {}).get("member_prompt", "") if config else ""
+        session_id = message.get("session_id", str(uuid.uuid4()))
+        user_message = message.get("message", "")
+        user_name = current_user.get("full_name", "").split()[0] if current_user.get("full_name") else "Champion"
         
-        user_name = current_user.get("full_name", "Membre")
+        if not user_message:
+            return {
+                "response": f"👋 Salut {user_name} ! Je suis Léo, ton assistant personnel. Comment puis-je t'aider aujourd'hui ? Tu veux explorer ton espace membre, trouver un événement, ou autre chose ? 🥋",
+                "session_id": session_id
+            }
+        
+        # Personalize the prompt with member info
+        member_context = f"""
+INFORMATIONS SUR CE MEMBRE :
+- Prénom : {user_name}
+- Grade : {current_user.get('belt_grade', 'Non défini')}
+- Club : {current_user.get('club', 'Non assigné')}
+- Ville : {current_user.get('city', 'Non renseignée')}
+"""
+        
+        # Get or create session
+        member_session_key = f"member_{current_user.get('id', session_id)}"
+        if member_session_key not in chat_sessions:
+            chat_sessions[member_session_key] = LlmChat(
+                api_key=EMERGENT_API_KEY,
+                system_message=MEMBER_ASSISTANT_PROMPT + member_context
+            )
+        
+        chat = chat_sessions[member_session_key]
+        response = chat.send_message(user_message)
         
         return {
-            "response": f"Bonjour {user_name} ! Je suis votre assistant personnel. Comment puis-je vous aider aujourd'hui ?",
-            "session_id": message.get("session_id", str(uuid.uuid4()))
+            "response": response,
+            "session_id": session_id
         }
     except Exception as e:
+        logger.error(f"Chat member error: {str(e)}")
+        # Fallback response if AI fails
+        user_name = current_user.get("full_name", "").split()[0] if current_user.get("full_name") else "Champion"
+        return {
+            "response": f"👋 Salut {user_name} ! Je suis là pour t'aider. Tu peux consulter ton profil dans /member/profile, voir les événements dans /events, ou envoyer un message à ton instructeur via /messages. Que souhaites-tu faire ? 🥋",
+            "session_id": message.get("session_id", str(uuid.uuid4()))
+        }
         return {"response": "Bonjour ! Comment puis-je vous aider ?", "session_id": str(uuid.uuid4())}
 
 # ==================== ONBOARDING DYNAMIC ENDPOINTS ====================
