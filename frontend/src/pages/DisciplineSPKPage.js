@@ -64,26 +64,25 @@ const DisciplineSPKPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="font-oswald text-4xl font-bold text-text-primary uppercase mb-6 tracking-tight">
-                Qu'est-ce que le <span className="text-accent">SPK</span> ?
+                Pourquoi <span className="text-accent">Apprendre</span> ?
               </h2>
               <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
-                Le Self-Pro Krav (SPK) est une <strong className="text-white">version améliorée du Krav Maga</strong>, 
-                créée par le Capitaine Jacques Levinet. Elle a été conçue spécifiquement pour 
-                respecter les lois françaises et la déontologie.
+                Vous n'avez pas besoin d'être sportif. Vous n'avez pas besoin d'être fort.
+                <strong className="text-white"> Vous avez juste besoin de vouloir vous protéger.</strong>
               </p>
               <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
-                Contrairement au Krav Maga traditionnel, <strong className="text-white">on ne va jamais au-delà de la légitime défense</strong>. 
-                Nos techniques sont proportionnées : vous apprenez à vous protéger efficacement, 
-                tout en restant dans le cadre légal.
+                Notre méthode, le <strong className="text-accent">Self-Pro Krav</strong>, est basée sur vos réflexes naturels.
+                Vous apprenez des gestes simples, efficaces, et surtout <strong className="text-white">légaux</strong> — 
+                conformes aux lois françaises sur la légitime défense.
               </p>
               <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
-                C'est une self-défense <strong className="text-white">responsable et éthique</strong>, 
-                adaptée aux réalités du terrain et aux exigences morales.
+                Pas de violence gratuite. Pas de techniques dangereuses. 
+                Juste ce qu'il faut pour <strong className="text-white">vous sentir en sécurité</strong>.
               </p>
               <div className="bg-accent/10 border border-accent/30 rounded-lg p-6">
-                <p className="text-accent font-oswald uppercase leading-none tracking-wide mb-2">Notre Différence</p>
+                <p className="text-accent font-oswald uppercase leading-none tracking-wide mb-2">Notre Engagement</p>
                 <p className="text-text-secondary font-manrope">
-                  "Le SPK, c'est le Krav Maga qui respecte les règles. Efficace, légal, éthique."
+                  "Vous apprendre à vous défendre, dans le respect de la loi et de vos valeurs."
                 </p>
               </div>
             </div>
@@ -105,7 +104,7 @@ const DisciplineSPKPage = () => {
       <section className="py-20 px-6 bg-background">
         <div className="container mx-auto max-w-6xl">
           <h2 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-12 tracking-tight">
-            Les <span className="text-accent">Principes</span> Fondamentaux
+            Ce Que Vous <span className="text-accent">Allez Apprendre</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
