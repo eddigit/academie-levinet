@@ -1,101 +1,167 @@
 {
   "summary": {
-    "total_tests": 15,
-    "passed_tests": 14,
-    "failed_tests": 1,
-    "success_rate": 93.33333333333333
+    "total_tests": 26,
+    "passed_tests": 20,
+    "failed_tests": 6,
+    "success_rate": 76.92307692307693
   },
   "detailed_results": [
     {
       "test_name": "Admin Login",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:14.739364"
+      "timestamp": "2025-12-19T14:57:57.687227"
     },
     {
       "test_name": "Get Current User",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:14.811122"
+      "timestamp": "2025-12-19T14:57:57.762228"
     },
     {
       "test_name": "Create Technical Director",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:14.843444"
+      "timestamp": "2025-12-19T14:57:57.814381"
     },
     {
       "test_name": "Get Technical Directors",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:14.880594"
+      "timestamp": "2025-12-19T14:57:57.859927"
     },
     {
       "test_name": "Create Member",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:14.914600"
+      "timestamp": "2025-12-19T14:57:57.899947"
     },
     {
       "test_name": "Get Members",
-      "success": false,
-      "details": "Expected 200, got 520 - Internal Server Error",
-      "timestamp": "2025-12-19T07:20:14.951447"
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-19T14:57:57.938427"
     },
     {
       "test_name": "Create Subscription",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:14.985248"
+      "timestamp": "2025-12-19T14:57:57.977571"
     },
     {
       "test_name": "Get Subscriptions",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:15.021017"
+      "timestamp": "2025-12-19T14:57:58.056530"
     },
     {
       "test_name": "Get Dashboard Stats",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:15.058527"
+      "timestamp": "2025-12-19T14:57:58.099637"
     },
     {
       "test_name": "Dashboard Stats Validation",
       "success": true,
       "details": "All required fields present",
-      "timestamp": "2025-12-19T07:20:15.059046"
+      "timestamp": "2025-12-19T14:57:58.100302"
     },
     {
       "test_name": "Create Pending Member",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:15.098970"
+      "timestamp": "2025-12-19T14:57:58.147539"
     },
     {
       "test_name": "Get Pending Members",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:15.134844"
+      "timestamp": "2025-12-19T14:57:58.185052"
     },
     {
       "test_name": "Approve Pending Member",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:15.406106"
+      "timestamp": "2025-12-19T14:57:58.452686"
     },
     {
       "test_name": "Get SMTP Settings",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:15.438681"
+      "timestamp": "2025-12-19T14:57:58.508217"
     },
     {
       "test_name": "Update SMTP Settings",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-19T07:20:15.496683"
+      "timestamp": "2025-12-19T14:57:58.551331"
+    },
+    {
+      "test_name": "Get Technical Directors List",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-19T14:57:58.585307"
+    },
+    {
+      "test_name": "Get Instructors List",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-19T14:57:58.622397"
+    },
+    {
+      "test_name": "Create Club",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-19T14:57:58.659613"
+    },
+    {
+      "test_name": "Get All Clubs",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-19T14:57:58.702076"
+    },
+    {
+      "test_name": "Get Club Details",
+      "success": false,
+      "details": "Expected 200, got 404 - {'detail': 'Club non trouv\u00e9'}",
+      "timestamp": "2025-12-19T14:57:58.738649"
+    },
+    {
+      "test_name": "Update Club",
+      "success": false,
+      "details": "Expected 200, got 404 - {'detail': 'Club non trouv\u00e9'}",
+      "timestamp": "2025-12-19T14:57:58.775975"
+    },
+    {
+      "test_name": "Get Club Stats",
+      "success": false,
+      "details": "Expected 200, got 404 - {'detail': 'Club non trouv\u00e9'}",
+      "timestamp": "2025-12-19T14:57:58.815189"
+    },
+    {
+      "test_name": "Assign Member to Club",
+      "success": false,
+      "details": "Expected 200, got 404 - {'detail': 'Club non trouv\u00e9'}",
+      "timestamp": "2025-12-19T14:57:58.853617"
+    },
+    {
+      "test_name": "Remove Member from Club",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-12-19T14:57:58.894805"
+    },
+    {
+      "test_name": "Create Visit Request",
+      "success": false,
+      "details": "Expected 200, got 422 - {'detail': [{'type': 'string_type', 'loc': ['body', 'target_club_id'], 'msg': 'Input should be a valid string', 'input': None, 'url': 'https://errors.pydantic.dev/2.12/v/string_type'}]}",
+      "timestamp": "2025-12-19T14:57:58.932156"
+    },
+    {
+      "test_name": "Delete Club",
+      "success": false,
+      "details": "Expected 200, got 404 - {'detail': 'Club non trouv\u00e9'}",
+      "timestamp": "2025-12-19T14:57:58.969840"
     }
   ],
-  "timestamp": "2025-12-19T07:20:15.497525"
+  "timestamp": "2025-12-19T14:57:58.970653"
 }
