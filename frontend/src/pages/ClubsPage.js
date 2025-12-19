@@ -515,9 +515,9 @@ const ClubsPage = () => {
 
           {/* Club Detail Modal */}
           {isDetailOpen && selectedClub && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-paper rounded-xl border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-paper z-10">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4" onClick={() => setIsDetailOpen(false)}>
+              <div className="bg-paper rounded-xl border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="p-6 border-b border-white/10 flex justify-between items-center sticky top-0 bg-paper z-20">
                   <div className="flex items-center gap-3">
                     {selectedClub.logo_url ? (
                       <img src={selectedClub.logo_url} alt={selectedClub.name} className="w-12 h-12 rounded-lg object-cover" />
