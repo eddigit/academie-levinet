@@ -82,7 +82,7 @@ const JoinPage = () => {
           
           <Link
             to="/onboarding"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-secondary hover:bg-secondary/80 text-white font-oswald uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-secondary hover:bg-secondary/80 text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)]"
           >
             Commencer l'Inscription
             <ChevronRight className="w-5 h-5" strokeWidth={2} />
@@ -144,7 +144,7 @@ const JoinPage = () => {
                 
                 <Link
                   to={type.link}
-                  className={`block w-full py-3 text-center font-oswald uppercase tracking-wider rounded-sm transition-all ${
+                  className={`block w-full py-3 text-center font-oswald uppercase leading-none tracking-wider rounded-sm transition-all ${
                     type.highlight 
                       ? 'bg-secondary hover:bg-secondary/80 text-white shadow-[0_0_15px_rgba(239,68,68,0.3)]' 
                       : 'border border-white/20 hover:border-white/50 text-white'
@@ -215,14 +215,14 @@ const JoinPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/onboarding"
-              className="px-8 py-4 bg-secondary hover:bg-secondary/80 text-white font-oswald uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] flex items-center justify-center gap-2"
+              className="px-8 py-4 bg-secondary hover:bg-secondary/80 text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] flex items-center justify-center gap-2"
             >
               Démarrer l'Inscription
               <ChevronRight className="w-5 h-5" strokeWidth={2} />
             </Link>
             <Link
               to="/about"
-              className="px-8 py-4 border border-white/20 hover:border-white/50 text-white font-oswald uppercase tracking-wider rounded-sm transition-all flex items-center justify-center gap-2"
+              className="px-8 py-4 border border-white/20 hover:border-white/50 text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all flex items-center justify-center gap-2"
             >
               En Savoir Plus
               <ChevronRight className="w-5 h-5" strokeWidth={2} />

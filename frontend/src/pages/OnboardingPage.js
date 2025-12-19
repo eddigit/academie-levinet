@@ -264,7 +264,7 @@ const OnboardingPage = () => {
             
             <Link
               to="/"
-              className="w-full py-3 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors"
+              className="w-full py-3 bg-primary hover:bg-primary-dark text-white font-oswald uppercase leading-none tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors"
             >
               Retour à l'accueil
             </Link>
@@ -367,7 +367,7 @@ const OnboardingPage = () => {
                 <button
                   onClick={handleExistingMemberSubmit}
                   disabled={loading || !canSubmitExistingMember()}
-                  className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                  className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase leading-none tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                 >
                   {loading ? (
                     <>
@@ -678,7 +678,7 @@ const OnboardingPage = () => {
                   <button
                     onClick={handleCreateAccountAndPay}
                     disabled={loading}
-                    className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                    className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase leading-none tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
                   >
                     {loading ? (
                       <>
@@ -704,7 +704,7 @@ const OnboardingPage = () => {
                 <div className="border-t border-white/10 pt-6">
                   <button
                     onClick={() => setIsExistingMember(true)}
-                    className="w-full py-3 bg-white/5 hover:bg-white/10 text-text-secondary hover:text-text-primary font-oswald uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors"
+                    className="w-full py-3 bg-white/5 hover:bg-white/10 text-text-secondary hover:text-text-primary font-oswald uppercase leading-none tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors"
                   >
                     <UserCheck className="w-5 h-5" />
                     Je suis déjà membre
