@@ -3843,7 +3843,7 @@ async def chat_visitor_endpoint(message: dict):
         # Get or create session
         if session_id not in chat_sessions:
             chat_sessions[session_id] = LlmChat(
-                api_key=EMERGENT_API_KEY,
+                api_key=EMERGENT_LLM_KEY,
                 system_message=VISITOR_ASSISTANT_PROMPT
             )
         
@@ -3889,7 +3889,7 @@ INFORMATIONS SUR CE MEMBRE :
         member_session_key = f"member_{current_user.get('id', session_id)}"
         if member_session_key not in chat_sessions:
             chat_sessions[member_session_key] = LlmChat(
-                api_key=EMERGENT_API_KEY,
+                api_key=EMERGENT_LLM_KEY,
                 system_message=MEMBER_ASSISTANT_PROMPT + member_context
             )
         
