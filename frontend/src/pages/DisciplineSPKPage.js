@@ -5,10 +5,10 @@ import { Shield, Target, Zap, Brain, CheckCircle, ChevronRight } from 'lucide-re
 
 const DisciplineSPKPage = () => {
   const principles = [
-    { icon: Target, title: 'Efficacité Réaliste', description: 'Techniques éprouvées sur le terrain, basées sur l\'instinct de survie.' },
-    { icon: Shield, title: 'Légalité', description: 'Adapté aux législations françaises et européennes sur la légitime défense.' },
-    { icon: Brain, title: 'Instinct Naturel', description: 'Exploite les réflexes innés de l\'humain face au danger.' },
-    { icon: Zap, title: 'Rapidité d\'Apprentissage', description: 'Méthode structurée pour une progression rapide et mesurable.' },
+    { icon: Target, title: 'Krav Maga Amélioré', description: 'Une évolution du Krav Maga, adaptée aux lois françaises et à la déontologie.' },
+    { icon: Shield, title: 'Légitime Défense', description: 'Techniques proportionnées, on ne va jamais au-delà de ce que la loi permet.' },
+    { icon: Brain, title: 'Respect des Règles', description: 'Moralité, éthique et professionnalisme sont au cœur de notre enseignement.' },
+    { icon: Zap, title: 'Efficacité Responsable', description: 'Se défendre efficacement tout en respectant la loi française.' },
   ];
 
   const modules = [
