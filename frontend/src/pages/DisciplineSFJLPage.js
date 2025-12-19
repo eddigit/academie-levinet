@@ -123,7 +123,7 @@ const DisciplineSFJLPage = () => {
       <section className="py-20 px-6 bg-paper">
         <div className="container mx-auto max-w-4xl">
           <h2 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-12 tracking-tight">
-            Scénarios <span className="text-secondary">Travaillés</span>
+            Ce Que <span className="text-secondary">Vous Apprendrez</span>
           </h2>
           
           <div className="bg-white/5 border border-white/10 rounded-lg p-8">
@@ -138,7 +138,7 @@ const DisciplineSFJLPage = () => {
           </div>
           
           <p className="text-center text-text-muted font-manrope mt-6">
-            Tous les scénarios sont adaptés aux réalités quotidiennes des femmes.
+            Des gestes simples pour des situations de la vie quotidienne.
           </p>
         </div>
       </section>
