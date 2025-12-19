@@ -2,8 +2,16 @@ import React, { useState, useEffect } from 'react';
 import MemberSidebar from '../../components/MemberSidebar';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
-import { User, Mail, Phone, MapPin, Calendar, Award, Edit, Camera } from 'lucide-react';
+import { 
+  User, Mail, Phone, MapPin, Calendar, Award, Edit, Camera, 
+  Save, X, Loader2, Lock, Check, Home, Users
+} from 'lucide-react';
 import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Textarea } from '../../components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { toast } from 'sonner';
 
 // Belt colors
 const beltColors = {
@@ -14,26 +22,138 @@ const beltColors = {
   'Ceinture Bleue': { accent: '#3B82F6', badgeBg: '#3B82F6', badgeText: '#FFFFFF' },
   'Ceinture Marron': { accent: '#B45309', badgeBg: '#B45309', badgeText: '#FFFFFF' },
   'Ceinture Noire': { accent: '#374151', badgeBg: '#1F2937', badgeText: '#FFFFFF' },
+  'Ceinture Noire 1er Dan': { accent: '#374151', badgeBg: '#1F2937', badgeText: '#FFFFFF' },
+  'Ceinture Noire 2ème Dan': { accent: '#374151', badgeBg: '#1F2937', badgeText: '#FFFFFF' },
+  'Ceinture Noire 3ème Dan': { accent: '#374151', badgeBg: '#1F2937', badgeText: '#FFFFFF' },
+  'Ceinture Noire 4ème Dan': { accent: '#374151', badgeBg: '#1F2937', badgeText: '#FFFFFF' },
+  'Ceinture Noire 5ème Dan': { accent: '#374151', badgeBg: '#1F2937', badgeText: '#FFFFFF' },
+  'Instructeur': { accent: '#DC2626', badgeBg: '#DC2626', badgeText: '#FFFFFF' },
+  'Directeur Technique': { accent: '#7C3AED', badgeBg: '#7C3AED', badgeText: '#FFFFFF' },
+  'Directeur National': { accent: '#EA580C', badgeBg: '#EA580C', badgeText: '#FFFFFF' },
 };
 
-const MemberProfile = () => {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState({
-    first_name: 'Jean',
-    last_name: 'Dupont',
-    email: user?.email || 'jean.dupont@academie-levinet.com',
-    phone: '+33 6 12 34 56 78',
-    date_of_birth: '1990-01-15',
-    city: 'Paris',
-    country: 'France',
-    belt_grade: 'Ceinture Orange',
-    membership_type: 'Premium',
-    membership_start_date: '2024-06-01',
-    membership_end_date: '2025-06-01',
-    membership_status: 'Actif'
-  });
+const beltGrades = [
+  "Ceinture Blanche", "Ceinture Jaune", "Ceinture Orange", "Ceinture Verte",
+  "Ceinture Bleue", "Ceinture Marron", "Ceinture Noire", "Ceinture Noire 1er Dan",
+  "Ceinture Noire 2ème Dan", "Ceinture Noire 3ème Dan", "Ceinture Noire 4ème Dan",
+  "Ceinture Noire 5ème Dan", "Instructeur", "Directeur Technique", "Directeur National"
+];
 
-  const beltStyle = beltColors[profile.belt_grade] || beltColors['Ceinture Blanche'];
+const MemberProfile = () => {
+  const { user, refreshUser } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    current: '',
+    new: '',
+    confirm: ''
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get('/profile');
+      setProfile(response.data);
+      setEditForm(response.data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      toast.error('Erreur lors du chargement du profil');
+    }
+    setLoading(false);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const response = await api.put('/profile', {
+        full_name: editForm.full_name,
+        phone: editForm.phone,
+        city: editForm.city,
+        country: editForm.country,
+        date_of_birth: editForm.date_of_birth,
+        belt_grade: editForm.belt_grade,
+        club_name: editForm.club_name,
+        instructor_name: editForm.instructor_name,
+        bio: editForm.bio
+      });
+      setProfile(response.data);
+      setIsEditing(false);
+      toast.success('Profil mis à jour avec succès');
+      if (refreshUser) refreshUser();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Erreur lors de la mise à jour');
+    }
+    setSaving(false);
+  };
+
+  const handlePhotoUpload = () => {
+    const url = window.prompt('Entrez l\'URL de votre photo de profil:');
+    if (url) {
+      updatePhoto(url);
+    }
+  };
+
+  const updatePhoto = async (url) => {
+    try {
+      await api.post('/profile/photo', null, { params: { photo_url: url } });
+      setProfile({ ...profile, photo_url: url });
+      toast.success('Photo mise à jour');
+    } catch (error) {
+      console.error('Error updating photo:', error);
+      toast.error('Erreur lors de la mise à jour de la photo');
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordForm.new !== passwordForm.confirm) {
+      toast.error('Les mots de passe ne correspondent pas');
+      return;
+    }
+    if (passwordForm.new.length < 6) {
+      toast.error('Le mot de passe doit contenir au moins 6 caractères');
+      return;
+    }
+    
+    setChangingPassword(true);
+    try {
+      await api.put('/profile/password', null, {
+        params: {
+          current_password: passwordForm.current,
+          new_password: passwordForm.new
+        }
+      });
+      toast.success('Mot de passe modifié avec succès');
+      setShowPasswordModal(false);
+      setPasswordForm({ current: '', new: '', confirm: '' });
+    } catch (error) {
+      console.error('Error changing password:', error);
+      toast.error(error.response?.data?.detail || 'Erreur lors du changement de mot de passe');
+    }
+    setChangingPassword(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <MemberSidebar />
+        <div className="flex-1 ml-64 p-6 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  const beltStyle = beltColors[profile?.belt_grade] || beltColors['Ceinture Blanche'];
+  const initials = profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U';
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -45,10 +165,22 @@ const MemberProfile = () => {
           <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide">
             Mon Profil
           </h1>
-          <Button variant="outline" className="gap-2">
-            <Edit className="w-4 h-4" strokeWidth={1.5} />
-            Modifier
-          </Button>
+          {!isEditing ? (
+            <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2 border-white/10">
+              <Edit className="w-4 h-4" strokeWidth={1.5} />
+              Modifier
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button onClick={() => { setIsEditing(false); setEditForm(profile); }} variant="outline" className="gap-2 border-white/10">
+                <X className="w-4 h-4" /> Annuler
+              </Button>
+              <Button onClick={handleSave} disabled={saving} className="gap-2 bg-primary hover:bg-primary-dark">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Enregistrer
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -60,134 +192,304 @@ const MemberProfile = () => {
                 className="relative h-48 flex items-center justify-center"
                 style={{ background: `radial-gradient(circle at center, ${beltStyle.accent}40 0%, ${beltStyle.accent}20 30%, transparent 70%)` }}
               >
-                {/* Concentric circles */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-40 h-40 rounded-full border-2 opacity-20" style={{ borderColor: beltStyle.accent }}></div>
-                  <div className="absolute w-32 h-32 rounded-full border-2 opacity-30" style={{ borderColor: beltStyle.accent }}></div>
-                </div>
-                
                 {/* Photo */}
                 <div 
-                  className="relative z-10 w-28 h-28 rounded-xl overflow-hidden border-4 shadow-xl"
+                  className="relative z-10 w-28 h-28 rounded-xl overflow-hidden border-4 shadow-xl group cursor-pointer"
                   style={{ borderColor: beltStyle.accent }}
+                  onClick={handlePhotoUpload}
                 >
-                  <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-                    <span className="text-4xl font-oswald font-bold text-white">
-                      {profile.first_name[0]}{profile.last_name[0]}
-                    </span>
+                  {profile?.photo_url ? (
+                    <img src={profile.photo_url} alt={profile.full_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                      <span className="text-4xl font-oswald font-bold text-white">{initials}</span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                
-                {/* Camera button */}
-                <button className="absolute bottom-4 right-4 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
-                  <Camera className="w-5 h-5 text-white" strokeWidth={1.5} />
-                </button>
               </div>
-              
-              {/* Name and Grade */}
-              <div className="p-4 text-center">
-                <h2 className="font-oswald text-2xl text-text-primary">
-                  {profile.first_name} {profile.last_name}
+
+              {/* Info Section */}
+              <div className="p-5 text-center">
+                <h2 className="font-oswald text-2xl font-bold text-text-primary uppercase">
+                  {profile?.full_name}
                 </h2>
-                <div 
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full mt-3"
-                  style={{ backgroundColor: beltStyle.badgeBg, color: beltStyle.badgeText }}
-                >
-                  <Award className="w-4 h-4" strokeWidth={1.5} />
-                  <span className="font-oswald uppercase text-sm font-bold">{profile.belt_grade}</span>
+                <p className="text-text-muted text-sm mt-1">{profile?.email}</p>
+                
+                {/* Belt Badge */}
+                <div className="mt-4">
+                  <span 
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+                    style={{ 
+                      backgroundColor: beltStyle.badgeBg, 
+                      color: beltStyle.badgeText 
+                    }}
+                  >
+                    <Award className="w-4 h-4" />
+                    {profile?.belt_grade || 'Non défini'}
+                  </span>
                 </div>
-              </div>
-              
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-4 p-4 border-t border-white/5">
-                <div className="text-center">
-                  <p className="font-oswald text-2xl text-primary">45</p>
-                  <p className="text-xs text-text-muted">Cours suivis</p>
-                </div>
-                <div className="text-center">
-                  <p className="font-oswald text-2xl text-accent">6</p>
-                  <p className="text-xs text-text-muted">Mois</p>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Details */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Personal Info */}
-            <div className="bg-paper rounded-xl border border-white/5 p-6">
-              <h3 className="font-oswald text-xl text-text-primary uppercase mb-6">Informations Personnelles</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Prénom</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1">{profile.first_name}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Nom</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1">{profile.last_name}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Email</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1 flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-primary" strokeWidth={1.5} />
-                    {profile.email}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Téléphone</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1 flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-primary" strokeWidth={1.5} />
-                    {profile.phone}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Date de naissance</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1 flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-primary" strokeWidth={1.5} />
-                    {profile.date_of_birth}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Localisation</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1 flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-primary" strokeWidth={1.5} />
-                    {profile.city}, {profile.country}
-                  </p>
+                {/* Status badges */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {profile?.has_paid_license && (
+                    <span className="px-3 py-1 bg-green-500/20 text-green-500 text-xs rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Licence active
+                    </span>
+                  )}
+                  {profile?.is_premium && (
+                    <span className="px-3 py-1 bg-amber-500/20 text-amber-500 text-xs rounded-full">
+                      Premium
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Membership */}
-            <div className="bg-paper rounded-xl border border-white/5 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-oswald text-xl text-text-primary uppercase">Mon Adhésion</h3>
-                <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">
-                  {profile.membership_status}
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Type</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1">{profile.membership_type}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Début</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1">{profile.membership_start_date}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-text-muted font-manrope uppercase tracking-wide">Fin</label>
-                  <p className="text-lg text-text-primary font-manrope mt-1">{profile.membership_end_date}</p>
-                </div>
-              </div>
-              
-              <Button className="mt-6 bg-primary hover:bg-primary-dark">
-                Renouveler mon adhésion
+            {/* Security Card */}
+            <div className="bg-paper rounded-xl border border-white/5 p-5 mt-6">
+              <h3 className="font-oswald text-lg text-text-primary uppercase mb-4 flex items-center gap-2">
+                <Lock className="w-5 h-5 text-primary" /> Sécurité
+              </h3>
+              <Button 
+                onClick={() => setShowPasswordModal(true)} 
+                variant="outline" 
+                className="w-full border-white/10"
+              >
+                Changer le mot de passe
               </Button>
             </div>
           </div>
+
+          {/* Details Card */}
+          <div className="lg:col-span-2">
+            <div className="bg-paper rounded-xl border border-white/5 p-6">
+              <h3 className="font-oswald text-lg text-text-primary uppercase mb-6">
+                Informations personnelles
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Full Name */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <User className="w-4 h-4" /> Nom complet
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      value={editForm.full_name || ''}
+                      onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
+                      className="bg-background border-white/10 text-text-primary"
+                    />
+                  ) : (
+                    <p className="text-text-primary">{profile?.full_name || '-'}</p>
+                  )}
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <Phone className="w-4 h-4" /> Téléphone
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      value={editForm.phone || ''}
+                      onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                      className="bg-background border-white/10 text-text-primary"
+                      placeholder="+33 6 00 00 00 00"
+                    />
+                  ) : (
+                    <p className="text-text-primary">{profile?.phone || '-'}</p>
+                  )}
+                </div>
+
+                {/* City */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4" /> Ville
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      value={editForm.city || ''}
+                      onChange={(e) => setEditForm({ ...editForm, city: e.target.value })}
+                      className="bg-background border-white/10 text-text-primary"
+                      placeholder="Paris"
+                    />
+                  ) : (
+                    <p className="text-text-primary">{profile?.city || '-'}</p>
+                  )}
+                </div>
+
+                {/* Country */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4" /> Pays
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      value={editForm.country || 'France'}
+                      onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
+                      className="bg-background border-white/10 text-text-primary"
+                    />
+                  ) : (
+                    <p className="text-text-primary">{profile?.country || 'France'}</p>
+                  )}
+                </div>
+
+                {/* Date of Birth */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4" /> Date de naissance
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      type="date"
+                      value={editForm.date_of_birth || ''}
+                      onChange={(e) => setEditForm({ ...editForm, date_of_birth: e.target.value })}
+                      className="bg-background border-white/10 text-text-primary"
+                    />
+                  ) : (
+                    <p className="text-text-primary">
+                      {profile?.date_of_birth ? new Date(profile.date_of_birth).toLocaleDateString('fr-FR') : '-'}
+                    </p>
+                  )}
+                </div>
+
+                {/* Belt Grade */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <Award className="w-4 h-4" /> Grade
+                  </Label>
+                  {isEditing ? (
+                    <Select
+                      value={editForm.belt_grade || ''}
+                      onValueChange={(value) => setEditForm({ ...editForm, belt_grade: value })}
+                    >
+                      <SelectTrigger className="bg-background border-white/10 text-text-primary">
+                        <SelectValue placeholder="Sélectionnez votre grade" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-paper border-white/10">
+                        {beltGrades.map((grade) => (
+                          <SelectItem key={grade} value={grade} className="text-text-primary">
+                            {grade}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <p className="text-text-primary">{profile?.belt_grade || '-'}</p>
+                  )}
+                </div>
+
+                {/* Club */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <Home className="w-4 h-4" /> Club
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      value={editForm.club_name || ''}
+                      onChange={(e) => setEditForm({ ...editForm, club_name: e.target.value })}
+                      className="bg-background border-white/10 text-text-primary"
+                      placeholder="Nom du club"
+                    />
+                  ) : (
+                    <p className="text-text-primary">{profile?.club_name || '-'}</p>
+                  )}
+                </div>
+
+                {/* Instructor */}
+                <div>
+                  <Label className="text-text-muted flex items-center gap-2 mb-2">
+                    <Users className="w-4 h-4" /> Instructeur
+                  </Label>
+                  {isEditing ? (
+                    <Input
+                      value={editForm.instructor_name || ''}
+                      onChange={(e) => setEditForm({ ...editForm, instructor_name: e.target.value })}
+                      className="bg-background border-white/10 text-text-primary"
+                      placeholder="Nom de l'instructeur"
+                    />
+                  ) : (
+                    <p className="text-text-primary">{profile?.instructor_name || '-'}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div className="mt-6">
+                <Label className="text-text-muted mb-2 block">Bio / Présentation</Label>
+                {isEditing ? (
+                  <Textarea
+                    value={editForm.bio || ''}
+                    onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                    className="bg-background border-white/10 text-text-primary min-h-[100px]"
+                    placeholder="Présentez-vous en quelques mots..."
+                  />
+                ) : (
+                  <p className="text-text-secondary">{profile?.bio || 'Aucune présentation'}</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Password Modal */}
+        {showPasswordModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-paper rounded-xl border border-white/10 p-6 w-full max-w-md">
+              <h3 className="font-oswald text-xl text-text-primary uppercase mb-6">
+                Changer le mot de passe
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-text-secondary">Mot de passe actuel</Label>
+                  <Input
+                    type="password"
+                    value={passwordForm.current}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, current: e.target.value })}
+                    className="mt-1 bg-background border-white/10 text-text-primary"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Nouveau mot de passe</Label>
+                  <Input
+                    type="password"
+                    value={passwordForm.new}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, new: e.target.value })}
+                    className="mt-1 bg-background border-white/10 text-text-primary"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Confirmer le nouveau mot de passe</Label>
+                  <Input
+                    type="password"
+                    value={passwordForm.confirm}
+                    onChange={(e) => setPasswordForm({ ...passwordForm, confirm: e.target.value })}
+                    className="mt-1 bg-background border-white/10 text-text-primary"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowPasswordModal(false)}
+                  className="flex-1 border-white/10"
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  onClick={handlePasswordChange}
+                  disabled={changingPassword}
+                  className="flex-1 bg-primary hover:bg-primary-dark"
+                >
+                  {changingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirmer'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
