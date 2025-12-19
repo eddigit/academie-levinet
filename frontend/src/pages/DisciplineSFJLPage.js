@@ -65,22 +65,22 @@ const DisciplineSFJLPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="font-oswald text-4xl font-bold text-text-primary uppercase mb-6 tracking-tight">
-                Pourquoi le <span className="text-secondary">SFJL</span> ?
+                Pourquoi <span className="text-secondary">Nous Rejoindre</span> ?
               </h2>
               <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
-                Dans un contexte où la sécurité personnelle est plus importante que jamais, 
-                le programme SFJL vous donne les outils pour vous défendre efficacement tout 
-                en respectant votre bien-être.
+                Vous n'avez pas besoin d'être sportive. Vous n'avez pas besoin d'être forte. 
+                Nous vous apprenons des gestes simples que vous pouvez utiliser, 
+                peu importe votre âge ou votre condition physique.
               </p>
               <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
-                Développé par des instructrices expérimentées sous la supervision de l'Académie 
-                Jacques Levinet, ce programme allie efficacité technique et approche psychologique.
+                Nos instructrices sont là pour vous accompagner avec patience et bienveillance. 
+                Vous apprenez à votre rythme, dans un environnement où vous vous sentez à l'aise.
               </p>
               <div className="bg-secondary/10 border border-secondary/30 rounded-lg p-6">
-                <p className="text-secondary font-oswald uppercase leading-none tracking-wide mb-2">Notre Philosophie</p>
+                <p className="text-secondary font-oswald uppercase leading-none tracking-wide mb-2">Notre Promesse</p>
                 <p className="text-text-secondary font-manrope italic">
-                  "La vraie force n'est pas dans la violence, mais dans la capacité à se protéger 
-                  et à protéger les autres avec intelligence et détermination."
+                  "Nous sommes là pour vous. Pas pour vous juger, mais pour vous aider 
+                  à vous sentir plus forte et plus confiante au quotidien."
                 </p>
               </div>
             </div>
