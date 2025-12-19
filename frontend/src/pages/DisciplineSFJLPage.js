@@ -102,7 +102,7 @@ const DisciplineSFJLPage = () => {
       <section className="py-20 px-6 bg-background">
         <div className="container mx-auto max-w-6xl">
           <h2 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-12 tracking-tight">
-            Les <span className="text-secondary">4 Piliers</span> du SFJL
+            Ce Que <span className="text-secondary">Nous Vous Offrons</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
