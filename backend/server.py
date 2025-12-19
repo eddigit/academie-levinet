@@ -714,6 +714,72 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
     
     return {"message": "Utilisateur supprimé"}
 
+@api_router.get("/admin/users/{user_id}")
+async def get_user_details(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Admin: Get full user details"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    return user
+
+@api_router.put("/admin/users/{user_id}")
+async def update_user(user_id: str, data: dict, current_user: dict = Depends(get_current_user)):
+    """Admin: Update any user's profile"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Fields that can be updated
+    allowed_fields = [
+        'full_name', 'email', 'phone', 'city', 'country', 'role',
+        'belt_grade', 'club_name', 'instructor_name', 'bio',
+        'date_of_birth', 'photo_url', 'has_paid_license', 'is_premium'
+    ]
+    
+    update_data = {k: v for k, v in data.items() if k in allowed_fields and v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Aucune donnée à mettre à jour")
+    
+    # Check if email is being changed and if it's already taken
+    if 'email' in update_data:
+        existing = await db.users.find_one({"email": update_data['email'], "id": {"$ne": user_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Cet email est déjà utilisé")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    updated_user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    return {"message": "Utilisateur mis à jour", "user": updated_user}
+
+@api_router.put("/admin/users/{user_id}/password")
+async def admin_change_user_password(user_id: str, new_password: str, current_user: dict = Depends(get_current_user)):
+    """Admin: Change any user's password"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Le mot de passe doit contenir au moins 6 caractères")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"password_hash": hash_password(new_password)}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    return {"message": "Mot de passe mis à jour avec succès"}
+
 # Technical Directors Routes
 @api_router.post("/technical-directors", response_model=TechnicalDirector)
 async def create_technical_director(director_data: TechnicalDirectorCreate, current_user: dict = Depends(get_current_user)):
