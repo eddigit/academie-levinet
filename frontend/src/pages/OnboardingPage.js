@@ -1,22 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   ChevronRight, ChevronLeft, User, UserCircle, Shield, ShieldCheck, 
   Sparkles, Activity, Briefcase, Home, Target, Monitor, Users, 
-  Globe, CreditCard, Check, Loader2, Lock
+  Globe, CreditCard, Check, Loader2, Lock, UserCheck, MapPin, Award
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import api from '../utils/api';
 import { toast } from 'sonner';
 
 const TOTAL_STEPS = 5;
 
+const beltGrades = [
+  "Ceinture Blanche",
+  "Ceinture Jaune",
+  "Ceinture Orange",
+  "Ceinture Verte",
+  "Ceinture Bleue",
+  "Ceinture Marron",
+  "Ceinture Noire 1er Dan",
+  "Ceinture Noire 2ème Dan",
+  "Ceinture Noire 3ème Dan",
+  "Ceinture Noire 4ème Dan",
+  "Ceinture Noire 5ème Dan",
+  "Instructeur",
+  "Directeur Technique",
+  "Directeur National"
+];
+
 const OnboardingPage = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [isExistingMember, setIsExistingMember] = useState(false);
+  const [showPendingConfirmation, setShowPendingConfirmation] = useState(false);
+  const [instructors, setInstructors] = useState([]);
+  
   const [formData, setFormData] = useState({
     // Step 1: Profil
     person_type: '',
@@ -31,8 +53,25 @@ const OnboardingPage = () => {
     password: '',
     phone: '',
     city: '',
-    country: 'France'
+    country: 'France',
+    // Step 5 - Existing member fields
+    club_name: '',
+    instructor_name: '',
+    belt_grade: ''
   });
+
+  // Fetch instructors list
+  useEffect(() => {
+    const fetchInstructors = async () => {
+      try {
+        const response = await api.get('/instructors');
+        setInstructors(response.data.technical_directors || []);
+      } catch (error) {
+        console.error('Error fetching instructors:', error);
+      }
+    };
+    fetchInstructors();
+  }, []);
 
   const personTypes = [
     { value: 'Femme', label: 'Femme', icon: User, description: 'Self-défense féminine' },
@@ -135,9 +174,37 @@ const OnboardingPage = () => {
       toast.error(errorMessage);
       
       // If user already exists, suggest login
-      if (errorMessage.includes('existe') || errorMessage.includes('exists')) {
+      if (errorMessage.includes('existe') || errorMessage.includes('exists') || errorMessage.includes('registered')) {
         toast.info('Vous avez déjà un compte ? Connectez-vous !');
       }
+    }
+    
+    setLoading(false);
+  };
+
+  const handleExistingMemberSubmit = async () => {
+    setLoading(true);
+    
+    try {
+      await api.post('/pending-members', {
+        person_type: formData.person_type,
+        motivations: formData.motivations,
+        training_mode: formData.training_mode,
+        full_name: formData.full_name,
+        email: formData.email,
+        phone: formData.phone,
+        city: formData.city,
+        country: formData.country,
+        club_name: formData.club_name,
+        instructor_name: formData.instructor_name,
+        belt_grade: formData.belt_grade
+      });
+
+      setShowPendingConfirmation(true);
+    } catch (error) {
+      console.error('Error:', error);
+      const errorMessage = error.response?.data?.detail || 'Erreur lors de l\'envoi de votre demande';
+      toast.error(errorMessage);
     }
     
     setLoading(false);
@@ -158,6 +225,10 @@ const OnboardingPage = () => {
     return true;
   };
 
+  const canSubmitExistingMember = () => {
+    return formData.city && formData.club_name && formData.instructor_name && formData.belt_grade;
+  };
+
   const stepTitles = [
     'Votre profil',
     'Vos motivations', 
@@ -165,6 +236,168 @@ const OnboardingPage = () => {
     'Créer votre compte',
     'Licence Membre'
   ];
+
+  // Pending confirmation screen
+  if (showPendingConfirmation) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-paper rounded-2xl border border-white/10 p-8">
+            <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <UserCheck className="w-10 h-10 text-amber-500" />
+            </div>
+            
+            <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase mb-4">
+              Demande Enregistrée
+            </h1>
+            
+            <p className="text-text-secondary mb-6">
+              Votre profil est maintenant <strong className="text-amber-500">en attente de validation</strong> par notre équipe.
+            </p>
+            
+            <div className="bg-background rounded-lg p-4 mb-6 text-left">
+              <p className="text-text-muted text-sm">
+                Un email de confirmation vous a été envoyé. Vous recevrez vos identifiants de connexion dès que votre compte sera validé par l'administration.
+              </p>
+            </div>
+            
+            <Link
+              to="/"
+              className="w-full py-3 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors"
+            >
+              Retour à l'accueil
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Existing member form (Step 5 alternative)
+  if (isExistingMember && step === 5) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6" data-testid="existing-member-page">
+        <div className="w-full max-w-4xl">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <Link to="/" className="inline-block mb-4">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
+                alt="Logo Académie Jacques Levinet" 
+                className="w-16 h-16 mx-auto rounded-full object-cover"
+              />
+            </Link>
+            <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide mb-2">
+              Membre Existant
+            </h1>
+            <p className="text-text-secondary font-manrope text-sm">
+              Complétez vos informations pour activer votre accès
+            </p>
+          </div>
+
+          {/* Form */}
+          <div className="stat-card">
+            <h2 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-2 text-center">
+              Vérification de votre profil
+            </h2>
+            <p className="text-text-secondary font-manrope text-center mb-6 text-sm">
+              Ces informations nous permettent de vérifier votre adhésion
+            </p>
+            
+            <div className="max-w-lg mx-auto space-y-4">
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2">
+                  <MapPin className="w-4 h-4" /> Votre ville *
+                </Label>
+                <Input
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  className="mt-1 bg-background border-white/10 text-text-primary"
+                  placeholder="Ex: Paris, Lyon, Marseille..."
+                />
+              </div>
+              
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2">
+                  <Home className="w-4 h-4" /> Nom de votre club *
+                </Label>
+                <Input
+                  value={formData.club_name}
+                  onChange={(e) => setFormData({ ...formData, club_name: e.target.value })}
+                  className="mt-1 bg-background border-white/10 text-text-primary"
+                  placeholder="Ex: Club SPK Paris Centre"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2">
+                  <User className="w-4 h-4" /> Nom de votre instructeur *
+                </Label>
+                <Input
+                  value={formData.instructor_name}
+                  onChange={(e) => setFormData({ ...formData, instructor_name: e.target.value })}
+                  className="mt-1 bg-background border-white/10 text-text-primary"
+                  placeholder="Prénom et nom de votre instructeur"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2">
+                  <Award className="w-4 h-4" /> Votre grade actuel *
+                </Label>
+                <Select
+                  value={formData.belt_grade}
+                  onValueChange={(value) => setFormData({ ...formData, belt_grade: value })}
+                >
+                  <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
+                    <SelectValue placeholder="Sélectionnez votre grade" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-paper border-white/10">
+                    {beltGrades.map((grade) => (
+                      <SelectItem key={grade} value={grade} className="text-text-primary hover:bg-white/5">
+                        {grade}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="pt-4">
+                <button
+                  onClick={handleExistingMemberSubmit}
+                  disabled={loading || !canSubmitExistingMember()}
+                  className="w-full py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Envoi en cours...
+                    </>
+                  ) : (
+                    <>
+                      <UserCheck className="w-5 h-5" />
+                      Soumettre ma demande
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Back button */}
+          <div className="flex justify-start mt-6">
+            <Button
+              onClick={() => setIsExistingMember(false)}
+              variant="outline"
+              className="border-white/10 text-text-secondary hover:text-text-primary"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" /> Retour
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6" data-testid="onboarding-page">
@@ -453,9 +686,23 @@ const OnboardingPage = () => {
                 </div>
 
                 {/* Security Note */}
-                <div className="flex items-center justify-center gap-2 text-text-muted text-xs">
+                <div className="flex items-center justify-center gap-2 text-text-muted text-xs mb-6">
                   <Lock className="w-4 h-4" />
                   <span>Paiement sécurisé par Stripe</span>
+                </div>
+
+                {/* Existing Member Button */}
+                <div className="border-t border-white/10 pt-6">
+                  <button
+                    onClick={() => setIsExistingMember(true)}
+                    className="w-full py-3 bg-white/5 hover:bg-white/10 text-text-secondary hover:text-text-primary font-oswald uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <UserCheck className="w-5 h-5" />
+                    Je suis déjà membre
+                  </button>
+                  <p className="text-text-muted text-xs mt-2">
+                    Vous avez déjà payé votre cotisation en club ? Faites valider votre accès.
+                  </p>
                 </div>
               </div>
             </div>
