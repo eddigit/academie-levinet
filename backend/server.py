@@ -180,11 +180,15 @@ class UserProfileUpdate(BaseModel):
 
 class AdminUserCreate(BaseModel):
     email: EmailStr
-    password: str
+    password: Optional[str] = None  # If None, generate random password
     full_name: str
-    role: str = "admin"  # admin or member
+    role: str = "admin"  # admin, member, instructor, technical_director
     phone: Optional[str] = None
     city: Optional[str] = None
+    country: str = "France"
+    belt_grade: Optional[str] = None
+    club_name: Optional[str] = None
+    send_email: bool = True  # Send credentials by email
 
 class UserCreate(BaseModel):
     email: EmailStr
