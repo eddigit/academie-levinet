@@ -235,7 +235,7 @@ const OnboardingPage = () => {
     'Vos motivations', 
     'Mode de formation',
     'Créer votre compte',
-    'Licence Membre'
+    'Devenir Membre'
   ];
 
   // Pending confirmation screen
