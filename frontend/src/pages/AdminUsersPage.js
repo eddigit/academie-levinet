@@ -3,6 +3,7 @@ import {
   Users, UserPlus, Shield, User, Search, Filter, 
   Trash2, Edit, Mail, Phone, MapPin, Crown, Loader2, Key, Eye, EyeOff, X, Save, Award
 } from 'lucide-react';
+import { Switch } from '../components/ui/switch';
 import Sidebar from '../components/Sidebar';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
