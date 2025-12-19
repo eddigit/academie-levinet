@@ -1,77 +1,95 @@
 {
   "summary": {
-    "total_tests": 11,
-    "passed_tests": 10,
-    "failed_tests": 1,
-    "success_rate": 90.9090909090909
+    "total_tests": 14,
+    "passed_tests": 8,
+    "failed_tests": 6,
+    "success_rate": 57.14285714285714
   },
   "detailed_results": [
     {
       "test_name": "Admin Login",
       "success": false,
       "details": "Expected 200, got 401 - {'detail': 'Invalid credentials'}",
-      "timestamp": "2025-12-18T17:42:37.245029"
+      "timestamp": "2025-12-19T07:19:45.753488"
     },
     {
       "test_name": "User Registration",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.510449"
+      "timestamp": "2025-12-19T07:19:46.013596"
     },
     {
       "test_name": "Get Current User",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.548143"
+      "timestamp": "2025-12-19T07:19:46.047452"
     },
     {
       "test_name": "Create Technical Director",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.586062"
+      "timestamp": "2025-12-19T07:19:46.086107"
     },
     {
       "test_name": "Get Technical Directors",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.637139"
+      "timestamp": "2025-12-19T07:19:46.123324"
     },
     {
       "test_name": "Create Member",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.691789"
+      "timestamp": "2025-12-19T07:19:46.165989"
     },
     {
       "test_name": "Get Members",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.723772"
+      "success": false,
+      "details": "Expected 200, got 520 - Internal Server Error",
+      "timestamp": "2025-12-19T07:19:46.200982"
     },
     {
       "test_name": "Create Subscription",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.808033"
+      "timestamp": "2025-12-19T07:19:46.235107"
     },
     {
       "test_name": "Get Subscriptions",
       "success": true,
       "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.849574"
+      "timestamp": "2025-12-19T07:19:46.271476"
     },
     {
       "test_name": "Get Dashboard Stats",
-      "success": true,
-      "details": "Status: 200",
-      "timestamp": "2025-12-18T17:42:37.887177"
+      "success": false,
+      "details": "Expected 200, got 520 - Internal Server Error",
+      "timestamp": "2025-12-19T07:19:46.305513"
     },
     {
-      "test_name": "Dashboard Stats Validation",
+      "test_name": "Create Pending Member",
       "success": true,
-      "details": "All required fields present",
-      "timestamp": "2025-12-18T17:42:37.887794"
+      "details": "Status: 200",
+      "timestamp": "2025-12-19T07:19:46.339807"
+    },
+    {
+      "test_name": "Get Pending Members",
+      "success": false,
+      "details": "Expected 200, got 403 - {'detail': 'Admin access required'}",
+      "timestamp": "2025-12-19T07:19:46.371692"
+    },
+    {
+      "test_name": "Approve Pending Member",
+      "success": false,
+      "details": "Expected 200, got 403 - {'detail': 'Admin access required'}",
+      "timestamp": "2025-12-19T07:19:46.420851"
+    },
+    {
+      "test_name": "Get SMTP Settings",
+      "success": false,
+      "details": "Expected 200, got 403 - {'detail': 'Admin access required'}",
+      "timestamp": "2025-12-19T07:19:46.494369"
     }
   ],
-  "timestamp": "2025-12-18T17:42:37.888113"
+  "timestamp": "2025-12-19T07:19:46.495178"
 }
