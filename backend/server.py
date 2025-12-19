@@ -2483,18 +2483,39 @@ class ChatResponse(BaseModel):
 # Store active chat sessions in memory (for simplicity)
 chat_sessions: Dict[str, LlmChat] = {}
 
+async def get_ai_config():
+    """Get AI configuration from database or use defaults"""
+    config = await db.settings.find_one({"id": "ai_config"}, {"_id": 0})
+    if not config:
+        return {
+            "visitor_extra_instructions": "",
+            "member_extra_instructions": "",
+            "ai_enabled": True
+        }
+    return config
+
 @api_router.post("/assistant/visitor", response_model=ChatResponse)
 async def visitor_assistant(data: ChatMessage):
     """Public AI assistant for visitors - presents the academy"""
     session_id = data.session_id or str(uuid.uuid4())
     
     try:
+        # Get custom instructions
+        ai_config = await get_ai_config()
+        if not ai_config.get("ai_enabled", True):
+            return ChatResponse(response="L'assistant est temporairement indisponible.", session_id=session_id)
+        
+        extra_instructions = ai_config.get("visitor_extra_instructions", "")
+        full_prompt = VISITOR_ASSISTANT_PROMPT
+        if extra_instructions:
+            full_prompt += f"\n\nINSTRUCTIONS SUPPLÉMENTAIRES DE L'ADMIN:\n{extra_instructions}"
+        
         # Get or create chat session
         if session_id not in chat_sessions:
             chat_sessions[session_id] = LlmChat(
                 api_key=EMERGENT_LLM_KEY,
                 session_id=session_id,
-                system_message=VISITOR_ASSISTANT_PROMPT
+                system_message=full_prompt
             ).with_model("openai", "gpt-4o-mini")
         
         chat = chat_sessions[session_id]
