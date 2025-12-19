@@ -5,21 +5,21 @@ import { Shield, Heart, Sparkles, Target, Users, ChevronRight, CheckCircle } fro
 
 const DisciplineSFJLPage = () => {
   const pillars = [
-    { icon: Sparkles, title: 'Empowerment', description: 'Développez votre confiance et votre force intérieure. Reprenez le contrôle.' },
-    { icon: Target, title: 'Scénarios Réalistes', description: 'Techniques adaptées aux situations réelles auxquelles les femmes peuvent faire face.' },
-    { icon: Shield, title: 'Sans Agressivité', description: 'Pratique sûre et respectueuse dans un environnement bienveillant.' },
-    { icon: Users, title: 'Entre Femmes', description: 'Cours dédiés dans une atmosphère de soutien et de solidarité.' },
+    { icon: Sparkles, title: 'Reprendre Confiance', description: 'Apprenez à vous faire confiance. Vous êtes plus forte que vous ne le pensez.' },
+    { icon: Target, title: 'Des Gestes Simples', description: 'Des techniques faciles à retenir, adaptées à votre quotidien.' },
+    { icon: Shield, title: 'En Toute Sécurité', description: 'Un cadre bienveillant où vous apprenez à votre rythme, sans jugement.' },
+    { icon: Users, title: 'Entre Nous', description: 'Des cours entre femmes, dans une ambiance de soutien et de solidarité.' },
   ];
 
   const scenarios = [
-    'Agressions dans la rue',
-    'Harcèlement et suivis',
-    'Tentatives de vol à l\'arraché',
-    'Situations dans les transports',
-    'Défense en position assise',
-    'Libération de saisies',
-    'Gestion du stress',
-    'Prise de parole assertive',
+    'Se défendre dans la rue',
+    'Réagir face au harcèlement',
+    'Protéger son sac',
+    'Se sentir en sécurité dans les transports',
+    'Se libérer d\'une prise',
+    'Savoir dire non fermement',
+    'Gérer la peur et le stress',
+    'Prendre confiance en soi',
   ];
 
   return (
