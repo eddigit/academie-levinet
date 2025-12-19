@@ -3375,25 +3375,418 @@ async def test_smtp_settings(current_user: dict = Depends(get_current_user)):
 
 @api_router.get("/instructors")
 async def get_instructors():
-    """Get list of instructors (users with instructor-level grades)"""
-    instructor_grades = [
-        "Instructeur",
-        "Directeur Technique", 
-        "Directeur National",
-        "Ceinture Noire 3ème Dan",
-        "Ceinture Noire 4ème Dan",
-        "Ceinture Noire 5ème Dan"
-    ]
-    
+    """Get all users who are instructors or technical directors"""
     instructors = await db.users.find(
-        {"belt_grade": {"$in": instructor_grades}},
-        {"_id": 0, "password_hash": 0}
-    ).to_list(100)
+        {"belt_grade": {"$in": ["Instructeur", "Directeur Technique", "Directeur National"]}},
+        {"_id": 0, "id": 1, "full_name": 1, "email": 1, "city": 1, "country": 1, "belt_grade": 1, "photo_url": 1}
+    ).to_list(1000)
+    return {"instructors": instructors}
+
+# ==================== CLUB MANAGEMENT ENDPOINTS ====================
+
+@api_router.get("/clubs")
+async def get_clubs(
+    city: Optional[str] = None,
+    country: Optional[str] = None,
+    status: Optional[str] = None,
+    technical_director_id: Optional[str] = None
+):
+    """Get all clubs with optional filters"""
+    query = {}
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    if country:
+        query["country"] = {"$regex": country, "$options": "i"}
+    if status:
+        query["status"] = status
+    if technical_director_id:
+        query["technical_director_id"] = technical_director_id
     
-    # Also check technical directors
-    directors = await db.technical_directors.find({}, {"_id": 0}).to_list(100)
+    clubs = await db.clubs.find(query, {"_id": 0}).sort("name", 1).to_list(1000)
     
-    return {"instructors": instructors, "technical_directors": directors}
+    # Enrich with member counts and DT names
+    for club in clubs:
+        member_count = await db.users.count_documents({"club_id": club["id"]})
+        club["member_count"] = member_count
+        
+        # Get technical director name
+        if club.get("technical_director_id"):
+            dt = await db.users.find_one({"id": club["technical_director_id"]}, {"_id": 0, "full_name": 1})
+            club["technical_director_name"] = dt.get("full_name") if dt else "Non assigné"
+    
+    return {"clubs": clubs, "total": len(clubs)}
+
+@api_router.get("/clubs/{club_id}")
+async def get_club(club_id: str):
+    """Get a single club with full details"""
+    club = await db.clubs.find_one({"id": club_id}, {"_id": 0})
+    if not club:
+        raise HTTPException(status_code=404, detail="Club non trouvé")
+    
+    # Get technical director
+    if club.get("technical_director_id"):
+        dt = await db.users.find_one({"id": club["technical_director_id"]}, {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1})
+        club["technical_director"] = dt
+    
+    # Get instructors
+    if club.get("instructor_ids"):
+        instructors = await db.users.find(
+            {"id": {"$in": club["instructor_ids"]}},
+            {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "belt_grade": 1}
+        ).to_list(100)
+        club["instructors"] = instructors
+    else:
+        club["instructors"] = []
+    
+    # Get members
+    members = await db.users.find(
+        {"club_id": club_id},
+        {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "belt_grade": 1, "role": 1}
+    ).to_list(1000)
+    club["members"] = members
+    club["member_count"] = len(members)
+    
+    # Get statistics
+    club["stats"] = {
+        "total_members": len(members),
+        "admins": len([m for m in members if m.get("role") == "admin"]),
+        "active_visits": await db.visit_requests.count_documents({"target_club_id": club_id, "status": "Approuvé"})
+    }
+    
+    return club
+
+@api_router.post("/admin/clubs")
+async def create_club(club_data: ClubCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new club (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
+    
+    # Verify technical director exists
+    dt = await db.users.find_one({"id": club_data.technical_director_id}, {"_id": 0})
+    if not dt:
+        raise HTTPException(status_code=400, detail="Directeur technique non trouvé")
+    
+    club_id = str(uuid.uuid4())
+    club = {
+        "id": club_id,
+        "name": club_data.name,
+        "address": club_data.address,
+        "city": club_data.city,
+        "country": club_data.country,
+        "phone": club_data.phone,
+        "email": club_data.email,
+        "logo_url": club_data.logo_url,
+        "technical_director_id": club_data.technical_director_id,
+        "technical_director_name": dt.get("full_name"),
+        "instructor_ids": club_data.instructor_ids,
+        "disciplines": club_data.disciplines,
+        "schedule": club_data.schedule,
+        "status": ClubStatus.ACTIVE.value,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": None
+    }
+    
+    await db.clubs.insert_one(club)
+    
+    # Update the technical director's club assignment
+    await db.users.update_one(
+        {"id": club_data.technical_director_id},
+        {"$set": {"club_id": club_id, "role": "technical_director" if dt.get("role") != "admin" else dt.get("role")}}
+    )
+    
+    return {"message": "Club créé avec succès", "club": {k: v for k, v in club.items() if k != "_id"}}
+
+@api_router.put("/admin/clubs/{club_id}")
+async def update_club(club_id: str, club_data: ClubUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a club (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
+    
+    club = await db.clubs.find_one({"id": club_id})
+    if not club:
+        raise HTTPException(status_code=404, detail="Club non trouvé")
+    
+    update_data = {k: v for k, v in club_data.model_dump().items() if v is not None}
+    
+    # If changing technical director, verify and update names
+    if "technical_director_id" in update_data:
+        new_dt = await db.users.find_one({"id": update_data["technical_director_id"]}, {"_id": 0})
+        if not new_dt:
+            raise HTTPException(status_code=400, detail="Nouveau directeur technique non trouvé")
+        update_data["technical_director_name"] = new_dt.get("full_name")
+        
+        # Update user assignments
+        await db.users.update_one(
+            {"id": update_data["technical_director_id"]},
+            {"$set": {"club_id": club_id}}
+        )
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.clubs.update_one({"id": club_id}, {"$set": update_data})
+    
+    updated_club = await db.clubs.find_one({"id": club_id}, {"_id": 0})
+    return {"message": "Club mis à jour", "club": updated_club}
+
+@api_router.delete("/admin/clubs/{club_id}")
+async def delete_club(club_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a club (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
+    
+    club = await db.clubs.find_one({"id": club_id})
+    if not club:
+        raise HTTPException(status_code=404, detail="Club non trouvé")
+    
+    # Check if club has members
+    member_count = await db.users.count_documents({"club_id": club_id})
+    if member_count > 0:
+        raise HTTPException(status_code=400, detail=f"Impossible de supprimer: {member_count} membre(s) sont rattachés à ce club")
+    
+    await db.clubs.delete_one({"id": club_id})
+    await db.visit_requests.delete_many({"$or": [{"home_club_id": club_id}, {"target_club_id": club_id}]})
+    
+    return {"message": "Club supprimé avec succès"}
+
+@api_router.post("/admin/clubs/{club_id}/members/{user_id}")
+async def assign_member_to_club(club_id: str, user_id: str, current_user: dict = Depends(get_current_user)):
+    """Assign a member to a club (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
+    
+    club = await db.clubs.find_one({"id": club_id})
+    if not club:
+        raise HTTPException(status_code=404, detail="Club non trouvé")
+    
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    await db.users.update_one({"id": user_id}, {"$set": {"club_id": club_id}})
+    
+    return {"message": f"Membre assigné au club {club['name']}"}
+
+@api_router.delete("/admin/clubs/{club_id}/members/{user_id}")
+async def remove_member_from_club(club_id: str, user_id: str, current_user: dict = Depends(get_current_user)):
+    """Remove a member from a club (admin only)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
+    
+    await db.users.update_one({"id": user_id}, {"$unset": {"club_id": ""}})
+    
+    return {"message": "Membre retiré du club"}
+
+@api_router.get("/clubs/{club_id}/stats")
+async def get_club_stats(club_id: str, current_user: dict = Depends(get_current_user)):
+    """Get statistics for a club"""
+    club = await db.clubs.find_one({"id": club_id}, {"_id": 0})
+    if not club:
+        raise HTTPException(status_code=404, detail="Club non trouvé")
+    
+    members = await db.users.find({"club_id": club_id}, {"_id": 0}).to_list(1000)
+    
+    # Calculate statistics
+    stats = {
+        "total_members": len(members),
+        "by_grade": {},
+        "by_role": {},
+        "with_license": 0,
+        "premium_members": 0,
+        "pending_visits": await db.visit_requests.count_documents({"target_club_id": club_id, "status": "En attente"}),
+        "approved_visits": await db.visit_requests.count_documents({"target_club_id": club_id, "status": "Approuvé"})
+    }
+    
+    for member in members:
+        grade = member.get("belt_grade", "Non défini")
+        stats["by_grade"][grade] = stats["by_grade"].get(grade, 0) + 1
+        
+        role = member.get("role", "member")
+        stats["by_role"][role] = stats["by_role"].get(role, 0) + 1
+        
+        if member.get("has_paid_license"):
+            stats["with_license"] += 1
+        if member.get("is_premium"):
+            stats["premium_members"] += 1
+    
+    return stats
+
+# ==================== VISIT REQUEST ENDPOINTS ====================
+
+@api_router.get("/visit-requests")
+async def get_visit_requests(
+    status: Optional[str] = None,
+    club_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get visit requests (for admins/DTs or member's own requests)"""
+    query = {}
+    
+    if current_user.get("role") == "admin":
+        # Admins see all
+        if club_id:
+            query["$or"] = [{"home_club_id": club_id}, {"target_club_id": club_id}]
+    elif current_user.get("role") == "technical_director":
+        # DTs see requests for their club
+        user_club = current_user.get("club_id")
+        if user_club:
+            query["target_club_id"] = user_club
+    else:
+        # Members see only their own requests
+        query["member_id"] = current_user["id"]
+    
+    if status:
+        query["status"] = status
+    
+    requests = await db.visit_requests.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    return {"visit_requests": requests, "total": len(requests)}
+
+@api_router.post("/visit-requests")
+async def create_visit_request(request_data: VisitRequestCreate, current_user: dict = Depends(get_current_user)):
+    """Create a visit request to another club"""
+    home_club_id = current_user.get("club_id")
+    if not home_club_id:
+        raise HTTPException(status_code=400, detail="Vous devez être membre d'un club pour faire une demande de visite")
+    
+    if home_club_id == request_data.target_club_id:
+        raise HTTPException(status_code=400, detail="Vous ne pouvez pas demander à visiter votre propre club")
+    
+    # Verify target club exists
+    target_club = await db.clubs.find_one({"id": request_data.target_club_id}, {"_id": 0})
+    if not target_club:
+        raise HTTPException(status_code=404, detail="Club cible non trouvé")
+    
+    home_club = await db.clubs.find_one({"id": home_club_id}, {"_id": 0})
+    
+    # Check for existing pending request
+    existing = await db.visit_requests.find_one({
+        "member_id": current_user["id"],
+        "target_club_id": request_data.target_club_id,
+        "status": "En attente"
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="Vous avez déjà une demande en attente pour ce club")
+    
+    request_id = str(uuid.uuid4())
+    visit_request = {
+        "id": request_id,
+        "member_id": current_user["id"],
+        "member_name": current_user.get("full_name"),
+        "member_email": current_user.get("email"),
+        "home_club_id": home_club_id,
+        "home_club_name": home_club.get("name") if home_club else None,
+        "target_club_id": request_data.target_club_id,
+        "target_club_name": target_club.get("name"),
+        "status": VisitRequestStatus.PENDING.value,
+        "reason": request_data.reason,
+        "visit_date": request_data.visit_date,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "processed_at": None,
+        "approved_by": None,
+        "approved_by_name": None
+    }
+    
+    await db.visit_requests.insert_one(visit_request)
+    
+    return {"message": "Demande de visite créée", "request": {k: v for k, v in visit_request.items() if k != "_id"}}
+
+@api_router.put("/visit-requests/{request_id}/approve")
+async def approve_visit_request(request_id: str, current_user: dict = Depends(get_current_user)):
+    """Approve a visit request (admin or target club's DT)"""
+    visit_request = await db.visit_requests.find_one({"id": request_id})
+    if not visit_request:
+        raise HTTPException(status_code=404, detail="Demande non trouvée")
+    
+    # Check permissions
+    is_admin = current_user.get("role") == "admin"
+    is_club_dt = (
+        current_user.get("role") == "technical_director" and 
+        current_user.get("club_id") == visit_request.get("target_club_id")
+    )
+    
+    if not is_admin and not is_club_dt:
+        raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à approuver cette demande")
+    
+    await db.visit_requests.update_one(
+        {"id": request_id},
+        {"$set": {
+            "status": VisitRequestStatus.APPROVED.value,
+            "approved_by": current_user["id"],
+            "approved_by_name": current_user.get("full_name"),
+            "processed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Demande de visite approuvée"}
+
+@api_router.put("/visit-requests/{request_id}/reject")
+async def reject_visit_request(request_id: str, current_user: dict = Depends(get_current_user)):
+    """Reject a visit request (admin or target club's DT)"""
+    visit_request = await db.visit_requests.find_one({"id": request_id})
+    if not visit_request:
+        raise HTTPException(status_code=404, detail="Demande non trouvée")
+    
+    is_admin = current_user.get("role") == "admin"
+    is_club_dt = (
+        current_user.get("role") == "technical_director" and 
+        current_user.get("club_id") == visit_request.get("target_club_id")
+    )
+    
+    if not is_admin and not is_club_dt:
+        raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à refuser cette demande")
+    
+    await db.visit_requests.update_one(
+        {"id": request_id},
+        {"$set": {
+            "status": VisitRequestStatus.REJECTED.value,
+            "approved_by": current_user["id"],
+            "approved_by_name": current_user.get("full_name"),
+            "processed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Demande de visite refusée"}
+
+@api_router.delete("/visit-requests/{request_id}")
+async def cancel_visit_request(request_id: str, current_user: dict = Depends(get_current_user)):
+    """Cancel a visit request (member only, if pending)"""
+    visit_request = await db.visit_requests.find_one({"id": request_id})
+    if not visit_request:
+        raise HTTPException(status_code=404, detail="Demande non trouvée")
+    
+    if visit_request.get("member_id") != current_user["id"] and current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Vous ne pouvez annuler que vos propres demandes")
+    
+    if visit_request.get("status") != "En attente":
+        raise HTTPException(status_code=400, detail="Seules les demandes en attente peuvent être annulées")
+    
+    await db.visit_requests.delete_one({"id": request_id})
+    
+    return {"message": "Demande de visite annulée"}
+
+@api_router.get("/technical-directors-list")
+async def get_technical_directors_list():
+    """Get all technical directors for club assignment"""
+    directors = await db.users.find(
+        {"$or": [
+            {"role": "technical_director"},
+            {"belt_grade": {"$in": ["Directeur Technique", "Directeur National"]}}
+        ]},
+        {"_id": 0, "id": 1, "full_name": 1, "email": 1, "city": 1, "country": 1, "photo_url": 1, "club_id": 1}
+    ).to_list(1000)
+    return {"directors": directors}
+
+@api_router.get("/instructors-list")
+async def get_instructors_list():
+    """Get all instructors for club assignment"""
+    instructors = await db.users.find(
+        {"$or": [
+            {"role": "instructor"},
+            {"belt_grade": "Instructeur"}
+        ]},
+        {"_id": 0, "id": 1, "full_name": 1, "email": 1, "city": 1, "country": 1, "photo_url": 1, "club_id": 1}
+    ).to_list(1000)
+    return {"instructors": instructors}
 
 app.include_router(api_router)
 
