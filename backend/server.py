@@ -2417,6 +2417,159 @@ async def get_membership_status(current_user: dict = Depends(get_current_user)):
 
 # ==================== PENDING MEMBERS (EXISTING MEMBERS) ENDPOINTS ====================
 
+# ==================== AI ASSISTANT ENDPOINTS ====================
+
+# System prompts for the two assistants
+VISITOR_ASSISTANT_PROMPT = """Tu es l'assistant virtuel de l'Académie Jacques Levinet, spécialisée dans le Self-Pro Krav (SPK), une méthode de self-défense réaliste et efficace.
+
+TON RÔLE : Accueillir les visiteurs, présenter l'académie et les convaincre de rejoindre.
+
+INFORMATIONS SUR L'ACADÉMIE :
+- Fondée par Jacques Levinet, expert en self-défense avec plus de 40 ans d'expérience
+- Le SPK (Self-Pro Krav) est une méthode de self-défense réaliste, adaptée à tous (hommes, femmes, enfants, professionnels de la sécurité)
+- Réseau international de directeurs techniques et d'instructeurs certifiés
+- Formation en ligne disponible + clubs partenaires dans le monde entier
+
+AVANTAGES DE L'ADHÉSION (35€/an) :
+- Accès complet à l'espace membre
+- Support pédagogique
+- Accès à la communauté mondiale des pratiquants
+- Messagerie interne
+- Actualités et événements exclusifs
+
+DIRECTIVES :
+- Réponds toujours en français de manière chaleureuse et professionnelle
+- Mets en avant les bénéfices de la self-défense : confiance en soi, sécurité personnelle, condition physique
+- Encourage les visiteurs à s'inscrire via la page /onboarding
+- Sois concis mais informatif (max 3-4 phrases par réponse)
+- Si on te pose des questions techniques sur le SPK, donne des informations générales et invite à découvrir les formations"""
+
+MEMBER_ASSISTANT_PROMPT = """Tu es l'assistant virtuel de l'Académie Jacques Levinet, dédié à accompagner les MEMBRES dans l'utilisation de la plateforme.
+
+TON RÔLE : Guider les membres sur toutes les fonctionnalités de l'espace membre.
+
+FONCTIONNALITÉS DE LA PLATEFORME :
+1. TABLEAU DE BORD (/member/dashboard) - Vue d'ensemble, actualités, événements à venir
+2. MON PROFIL (/member/profile) - Modifier ses informations, photo, grade, changer le mot de passe
+3. MESSAGERIE (/member/messages) - Contacter d'autres membres et les instructeurs
+4. PROGRAMMES (/member/programs) - Accéder aux programmes techniques SPK
+5. MES GRADES (/member/grades) - Voir sa progression et les prochains grades
+6. ÉVÉNEMENTS (/member/events) - Stages, séminaires, passages de grades
+7. BOUTIQUE (/member/shop) - Équipements SPK (kimonos, protections, etc.)
+8. MUR SOCIAL - Partager avec la communauté, liker et commenter
+
+DIRECTIVES :
+- Réponds toujours en français de manière amicale et aidante
+- Guide pas à pas pour chaque fonctionnalité
+- Sois concis et pratique (max 3-4 phrases par réponse)
+- Si le membre a un problème technique, suggère de contacter l'administration
+- Encourage la participation à la communauté"""
+
+class ChatMessage(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    session_id: str
+
+# Store active chat sessions in memory (for simplicity)
+chat_sessions: Dict[str, LlmChat] = {}
+
+@api_router.post("/assistant/visitor", response_model=ChatResponse)
+async def visitor_assistant(data: ChatMessage):
+    """Public AI assistant for visitors - presents the academy"""
+    session_id = data.session_id or str(uuid.uuid4())
+    
+    try:
+        # Get or create chat session
+        if session_id not in chat_sessions:
+            chat_sessions[session_id] = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=session_id,
+                system_message=VISITOR_ASSISTANT_PROMPT
+            ).with_model("openai", "gpt-4o-mini")
+        
+        chat = chat_sessions[session_id]
+        
+        # Send message and get response
+        user_message = UserMessage(text=data.message)
+        response = await chat.send_message(user_message)
+        
+        # Save to database for history
+        await db.chat_history.insert_one({
+            "id": str(uuid.uuid4()),
+            "session_id": session_id,
+            "type": "visitor",
+            "user_message": data.message,
+            "assistant_response": response,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        return ChatResponse(response=response, session_id=session_id)
+        
+    except Exception as e:
+        logger.error(f"Visitor assistant error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Erreur de l'assistant. Veuillez réessayer.")
+
+@api_router.post("/assistant/member", response_model=ChatResponse)
+async def member_assistant(data: ChatMessage, current_user: dict = Depends(get_current_user)):
+    """AI assistant for members - helps with platform usage"""
+    session_id = data.session_id or f"member_{current_user['id']}"
+    
+    try:
+        # Personalized system message with member info
+        personalized_prompt = f"""{MEMBER_ASSISTANT_PROMPT}
+
+INFORMATIONS SUR LE MEMBRE ACTUEL :
+- Nom : {current_user.get('full_name', 'Membre')}
+- Grade : {current_user.get('belt_grade', 'Non défini')}
+- Club : {current_user.get('club_name', 'Non défini')}
+"""
+        
+        # Get or create chat session
+        if session_id not in chat_sessions:
+            chat_sessions[session_id] = LlmChat(
+                api_key=EMERGENT_LLM_KEY,
+                session_id=session_id,
+                system_message=personalized_prompt
+            ).with_model("openai", "gpt-4o-mini")
+        
+        chat = chat_sessions[session_id]
+        
+        # Send message and get response
+        user_message = UserMessage(text=data.message)
+        response = await chat.send_message(user_message)
+        
+        # Save to database for history
+        await db.chat_history.insert_one({
+            "id": str(uuid.uuid4()),
+            "session_id": session_id,
+            "type": "member",
+            "user_id": current_user['id'],
+            "user_message": data.message,
+            "assistant_response": response,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        return ChatResponse(response=response, session_id=session_id)
+        
+    except Exception as e:
+        logger.error(f"Member assistant error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Erreur de l'assistant. Veuillez réessayer.")
+
+@api_router.get("/assistant/history")
+async def get_chat_history(current_user: dict = Depends(get_current_user)):
+    """Get member's chat history"""
+    history = await db.chat_history.find(
+        {"user_id": current_user['id']},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    return {"history": history}
+
+# ==================== PENDING MEMBERS ENDPOINTS ====================
+
 @api_router.post("/pending-members")
 async def create_pending_member(data: PendingMemberCreate):
     """Create a pending member request (for existing members)"""
