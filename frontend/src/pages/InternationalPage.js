@@ -71,12 +71,18 @@ const InternationalPage = () => {
           </h2>
           
           <div className="mb-12">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/2hjhk0ei_Generated%20Image%20December%2014%2C%202025%20-%209_12PM.jpeg"
-              alt="Réseau mondial de l'Académie Jacques Levinet"
-              className="w-full rounded-lg border border-white/10"
-              data-placeholder="world-map-network"
-            />
+            <div className="w-full h-[500px] rounded-lg border border-white/10 overflow-hidden">
+              <iframe 
+                src="https://www.google.com/maps/d/embed?mid=1RdKNrRv4jEPjQTr7BDBCpXuuYAs&ll=-0.1073627811302309%2C0&z=2"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Réseau mondial de l'Académie Jacques Levinet"
+              />
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
