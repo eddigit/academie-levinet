@@ -34,19 +34,19 @@ const DisciplineSFJLPage = () => {
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <div className="inline-block px-4 py-2 bg-secondary/10 border border-secondary/30 rounded-sm mb-6">
-            <span className="text-secondary font-oswald text-sm uppercase tracking-wider">Spécial Femmes</span>
+            <span className="text-secondary font-oswald text-sm uppercase tracking-wider">Pour Vous, Mesdames</span>
           </div>
           
           <h1 className="font-oswald text-5xl md:text-7xl font-bold text-text-primary uppercase mb-6 tracking-tight">
-            <span className="text-secondary">SFJL</span>
+            Self-Défense <span className="text-secondary">Féminine</span>
           </h1>
           <p className="font-oswald text-2xl text-text-secondary uppercase tracking-wide mb-6">
-            Self-Défense Féminine Jacques Levinet
+            Apprenez à Vous Protéger
           </p>
           
           <p className="text-xl text-text-secondary font-manrope mb-8 leading-relaxed max-w-3xl mx-auto">
-            Reprenez le contrôle de votre sécurité. Un programme conçu spécifiquement 
-            pour les femmes, par des femmes, dans un environnement bienveillant.
+            Vous avez le droit de vous sentir en sécurité. Nous sommes là pour vous apprendre 
+            des gestes simples et efficaces, dans un cadre bienveillant et rassurant.
           </p>
           
           <Link
