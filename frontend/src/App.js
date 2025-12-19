@@ -74,9 +74,7 @@ function App() {
       <CartProvider>
         <BrowserRouter>
           <CartDrawer />
-          <Routes>
-          {/* Public pages */}
-          <Route path="/" element={<LandingPage />} />
+          <AppContent />
           <Route path="/founder" element={<FounderPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/disciplines/spk" element={<DisciplineSPKPage />} />
@@ -274,6 +272,16 @@ function App() {
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/cancel" element={<PaymentCancelPage />} />
         </Routes>
+      </>
+    );
+  };
+
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <CartDrawer />
+          <AppContent />
         </BrowserRouter>
       </CartProvider>
     </AuthProvider>
