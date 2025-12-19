@@ -325,6 +325,178 @@ class AcademieLevinetAPITester:
         
         return success
 
+    def test_get_technical_directors_list(self):
+        """Test getting technical directors list for club assignment"""
+        success, response = self.run_test(
+            "Get Technical Directors List",
+            "GET",
+            "technical-directors-list",
+            200
+        )
+        return success, response
+
+    def test_get_instructors_list(self):
+        """Test getting instructors list for club assignment"""
+        success, response = self.run_test(
+            "Get Instructors List",
+            "GET",
+            "instructors-list",
+            200
+        )
+        return success, response
+
+    def test_create_club(self, director_id):
+        """Test creating a club"""
+        club_data = {
+            "name": f"Club SPK Test {datetime.now().strftime('%H%M%S')}",
+            "address": "123 Rue de Test",
+            "city": "Paris",
+            "country": "France",
+            "phone": "+33123456789",
+            "email": "test@club.com",
+            "technical_director_id": director_id,
+            "instructor_ids": [],
+            "disciplines": ["Self-Pro Krav (SPK)", "WKMO"],
+            "schedule": "Lun-Ven: 18h-21h\nSam: 10h-12h"
+        }
+        
+        success, response = self.run_test(
+            "Create Club",
+            "POST",
+            "admin/clubs",
+            200,
+            data=club_data
+        )
+        
+        return success, response.get('id') if success else None
+
+    def test_get_clubs(self):
+        """Test getting all clubs"""
+        success, response = self.run_test(
+            "Get All Clubs",
+            "GET",
+            "clubs",
+            200
+        )
+        return success, response
+
+    def test_get_club_details(self, club_id):
+        """Test getting club details with members and stats"""
+        success, response = self.run_test(
+            "Get Club Details",
+            "GET",
+            f"clubs/{club_id}",
+            200
+        )
+        return success, response
+
+    def test_update_club(self, club_id):
+        """Test updating club details"""
+        update_data = {
+            "name": f"Updated Club SPK Test {datetime.now().strftime('%H%M%S')}",
+            "city": "Lyon",
+            "phone": "+33987654321",
+            "status": "Actif"
+        }
+        
+        success, response = self.run_test(
+            "Update Club",
+            "PUT",
+            f"admin/clubs/{club_id}",
+            200,
+            data=update_data
+        )
+        
+        return success
+
+    def test_assign_member_to_club(self, club_id, user_id):
+        """Test assigning a member to a club"""
+        success, response = self.run_test(
+            "Assign Member to Club",
+            "POST",
+            f"admin/clubs/{club_id}/members/{user_id}",
+            200
+        )
+        return success
+
+    def test_remove_member_from_club(self, club_id, user_id):
+        """Test removing a member from a club"""
+        success, response = self.run_test(
+            "Remove Member from Club",
+            "DELETE",
+            f"admin/clubs/{club_id}/members/{user_id}",
+            200
+        )
+        return success
+
+    def test_get_club_stats(self, club_id):
+        """Test getting club statistics"""
+        success, response = self.run_test(
+            "Get Club Stats",
+            "GET",
+            f"clubs/{club_id}/stats",
+            200
+        )
+        return success, response
+
+    def test_create_visit_request(self, target_club_id):
+        """Test creating a visit request"""
+        visit_data = {
+            "target_club_id": target_club_id,
+            "reason": "Visite d'entraînement pendant les vacances",
+            "visit_date": "2025-02-15"
+        }
+        
+        success, response = self.run_test(
+            "Create Visit Request",
+            "POST",
+            "visit-requests",
+            200,
+            data=visit_data
+        )
+        
+        return success, response.get('id') if success else None
+
+    def test_get_visit_requests(self):
+        """Test getting visit requests"""
+        success, response = self.run_test(
+            "Get Visit Requests",
+            "GET",
+            "visit-requests",
+            200
+        )
+        return success, response
+
+    def test_approve_visit_request(self, request_id):
+        """Test approving a visit request"""
+        success, response = self.run_test(
+            "Approve Visit Request",
+            "PUT",
+            f"visit-requests/{request_id}/approve",
+            200
+        )
+        return success
+
+    def test_reject_visit_request(self, request_id):
+        """Test rejecting a visit request"""
+        success, response = self.run_test(
+            "Reject Visit Request",
+            "PUT",
+            f"visit-requests/{request_id}/reject",
+            200
+        )
+        return success
+
+    def test_delete_club(self, club_id):
+        """Test deleting a club"""
+        success, response = self.run_test(
+            "Delete Club",
+            "DELETE",
+            f"admin/clubs/{club_id}",
+            200
+        )
+        return success
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting Académie Jacques Levinet API Tests")
