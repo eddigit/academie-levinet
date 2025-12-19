@@ -36,6 +36,9 @@ import MemberShopPage from './pages/member/MemberShopPage';
 // Shop pages
 import ShopPage from './pages/ShopPage';
 import AdminProductsPage from './pages/AdminProductsPage';
+// Admin pages
+import PendingMembersPage from './pages/PendingMembersPage';
+import SettingsPage from './pages/SettingsPage';
 // Payment pages
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
