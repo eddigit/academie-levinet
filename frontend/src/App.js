@@ -41,6 +41,8 @@ import AdminProductsPage from './pages/AdminProductsPage';
 import PendingMembersPage from './pages/PendingMembersPage';
 import SettingsPage from './pages/SettingsPage';
 import AdminUsersPage from './pages/AdminUsersPage';
+import AIConfigPage from './pages/AIConfigPage';
+import SubscriptionManagementPage from './pages/SubscriptionManagementPage';
 // Payment pages
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
