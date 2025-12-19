@@ -501,6 +501,262 @@ class AcademieLevinetAPITester:
         )
         return success
 
+    # ==================== EVENTS CRUD TESTS ====================
+    
+    def test_create_event(self):
+        """Test creating an event"""
+        event_data = {
+            "title": f"Stage SPK Test {datetime.now().strftime('%H%M%S')}",
+            "description": "Stage de Self-Pro Krav pour débutants et confirmés",
+            "event_type": "Stage",
+            "start_date": "2025-03-15",
+            "end_date": "2025-03-15",
+            "start_time": "14:00",
+            "end_time": "17:00",
+            "location": "Dojo Central Paris",
+            "city": "Paris",
+            "country": "France",
+            "instructor": "Jacques Levinet",
+            "max_participants": 20,
+            "price": 45.0,
+            "image_url": "https://example.com/stage.jpg"
+        }
+        
+        success, response = self.run_test(
+            "Create Event",
+            "POST",
+            "events",
+            200,
+            data=event_data
+        )
+        
+        return success, response.get('id') if success else None
+
+    def test_get_events(self):
+        """Test getting all events"""
+        success, response = self.run_test(
+            "Get All Events",
+            "GET",
+            "events",
+            200
+        )
+        return success, response
+
+    def test_get_event_details(self, event_id):
+        """Test getting event details"""
+        success, response = self.run_test(
+            "Get Event Details",
+            "GET",
+            f"events/{event_id}",
+            200
+        )
+        return success, response
+
+    def test_update_event(self, event_id):
+        """Test updating an event"""
+        update_data = {
+            "title": f"Updated Stage SPK Test {datetime.now().strftime('%H%M%S')}",
+            "description": "Stage de Self-Pro Krav mis à jour",
+            "price": 50.0,
+            "max_participants": 25,
+            "status": "À venir"
+        }
+        
+        success, response = self.run_test(
+            "Update Event",
+            "PUT",
+            f"events/{event_id}",
+            200,
+            data=update_data
+        )
+        
+        return success
+
+    def test_delete_event(self, event_id):
+        """Test deleting an event"""
+        success, response = self.run_test(
+            "Delete Event",
+            "DELETE",
+            f"events/{event_id}",
+            200
+        )
+        return success
+
+    def test_register_for_event(self, event_id):
+        """Test registering for an event"""
+        success, response = self.run_test(
+            "Register for Event",
+            "POST",
+            f"events/{event_id}/register",
+            200
+        )
+        return success
+
+    def test_get_event_registrations(self, event_id):
+        """Test getting event registrations"""
+        success, response = self.run_test(
+            "Get Event Registrations",
+            "GET",
+            f"events/{event_id}/registrations",
+            200
+        )
+        return success, response
+
+    def test_unregister_from_event(self, event_id):
+        """Test unregistering from an event"""
+        success, response = self.run_test(
+            "Unregister from Event",
+            "DELETE",
+            f"events/{event_id}/register",
+            200
+        )
+        return success
+
+    # ==================== ADMIN USERS CRUD TESTS ====================
+    
+    def test_get_admin_users(self):
+        """Test getting all users (admin endpoint)"""
+        success, response = self.run_test(
+            "Get All Users (Admin)",
+            "GET",
+            "admin/users",
+            200
+        )
+        return success, response
+
+    def test_create_admin_user(self):
+        """Test creating a new user via admin endpoint"""
+        user_data = {
+            "email": f"admin_test_{datetime.now().strftime('%H%M%S')}@test.com",
+            "password": "TestPass123!",
+            "full_name": "Test Admin User",
+            "role": "admin",
+            "phone": "+33123456789",
+            "city": "Paris",
+            "country": "France",
+            "belt_grade": "Ceinture Noire 1er Dan",
+            "send_email": False
+        }
+        
+        success, response = self.run_test(
+            "Create Admin User",
+            "POST",
+            "admin/users",
+            200,
+            data=user_data
+        )
+        
+        return success, response.get('user_id') if success else None
+
+    def test_create_member_user(self):
+        """Test creating a member user via admin endpoint"""
+        user_data = {
+            "email": f"member_test_{datetime.now().strftime('%H%M%S')}@test.com",
+            "password": "TestPass123!",
+            "full_name": "Test Member User",
+            "role": "member",
+            "phone": "+33987654321",
+            "city": "Lyon",
+            "country": "France",
+            "belt_grade": "Ceinture Blanche",
+            "send_email": False
+        }
+        
+        success, response = self.run_test(
+            "Create Member User",
+            "POST",
+            "admin/users",
+            200,
+            data=user_data
+        )
+        
+        return success, response.get('user_id') if success else None
+
+    def test_create_instructor_user(self):
+        """Test creating an instructor user via admin endpoint"""
+        user_data = {
+            "email": f"instructor_test_{datetime.now().strftime('%H%M%S')}@test.com",
+            "password": "TestPass123!",
+            "full_name": "Test Instructor User",
+            "role": "instructor",
+            "phone": "+33555666777",
+            "city": "Marseille",
+            "country": "France",
+            "belt_grade": "Instructeur",
+            "send_email": False
+        }
+        
+        success, response = self.run_test(
+            "Create Instructor User",
+            "POST",
+            "admin/users",
+            200,
+            data=user_data
+        )
+        
+        return success, response.get('user_id') if success else None
+
+    def test_get_user_details(self, user_id):
+        """Test getting user details"""
+        success, response = self.run_test(
+            "Get User Details",
+            "GET",
+            f"admin/users/{user_id}",
+            200
+        )
+        return success, response
+
+    def test_update_user(self, user_id):
+        """Test updating user details"""
+        update_data = {
+            "full_name": f"Updated Test User {datetime.now().strftime('%H%M%S')}",
+            "phone": "+33999888777",
+            "city": "Nice",
+            "belt_grade": "Ceinture Jaune",
+            "has_paid_license": True,
+            "is_premium": True
+        }
+        
+        success, response = self.run_test(
+            "Update User",
+            "PUT",
+            f"admin/users/{user_id}",
+            200,
+            data=update_data
+        )
+        
+        return success
+
+    def test_change_user_password(self, user_id):
+        """Test changing user password (admin)"""
+        success, response = self.run_test(
+            "Change User Password",
+            "PUT",
+            f"admin/users/{user_id}/password?new_password=NewPass123!",
+            200
+        )
+        return success
+
+    def test_update_user_role(self, user_id, new_role):
+        """Test updating user role"""
+        success, response = self.run_test(
+            "Update User Role",
+            "PUT",
+            f"admin/users/{user_id}/role?role={new_role}",
+            200
+        )
+        return success
+
+    def test_delete_user(self, user_id):
+        """Test deleting a user"""
+        success, response = self.run_test(
+            "Delete User",
+            "DELETE",
+            f"admin/users/{user_id}",
+            200
+        )
+        return success
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting Académie Jacques Levinet API Tests")
