@@ -39,6 +39,8 @@ const OnboardingPage = () => {
   const [isExistingMember, setIsExistingMember] = useState(false);
   const [showPendingConfirmation, setShowPendingConfirmation] = useState(false);
   const [instructors, setInstructors] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [clubs, setClubs] = useState([]);
   
   const [formData, setFormData] = useState({
     // Step 1: Profil
@@ -61,17 +63,23 @@ const OnboardingPage = () => {
     belt_grade: ''
   });
 
-  // Fetch instructors list
+  // Fetch countries, instructors, and clubs
   useEffect(() => {
-    const fetchInstructors = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get('/instructors');
-        setInstructors(response.data.technical_directors || []);
+        const [countriesRes, instructorsRes, clubsRes] = await Promise.all([
+          api.get('/onboarding/countries').catch(() => ({ data: { countries: [] } })),
+          api.get('/onboarding/instructors').catch(() => ({ data: { instructors: [] } })),
+          api.get('/onboarding/clubs').catch(() => ({ data: { clubs: [] } }))
+        ]);
+        setCountries(countriesRes.data.countries || []);
+        setInstructors(instructorsRes.data.instructors || []);
+        setClubs(clubsRes.data.clubs || []);
       } catch (error) {
-        console.error('Error fetching instructors:', error);
+        console.error('Error fetching onboarding data:', error);
       }
     };
-    fetchInstructors();
+    fetchData();
   }, []);
 
   const personTypes = [
