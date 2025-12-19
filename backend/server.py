@@ -173,7 +173,6 @@ class AdminUserCreate(BaseModel):
     role: str = "admin"  # admin or member
     phone: Optional[str] = None
     city: Optional[str] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
     email: EmailStr
