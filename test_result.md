@@ -1,43 +1,44 @@
 # Testing Protocol
 
-## Test Session: Existing Members Validation Flow
+## Test Session: Admin Users & Member Profile
 
 ### Features to Test:
-1. "Je suis déjà membre" button on Step 5
-2. Existing member form (city, club, instructor, grade)
-3. Pending member creation API
-4. Admin page: Pending Members list
-5. Admin page: Settings/SMTP configuration
-6. Approve/Reject pending members
-7. Email with temporary password on approval
+1. Admin user management page (/admin/users)
+2. Create admin/member users
+3. Promote/Demote users
+4. Delete users
+5. Member profile page (/member/profile)
+6. Edit profile fields
+7. Change password
+8. Upload/change profile photo
 
 ### Test Credentials:
-- Admin Email: admin@academie-levinet.com
-- Admin Password: Admin2025!
+- Admin: admin@academie-levinet.com / Admin2025!
+- Member: test@academie-levinet.com / test123
 
 ### Routes to Test:
-- /onboarding (step 5 with "Je suis déjà membre" button)
-- /admin/pending-members
-- /admin/settings
+- /admin/users
+- /member/profile
 
 ### Backend Endpoints to Test:
-- POST /api/pending-members
-- GET /api/admin/pending-members
-- POST /api/admin/pending-members/{id}/approve
-- POST /api/admin/pending-members/{id}/reject
-- GET /api/admin/settings/smtp
-- PUT /api/admin/settings/smtp
-- GET /api/instructors
+- GET /api/admin/users
+- POST /api/admin/users
+- PUT /api/admin/users/{id}/role
+- DELETE /api/admin/users/{id}
+- GET /api/profile
+- PUT /api/profile
+- PUT /api/profile/password
+- POST /api/profile/photo
 
 ### Tests Passed:
-- "Je suis déjà membre" button visible ✓
-- Existing member form displayed ✓
-- Pending member creation API ✓
-- Admin pending members page loads ✓
-- Admin settings page loads ✓
-- Member approval creates user account ✓
-- Grades list includes Instructeur, Directeur Technique, Directeur National ✓
+- Admin users page loads ✓
+- Create user modal displays ✓
+- Users list with filters (Tous, Admins, Membres) ✓
+- Member profile page loads ✓
+- Profile edit mode works ✓
+- All profile fields editable ✓
 
 ### Incorporate User Feedback:
-- Complete flow for existing members who already paid their license in club
+- Admin can create admin accounts for bureau management
+- Users can update their profile and photo
 
