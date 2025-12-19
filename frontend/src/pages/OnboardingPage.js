@@ -624,10 +624,10 @@ const OnboardingPage = () => {
           {step === 5 && (
             <div className="text-center">
               <h2 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-2">
-                Licence Membre Académie
+                Devenir Membre
               </h2>
               <p className="text-text-secondary font-manrope mb-8 text-sm">
-                Cotisation annuelle obligatoire incluant l'assurance
+                Cotisation membre de l'Académie Jacques Levinet
               </p>
 
               <div className="max-w-md mx-auto">
@@ -635,7 +635,7 @@ const OnboardingPage = () => {
                 <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl border border-primary/30 p-6 mb-6">
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <Shield className="w-8 h-8 text-primary" />
-                    <span className="font-oswald text-xl text-text-primary uppercase">Licence Membre</span>
+                    <span className="font-oswald text-xl text-text-primary uppercase">Membre AJL</span>
                   </div>
                   
                   <div className="text-center mb-6">
@@ -651,11 +651,15 @@ const OnboardingPage = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-text-secondary text-sm">Assurance responsabilité civile incluse</span>
+                      <span className="text-text-secondary text-sm">Support pédagogique</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-text-secondary text-sm">Communauté mondiale de pratiquants</span>
+                      <span className="text-text-secondary text-sm">Accès à la communauté</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-text-secondary text-sm">Communauté mondiale des pratiquants</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
@@ -663,7 +667,11 @@ const OnboardingPage = () => {
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-text-secondary text-sm">Actualités et événements exclusifs</span>
+                      <span className="text-text-secondary text-sm">Actualités</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-text-secondary text-sm">Événements</span>
                     </div>
                   </div>
 
