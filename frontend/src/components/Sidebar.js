@@ -121,7 +121,7 @@ const Sidebar = () => {
         )}
       </nav>
 
-      <div className="p-4 border-t border-white/5">
+      <div className="p-4 border-t border-white/5 flex-shrink-0">
         <button
           onClick={logout}
           data-testid="logout-button"
