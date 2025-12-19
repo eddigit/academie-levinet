@@ -74,7 +74,7 @@ const LandingPage = () => {
             <Link 
               to="/onboarding" 
               data-testid="hero-cta-button"
-              className="px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-lg tracking-wider rounded-sm transition-smooth glow-effect"
+              className="flex items-center justify-center px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-lg tracking-wider leading-none rounded-sm transition-smooth glow-effect"
             >
               Rejoindre l'Académie
             </Link>
