@@ -687,11 +687,11 @@ const ClubsPage = () => {
 
           {/* Edit Club Modal */}
           {isEditOpen && editingClub && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <div className="bg-paper rounded-xl border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4" onClick={() => setIsEditOpen(false)}>
+              <div className="bg-paper rounded-xl border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="p-6 border-b border-white/10 flex justify-between items-center">
                   <h2 className="font-oswald text-xl text-text-primary uppercase">Modifier le club</h2>
-                  <button onClick={() => setIsEditOpen(false)} className="text-text-muted hover:text-text-primary">
+                  <button onClick={() => setIsEditOpen(false)} className="text-text-muted hover:text-text-primary z-10">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
