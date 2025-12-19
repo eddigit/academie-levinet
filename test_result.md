@@ -1,36 +1,51 @@
-# Test Result Document
+# Pre-Deployment Audit - Académie Jacques Levinet CRM
 
-## Current Test Scope
-Testing CRUD operations for Admin accounts on:
-1. Events (Événements)
-2. Member accounts (Comptes membres)
-3. Instructor accounts (Comptes instructeurs)
-4. Clubs
+## Audit Scope
+Complete functional and operational audit before production deployment.
+
+## Areas to Audit
+
+### 1. Authentication & Security
+- Login/logout flows
+- JWT token validation
+- Role-based access control (admin, member, instructor, technical_director)
+- Password security
+
+### 2. Core Features
+- Dashboard statistics
+- Member management (CRUD)
+- Club management (CRUD)
+- Event management (CRUD)
+- News management
+- Messaging system
+- Subscription management
+
+### 3. Onboarding Flows
+- New member registration with Stripe payment
+- Existing member registration with admin approval
+
+### 4. Admin Features
+- User management
+- Pending member approvals
+- Site content management
+- AI configuration
+- SMTP settings
+
+### 5. Public Pages
+- Landing page
+- Discipline pages (SPK, SFJL, WKMO, IPC)
+- Founder page
+- International page
+- About page
+
+### 6. Integrations
+- Stripe payment
+- OpenAI chat assistants
+- Google Maps
 
 ## Test Credentials
 - Admin: admin@academie-levinet.com / Admin2025!
+- Member: membre@academie-levinet.com / Membre2025!
 
-## Features to Test
-### Events CRUD
-- GET /api/events - List all events
-- POST /api/events - Create event
-- PUT /api/events/{id} - Update event
-- DELETE /api/events/{id} - Delete event
-
-### Users/Members CRUD
-- GET /api/admin/users - List all users
-- POST /api/admin/users - Create user
-- PUT /api/admin/users/{id} - Update user
-- DELETE /api/admin/users/{id} - Delete user
-- POST /api/admin/users/{id}/change-password - Change password
-
-### Clubs CRUD
-- GET /api/clubs - List all clubs
-- POST /api/admin/clubs - Create club
-- PUT /api/admin/clubs/{id} - Update club
-- DELETE /api/admin/clubs/{id} - Delete club
-- POST /api/admin/clubs/{id}/members/{user_id} - Assign member
-
-## Incorporate User Feedback
-- All CRUD operations must work for admins
-- Test create, read, update, delete for each entity
+## Audit Status
+Pending full audit by testing agent
