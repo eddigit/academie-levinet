@@ -53,7 +53,7 @@ const DisciplineSFJLPage = () => {
             to="/onboarding"
             className="inline-flex items-center gap-2 px-8 py-4 bg-secondary hover:bg-secondary/80 text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)]"
           >
-            Rejoindre le Programme
+            Je Veux Apprendre
             <ChevronRight className="w-5 h-5" strokeWidth={2} />
           </Link>
         </div>
