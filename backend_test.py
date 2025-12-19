@@ -627,7 +627,8 @@ class AcademieLevinetAPITester:
         # Note: Visit request creation requires user to be member of a club first
         # This is expected behavior and not a bug
         
-        # Test deleting the club (cleanup)
+        # Note: Club deletion will fail if members are assigned (which is correct behavior)
+        # We'll test it anyway to verify the error handling
         self.test_delete_club(club_id)
         
         return True
