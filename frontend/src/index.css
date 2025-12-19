@@ -44,3 +44,18 @@ code {
     border-right: 1px solid rgba(255, 255, 255, 0.05);
   }
 }
+
+/* Hide Emergent badge */
+[data-testid="emergent-badge"],
+div[class*="emergent"],
+a[href*="emergentagent.com"]:has(img),
+div:has(> a[href*="emergentagent.com"]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Alternative selector for the badge container */
+body > div:last-child:not(#root) {
+  display: none !important;
+}
