@@ -30,7 +30,8 @@ const AdminUsersPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newUser, setNewUser] = useState({
-    email: '', password: '', full_name: '', role: 'admin', phone: '', city: ''
+    email: '', password: '', full_name: '', role: 'admin', phone: '', city: '', 
+    belt_grade: '', send_email: true
   });
   
   // Edit user modal
@@ -203,17 +204,17 @@ const AdminUsersPage = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-text-secondary">Mot de passe *</Label>
+                    <Label className="text-text-secondary">Mot de passe (laisser vide pour générer automatiquement)</Label>
                     <Input
                       type="password"
                       value={newUser.password}
                       onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                       className="mt-1 bg-background border-white/10"
-                      placeholder="••••••••"
+                      placeholder="Généré automatiquement si vide"
                     />
                   </div>
                   <div>
-                    <Label className="text-text-secondary">Rôle *</Label>
+                    <Label className="text-text-secondary">Type de compte *</Label>
                     <Select
                       value={newUser.role}
                       onValueChange={(value) => setNewUser({ ...newUser, role: value })}
@@ -227,6 +228,16 @@ const AdminUsersPage = () => {
                             <Crown className="w-4 h-4 text-amber-500" /> Administrateur
                           </div>
                         </SelectItem>
+                        <SelectItem value="technical_director" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-purple-500" /> Directeur Technique
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="instructor" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <Award className="w-4 h-4 text-red-500" /> Instructeur
+                          </div>
+                        </SelectItem>
                         <SelectItem value="member" className="text-text-primary">
                           <div className="flex items-center gap-2">
                             <User className="w-4 h-4 text-primary" /> Membre
@@ -234,6 +245,16 @@ const AdminUsersPage = () => {
                         </SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 bg-background/50 rounded-lg">
+                    <Switch
+                      checked={newUser.send_email}
+                      onCheckedChange={(checked) => setNewUser({ ...newUser, send_email: checked })}
+                    />
+                    <div>
+                      <Label className="text-text-primary">Envoyer les identifiants par email</Label>
+                      <p className="text-text-muted text-xs">L'utilisateur recevra un email avec ses accès</p>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
