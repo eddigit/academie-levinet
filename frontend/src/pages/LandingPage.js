@@ -400,7 +400,7 @@ const LandingPage = () => {
               <CheckCircle className="w-8 h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
                 <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Méthode Brevetée</h5>
-                <p className="text-text-secondary font-manrope text-sm">SPK - Self Pro Krav, validé et reconnu internationalement</p>
+                <p className="text-text-secondary font-manrope text-sm">SPK - Le Krav Maga amélioré, respectueux des lois françaises et de la légitime défense</p>
               </div>
             </div>
             <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
