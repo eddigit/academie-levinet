@@ -5,21 +5,21 @@ import { Shield, Target, Zap, Brain, CheckCircle, ChevronRight } from 'lucide-re
 
 const DisciplineSPKPage = () => {
   const principles = [
-    { icon: Target, title: 'Krav Maga Amélioré', description: 'Une évolution du Krav Maga, adaptée aux lois françaises et à la déontologie.' },
-    { icon: Shield, title: 'Légitime Défense', description: 'Techniques proportionnées, on ne va jamais au-delà de ce que la loi permet.' },
-    { icon: Brain, title: 'Respect des Règles', description: 'Moralité, éthique et professionnalisme sont au cœur de notre enseignement.' },
-    { icon: Zap, title: 'Efficacité Responsable', description: 'Se défendre efficacement tout en respectant la loi française.' },
+    { icon: Target, title: 'Simple & Efficace', description: 'Des techniques basées sur vos réflexes naturels. Pas besoin d\'être sportif.' },
+    { icon: Shield, title: '100% Légal', description: 'Conforme aux lois françaises. Vous apprenez à vous défendre, pas à attaquer.' },
+    { icon: Brain, title: 'Pour Tous', description: 'Hommes, femmes, tous âges. Chacun progresse à son rythme.' },
+    { icon: Zap, title: 'Résultats Rapides', description: 'Dès les premières séances, vous gagnez en confiance et en capacité.' },
   ];
 
   const modules = [
-    'Défense contre attaques à mains nues',
-    'Défense contre armes blanches',
-    'Défense contre armes à feu (menace)',
-    'Gestion du stress et de l\'agressivité',
-    'Techniques de désengagement',
-    'Protection de tiers',
-    'Situations multiples agresseurs',
-    'Self-défense au sol',
+    'Se défendre face à une agression',
+    'Réagir face à une menace',
+    'Gérer le stress et la peur',
+    'Se dégager d\'une prise',
+    'Protéger ses proches',
+    'Garder son calme en situation de danger',
+    'Fuir intelligemment',
+    'Reprendre confiance en soi',
   ];
 
   return (
@@ -34,25 +34,25 @@ const DisciplineSPKPage = () => {
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <div className="inline-block px-4 py-2 bg-accent/10 border border-accent/30 rounded-sm mb-6">
-            <span className="text-accent font-oswald text-sm uppercase tracking-wider">Méthode Phare</span>
+            <span className="text-accent font-oswald text-sm uppercase tracking-wider">Apprenez à Vous Défendre</span>
           </div>
           
           <h1 className="font-oswald text-5xl md:text-7xl font-bold text-text-primary uppercase mb-6 tracking-tight">
-            Self-Pro <span className="text-accent">Krav</span>
+            Krav Maga <span className="text-accent">Self-Défense</span>
           </h1>
           
           <p className="text-xl text-text-secondary font-manrope mb-4 leading-relaxed max-w-3xl mx-auto">
-            Le Krav Maga version améliorée, conçu pour la France.
+            Apprenez à vous protéger avec des gestes simples et efficaces.
           </p>
           <p className="text-lg text-text-muted font-manrope mb-8 leading-relaxed max-w-3xl mx-auto">
-            Respectueux des lois françaises, de la déontologie et de la légitime défense proportionnée.
+            Notre méthode <strong className="text-accent">Self-Pro Krav</strong> : le Krav Maga adapté aux lois françaises, éthique et accessible à tous.
           </p>
           
           <Link
             to="/onboarding"
             className="inline-flex items-center gap-2 px-8 py-4 bg-accent hover:bg-accent/80 text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(249,115,22,0.4)]"
           >
-            Commencer l'Entraînement
+            Je Veux Apprendre
             <ChevronRight className="w-5 h-5" strokeWidth={2} />
           </Link>
         </div>
