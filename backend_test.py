@@ -104,7 +104,7 @@ class AcademieLevinetAPITester:
         """Test login with admin credentials"""
         login_data = {
             "email": "admin@academie-levinet.com",
-            "password": "admin123"
+            "password": "Admin2025!"
         }
         
         success, response = self.run_test(
