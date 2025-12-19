@@ -568,6 +568,152 @@ async def login(credentials: UserLogin):
 async def get_me(current_user: dict = Depends(get_current_user)):
     return {k: v for k, v in current_user.items() if k != 'password_hash' and k != '_id'}
 
+# ==================== USER PROFILE ENDPOINTS ====================
+
+@api_router.get("/profile")
+async def get_profile(current_user: dict = Depends(get_current_user)):
+    """Get current user's full profile"""
+    return {k: v for k, v in current_user.items() if k != 'password_hash' and k != '_id'}
+
+@api_router.put("/profile")
+async def update_profile(data: UserProfileUpdate, current_user: dict = Depends(get_current_user)):
+    """Update current user's profile"""
+    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": update_data}
+    )
+    
+    updated_user = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "password_hash": 0})
+    return updated_user
+
+@api_router.put("/profile/password")
+async def update_password(
+    current_password: str,
+    new_password: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update current user's password"""
+    # Verify current password
+    user = await db.users.find_one({"id": current_user['id']})
+    if not verify_password(current_password, user['password_hash']):
+        raise HTTPException(status_code=400, detail="Mot de passe actuel incorrect")
+    
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Le nouveau mot de passe doit contenir au moins 6 caractères")
+    
+    # Update password
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"password_hash": hash_password(new_password)}}
+    )
+    
+    return {"message": "Mot de passe mis à jour avec succès"}
+
+@api_router.post("/profile/photo")
+async def upload_profile_photo(photo_url: str, current_user: dict = Depends(get_current_user)):
+    """Update profile photo URL"""
+    await db.users.update_one(
+        {"id": current_user['id']},
+        {"$set": {"photo_url": photo_url}}
+    )
+    return {"message": "Photo mise à jour", "photo_url": photo_url}
+
+# ==================== ADMIN USER MANAGEMENT ====================
+
+@api_router.get("/admin/users")
+async def get_all_users(
+    role: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Admin: Get all users"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if role:
+        query["role"] = role
+    
+    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
+    
+    for user in users:
+        if isinstance(user.get('created_at'), str):
+            user['created_at'] = datetime.fromisoformat(user['created_at'])
+    
+    return {"users": users, "total": len(users)}
+
+@api_router.post("/admin/users")
+async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(get_current_user)):
+    """Admin: Create a new user (admin or member)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Check if email exists
+    existing = await db.users.find_one({"email": data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email déjà utilisé")
+    
+    # Validate role
+    if data.role not in ['admin', 'member']:
+        raise HTTPException(status_code=400, detail="Rôle invalide. Utilisez 'admin' ou 'member'")
+    
+    user = User(
+        email=data.email,
+        password_hash=hash_password(data.password),
+        full_name=data.full_name,
+        role=data.role,
+        phone=data.phone,
+        city=data.city,
+        has_paid_license=True if data.role == 'admin' else False
+    )
+    
+    doc = user.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    
+    await db.users.insert_one(doc)
+    
+    return {"message": f"Utilisateur {data.role} créé avec succès", "user_id": user.id}
+
+@api_router.put("/admin/users/{user_id}/role")
+async def update_user_role(user_id: str, role: str, current_user: dict = Depends(get_current_user)):
+    """Admin: Update user role"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    if role not in ['admin', 'member']:
+        raise HTTPException(status_code=400, detail="Rôle invalide")
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"role": role}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    return {"message": f"Rôle mis à jour en '{role}'"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Admin: Delete a user"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Prevent self-deletion
+    if user_id == current_user['id']:
+        raise HTTPException(status_code=400, detail="Vous ne pouvez pas supprimer votre propre compte")
+    
+    result = await db.users.delete_one({"id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    return {"message": "Utilisateur supprimé"}
+
 # Technical Directors Routes
 @api_router.post("/technical-directors", response_model=TechnicalDirector)
 async def create_technical_director(director_data: TechnicalDirectorCreate, current_user: dict = Depends(get_current_user)):
