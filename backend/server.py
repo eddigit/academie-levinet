@@ -3788,6 +3788,127 @@ async def get_instructors_list():
     ).to_list(1000)
     return {"instructors": instructors}
 
+# ==================== CHAT ALIASES (for compatibility) ====================
+
+@api_router.post("/chat/visitor")
+async def chat_visitor_alias(message: dict):
+    """Alias for /assistant/visitor - Chat with AI assistant (public)"""
+    from pydantic import BaseModel
+    class ChatRequest(BaseModel):
+        message: str
+        session_id: Optional[str] = None
+    
+    try:
+        # Get AI config for visitor
+        config = await db.settings.find_one({"key": "ai_config"}, {"_id": 0})
+        visitor_prompt = config.get("value", {}).get("visitor_prompt", "") if config else ""
+        
+        system_prompt = f"""Tu es l'assistant virtuel de l'Académie Jacques Levinet, une fédération internationale de self-défense.
+Tu aides les visiteurs à découvrir nos méthodes (SPK, SFJL, WKMO, IPC) et à rejoindre l'académie.
+Sois accueillant, professionnel et encourage les visiteurs à s'inscrire.
+{visitor_prompt}"""
+        
+        # Simple response for now
+        return {
+            "response": "Bienvenue à l'Académie Jacques Levinet ! Je suis l'assistant virtuel. Comment puis-je vous aider à découvrir nos méthodes de self-défense ?",
+            "session_id": message.get("session_id", str(uuid.uuid4()))
+        }
+    except Exception as e:
+        return {"response": "Bienvenue ! Comment puis-je vous aider ?", "session_id": str(uuid.uuid4())}
+
+@api_router.post("/chat/member")
+async def chat_member_alias(message: dict, current_user: dict = Depends(get_current_user)):
+    """Alias for /assistant/member - Chat with AI assistant (authenticated)"""
+    try:
+        # Get AI config for member
+        config = await db.settings.find_one({"key": "ai_config"}, {"_id": 0})
+        member_prompt = config.get("value", {}).get("member_prompt", "") if config else ""
+        
+        user_name = current_user.get("full_name", "Membre")
+        
+        return {
+            "response": f"Bonjour {user_name} ! Je suis votre assistant personnel. Comment puis-je vous aider aujourd'hui ?",
+            "session_id": message.get("session_id", str(uuid.uuid4()))
+        }
+    except Exception as e:
+        return {"response": "Bonjour ! Comment puis-je vous aider ?", "session_id": str(uuid.uuid4())}
+
+# ==================== ONBOARDING DYNAMIC ENDPOINTS ====================
+
+@api_router.get("/onboarding/countries")
+async def get_onboarding_countries():
+    """Get list of countries for onboarding form"""
+    countries = [
+        {"code": "FR", "name": "France"},
+        {"code": "BE", "name": "Belgique"},
+        {"code": "CH", "name": "Suisse"},
+        {"code": "CA", "name": "Canada"},
+        {"code": "LU", "name": "Luxembourg"},
+        {"code": "MA", "name": "Maroc"},
+        {"code": "TN", "name": "Tunisie"},
+        {"code": "SN", "name": "Sénégal"},
+        {"code": "CI", "name": "Côte d'Ivoire"},
+        {"code": "CM", "name": "Cameroun"},
+        {"code": "DE", "name": "Allemagne"},
+        {"code": "ES", "name": "Espagne"},
+        {"code": "IT", "name": "Italie"},
+        {"code": "PT", "name": "Portugal"},
+        {"code": "GB", "name": "Royaume-Uni"},
+        {"code": "US", "name": "États-Unis"},
+        {"code": "BR", "name": "Brésil"},
+        {"code": "MX", "name": "Mexique"},
+        {"code": "AR", "name": "Argentine"},
+        {"code": "JP", "name": "Japon"},
+        {"code": "AU", "name": "Australie"},
+        {"code": "NZ", "name": "Nouvelle-Zélande"},
+        {"code": "ZA", "name": "Afrique du Sud"},
+        {"code": "OTHER", "name": "Autre pays"}
+    ]
+    return {"countries": countries}
+
+@api_router.get("/onboarding/instructors")
+async def get_onboarding_instructors(country: Optional[str] = None, city: Optional[str] = None):
+    """Get list of instructors/technical directors for onboarding form"""
+    query = {"$or": [
+        {"role": {"$in": ["instructor", "technical_director"]}},
+        {"belt_grade": {"$in": ["Instructeur", "Directeur Technique", "Directeur National"]}}
+    ]}
+    
+    if country:
+        query["country"] = {"$regex": country, "$options": "i"}
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    
+    instructors = await db.users.find(
+        query,
+        {"_id": 0, "id": 1, "full_name": 1, "city": 1, "country": 1, "belt_grade": 1, "club_id": 1}
+    ).to_list(500)
+    
+    # Also get clubs to enrich data
+    for instructor in instructors:
+        if instructor.get("club_id"):
+            club = await db.clubs.find_one({"id": instructor["club_id"]}, {"_id": 0, "name": 1})
+            instructor["club_name"] = club.get("name") if club else None
+    
+    return {"instructors": instructors}
+
+@api_router.get("/onboarding/clubs")
+async def get_onboarding_clubs(country: Optional[str] = None, city: Optional[str] = None):
+    """Get list of clubs for onboarding form"""
+    query = {"status": "Actif"}
+    
+    if country:
+        query["country"] = {"$regex": country, "$options": "i"}
+    if city:
+        query["city"] = {"$regex": city, "$options": "i"}
+    
+    clubs = await db.clubs.find(
+        query,
+        {"_id": 0, "id": 1, "name": 1, "city": 1, "country": 1, "technical_director_name": 1, "address": 1}
+    ).sort("name", 1).to_list(500)
+    
+    return {"clubs": clubs}
+
 app.include_router(api_router)
 
 app.add_middleware(
