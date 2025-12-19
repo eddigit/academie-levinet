@@ -32,14 +32,9 @@ code {
   }
 }
 
-/* Fix accent spacing for uppercase titles */
-.font-oswald {
-  line-height: 1.4 !important;
-}
-
-.uppercase {
+/* Titles only - not buttons */
+h1.font-oswald, h2.font-oswald, h3.font-oswald, h4.font-oswald {
   line-height: 1.4;
-  padding-top: 0.1em;
 }
 
 @layer utilities {
