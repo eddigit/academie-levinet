@@ -50,7 +50,19 @@ class BeltGrade(str, Enum):
     GREEN = "Ceinture Verte"
     BLUE = "Ceinture Bleue"
     BROWN = "Ceinture Marron"
-    BLACK = "Ceinture Noire"
+    BLACK_1DAN = "Ceinture Noire 1er Dan"
+    BLACK_2DAN = "Ceinture Noire 2ème Dan"
+    BLACK_3DAN = "Ceinture Noire 3ème Dan"
+    BLACK_4DAN = "Ceinture Noire 4ème Dan"
+    BLACK_5DAN = "Ceinture Noire 5ème Dan"
+    INSTRUCTOR = "Instructeur"
+    TECHNICAL_DIRECTOR = "Directeur Technique"
+    NATIONAL_DIRECTOR = "Directeur National"
+
+class PendingMemberStatus(str, Enum):
+    PENDING = "En attente"
+    APPROVED = "Approuvé"
+    REJECTED = "Rejeté"
 
 class LeadPersonType(str, Enum):
     WOMAN = "Femme"
