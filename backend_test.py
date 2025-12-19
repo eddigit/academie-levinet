@@ -887,6 +887,69 @@ class AcademieLevinetAPITester:
         # We'll test it anyway to verify the error handling
         self.test_delete_club(club_id)
         
+        print("\n📋 EVENTS CRUD TESTS")
+        print("-" * 30)
+        
+        # Test Events CRUD operations
+        success, event_id = self.test_create_event()
+        if success and event_id:
+            # Test getting all events
+            self.test_get_events()
+            
+            # Test getting event details
+            self.test_get_event_details(event_id)
+            
+            # Test updating event
+            self.test_update_event(event_id)
+            
+            # Test event registration
+            self.test_register_for_event(event_id)
+            
+            # Test getting event registrations
+            self.test_get_event_registrations(event_id)
+            
+            # Test unregistering from event
+            self.test_unregister_from_event(event_id)
+            
+            # Test deleting event
+            self.test_delete_event(event_id)
+        else:
+            print("❌ Failed to create event. Skipping event-related tests.")
+        
+        print("\n📋 ADMIN USERS CRUD TESTS")
+        print("-" * 30)
+        
+        # Test getting all users
+        self.test_get_admin_users()
+        
+        # Test creating different types of users
+        success, admin_user_id = self.test_create_admin_user()
+        success, member_user_id = self.test_create_member_user()
+        success, instructor_user_id = self.test_create_instructor_user()
+        
+        # Test user operations with the created member user
+        if member_user_id:
+            # Test getting user details
+            self.test_get_user_details(member_user_id)
+            
+            # Test updating user
+            self.test_update_user(member_user_id)
+            
+            # Test changing user password
+            self.test_change_user_password(member_user_id)
+            
+            # Test updating user role
+            self.test_update_user_role(member_user_id, "admin")
+            
+            # Test deleting user (do this last)
+            self.test_delete_user(member_user_id)
+        
+        # Clean up other test users
+        if admin_user_id:
+            self.test_delete_user(admin_user_id)
+        if instructor_user_id:
+            self.test_delete_user(instructor_user_id)
+        
         return True
 
     def print_summary(self):
