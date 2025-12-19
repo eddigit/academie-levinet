@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, UserCog, CreditCard, LogOut, UserPlus, Newspaper, Calendar, MessageSquare, Shield, ShoppingBag, UserCheck, Settings, Bot, Receipt, Globe } from 'lucide-react';
+import { LayoutDashboard, Users, UserCog, CreditCard, LogOut, UserPlus, Newspaper, Calendar, MessageSquare, Shield, ShoppingBag, UserCheck, Settings, Bot, Receipt, Globe, Building2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 
@@ -32,6 +32,7 @@ const Sidebar = () => {
     { path: '/events', icon: Calendar, label: 'Événements', testId: 'nav-events' },
     { path: '/leads', icon: UserPlus, label: 'Leads', testId: 'nav-leads' },
     { path: '/members', icon: Users, label: 'Membres', testId: 'nav-members' },
+    { path: '/clubs', icon: Building2, label: 'Clubs', testId: 'nav-clubs' },
     { path: '/technical-directors', icon: UserCog, label: 'Directeurs Techniques', testId: 'nav-directors' },
     { path: '/subscriptions', icon: CreditCard, label: 'Cotisations', testId: 'nav-subscriptions' },
   ];
