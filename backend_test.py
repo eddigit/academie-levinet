@@ -247,6 +247,84 @@ class AcademieLevinetAPITester:
         
         return success
 
+    def test_create_pending_member(self):
+        """Test creating a pending member request"""
+        pending_member_data = {
+            "person_type": "Homme",
+            "motivations": ["Sécurité personnelle", "Confiance en soi"],
+            "full_name": "Jean Membre",
+            "email": f"pending_{datetime.now().strftime('%H%M%S')}@test.com",
+            "phone": "+33123456789",
+            "city": "Paris",
+            "country": "France",
+            "club_name": "Club SPK Paris Centre",
+            "instructor_name": "Jacques Levinet",
+            "belt_grade": "Ceinture Noire 1er Dan",
+            "training_mode": "club"
+        }
+        
+        success, response = self.run_test(
+            "Create Pending Member",
+            "POST",
+            "pending-members",
+            200,
+            data=pending_member_data
+        )
+        
+        return success, response.get('id') if success else None
+
+    def test_get_pending_members(self):
+        """Test getting pending members (admin only)"""
+        success, response = self.run_test(
+            "Get Pending Members",
+            "GET",
+            "admin/pending-members",
+            200
+        )
+        return success, response
+
+    def test_approve_pending_member(self, pending_id):
+        """Test approving a pending member"""
+        success, response = self.run_test(
+            "Approve Pending Member",
+            "POST",
+            f"admin/pending-members/{pending_id}/approve",
+            200
+        )
+        return success
+
+    def test_smtp_settings(self):
+        """Test SMTP settings endpoints"""
+        # Get SMTP settings
+        success, response = self.run_test(
+            "Get SMTP Settings",
+            "GET",
+            "admin/settings/smtp",
+            200
+        )
+        
+        if not success:
+            return False
+        
+        # Update SMTP settings
+        smtp_data = {
+            "smtp_host": "smtp.gmail.com",
+            "smtp_port": 587,
+            "smtp_user": "test@gmail.com",
+            "from_email": "test@academie-levinet.com",
+            "from_name": "Académie Jacques Levinet Test"
+        }
+        
+        success, response = self.run_test(
+            "Update SMTP Settings",
+            "PUT",
+            "admin/settings/smtp",
+            200,
+            data=smtp_data
+        )
+        
+        return success
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting Académie Jacques Levinet API Tests")
