@@ -492,16 +492,14 @@ const LandingPage = () => {
 
             {/* Disciplines */}
             <div>
-              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Disciplines</h4>
+              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Nos Disciplines</h4>
               <ul className="space-y-3">
-                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Krav Maga SPK</Link></li>
+                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Krav Maga Self-Défense</Link></li>
                 <li><Link to="/disciplines/canne" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Canne Défense</Link></li>
                 <li><Link to="/disciplines/baton" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Bâton Défense</Link></li>
-                <li><Link to="/disciplines/enfants" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self Défense Enfant</Link></li>
-                <li><Link to="/disciplines/sfjl" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self Défense Femme</Link></li>
+                <li><Link to="/disciplines/enfants" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self-Défense Enfants</Link></li>
+                <li><Link to="/disciplines/sfjl" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self-Défense Femmes</Link></li>
                 <li><Link to="/disciplines/ipc" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Real Operational System</Link></li>
-                <li><span className="text-text-secondary font-manrope text-sm">Accessibilité</span></li>
-                <li><span className="text-text-secondary font-manrope text-sm">Instinct de survie et réflexes</span></li>
               </ul>
             </div>
 
