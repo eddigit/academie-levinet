@@ -2546,6 +2546,13 @@ async def member_assistant(data: ChatMessage, current_user: dict = Depends(get_c
     session_id = data.session_id or f"member_{current_user['id']}"
     
     try:
+        # Get custom instructions
+        ai_config = await get_ai_config()
+        if not ai_config.get("ai_enabled", True):
+            return ChatResponse(response="L'assistant est temporairement indisponible.", session_id=session_id)
+        
+        extra_instructions = ai_config.get("member_extra_instructions", "")
+        
         # Personalized system message with member info
         personalized_prompt = f"""{MEMBER_ASSISTANT_PROMPT}
 
@@ -2554,6 +2561,8 @@ INFORMATIONS SUR LE MEMBRE ACTUEL :
 - Grade : {current_user.get('belt_grade', 'Non défini')}
 - Club : {current_user.get('club_name', 'Non défini')}
 """
+        if extra_instructions:
+            personalized_prompt += f"\n\nINSTRUCTIONS SUPPLÉMENTAIRES DE L'ADMIN:\n{extra_instructions}"
         
         # Get or create chat session
         if session_id not in chat_sessions:
