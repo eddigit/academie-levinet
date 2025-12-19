@@ -160,13 +160,13 @@ const LandingPage = () => {
                 <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
                   <div className="h-1 w-12 bg-accent mb-4 transition-all duration-500 group-hover:w-24" />
                   <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
-                    Adultes & Enfants
+                    Krav Maga Self-Défense
                   </h4>
                   <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
-                    Développez confiance, forme physique et sécurité pour toute la famille
+                    Apprenez à vous défendre avec notre méthode Self-Pro Krav, adaptée à tous
                   </p>
                   <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-accent">Découvrir</span>
+                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-accent">Je veux apprendre</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent w-5 h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                 </div>
