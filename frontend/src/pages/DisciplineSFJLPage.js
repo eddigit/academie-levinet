@@ -14,7 +14,7 @@ const DisciplineSFJLPage = () => {
   const scenarios = [
     'Se défendre dans la rue',
     'Réagir face au harcèlement',
-    'Protéger son sac',
+    'Se dégager d\'une agression',
     'Se sentir en sécurité dans les transports',
     'Se libérer d\'une prise',
     'Savoir dire non fermement',
