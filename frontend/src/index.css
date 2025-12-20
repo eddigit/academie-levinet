@@ -117,6 +117,104 @@ h1.font-oswald, h2.font-oswald, h3.font-oswald, h4.font-oswald {
   .safe-bottom {
     padding-bottom: max(1rem, var(--safe-area-bottom));
   }
+  
+  /* ==========================================
+     GLOW EFFECTS - Modern Premium Look
+     ========================================== */
+  
+  /* Header glow effect - subtle ambient light */
+  .header-glow {
+    position: relative;
+  }
+  
+  .header-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(ellipse at center top, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  /* Button glow effect - primary blue */
+  .btn-glow {
+    box-shadow: 
+      0 0 15px rgba(59, 130, 246, 0.4),
+      0 0 30px rgba(59, 130, 246, 0.2),
+      0 0 45px rgba(59, 130, 246, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .btn-glow:hover {
+    box-shadow: 
+      0 0 20px rgba(59, 130, 246, 0.6),
+      0 0 40px rgba(59, 130, 246, 0.4),
+      0 0 60px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Card glow effect - subtle ambient */
+  .card-glow {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card-glow::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  /* Accent glow for secondary elements */
+  .glow-accent {
+    box-shadow: 
+      0 0 15px rgba(236, 72, 153, 0.4),
+      0 0 30px rgba(236, 72, 153, 0.2);
+  }
+  
+  /* Soft glow for stat cards */
+  .glow-soft {
+    box-shadow: 
+      0 0 20px rgba(59, 130, 246, 0.1),
+      0 0 40px rgba(59, 130, 246, 0.05);
+  }
+  
+  /* Animated glow pulse */
+  .glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+  
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 
+        0 0 15px rgba(59, 130, 246, 0.4),
+        0 0 30px rgba(59, 130, 246, 0.2);
+    }
+    50% {
+      box-shadow: 
+        0 0 25px rgba(59, 130, 246, 0.6),
+        0 0 50px rgba(59, 130, 246, 0.3);
+    }
+  }
+  
+  /* Text glow effect */
+  .text-glow {
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  
+  /* Logo glow */
+  .logo-glow {
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
+  }
 }
 
 /* Hide Emergent badge */
