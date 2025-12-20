@@ -307,7 +307,7 @@ const LandingPage = () => {
                     <span className="text-primary text-lg md:text-xl">✓</span>
                     <div>
                       <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1">Manuels Numériques</h5>
-                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Support papier et vidéo téléchargeables</p>
+                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Support PDF et vidéos téléchargeables</p>
                     </div>
                   </li>
                 </ul>
@@ -317,7 +317,7 @@ const LandingPage = () => {
                   <Video className="w-12 h-12 md:w-16 md:h-16 text-primary mx-auto mb-3 md:mb-4" strokeWidth={1} />
                   <h4 className="font-oswald text-xl md:text-2xl font-bold text-text-primary uppercase mb-3 md:mb-4">E-Learning Self Défense</h4>
                   <p className="text-text-secondary font-manrope mb-4 md:mb-6 text-sm md:text-base">
-                    Rejoignez des centaines d'élèves qui se forment en ligne
+                    Rejoignez les élèves qui se forment en ligne
                   </p>
                   <div className="grid grid-cols-2 gap-3 md:gap-4 text-center">
                     <div>
