@@ -66,57 +66,57 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="stat-card" data-testid="stat-card-revenue">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-accent" />
+          <div className="stat-card p-4 md:p-6" data-testid="stat-card-revenue">
+            <div className="flex items-start justify-between mb-3 md:mb-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-accent/20 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-5 h-5 md:w-6 md:h-6 text-accent" />
               </div>
             </div>
-            <div className="text-3xl font-oswald font-bold text-text-primary mb-2">
+            <div className="text-2xl md:text-3xl font-oswald font-bold text-text-primary mb-1 md:mb-2">
               € {stats?.total_revenue?.toLocaleString() || 0}
             </div>
-            <div className="text-sm text-text-secondary font-manrope">Chiffre d'affaires</div>
-            <div className="flex items-center gap-2 mt-3">
-              <ArrowDown className="w-4 h-4 text-secondary" />
-              <span className="text-xs text-secondary font-manrope">-5% ce mois-ci</span>
+            <div className="text-xs md:text-sm text-text-secondary font-manrope">Chiffre d'affaires</div>
+            <div className="flex items-center gap-2 mt-2 md:mt-3">
+              <ArrowDown className="w-3 h-3 md:w-4 md:h-4 text-secondary" />
+              <span className="text-[10px] md:text-xs text-secondary font-manrope">-5% ce mois-ci</span>
             </div>
           </div>
 
-          <div className="stat-card" data-testid="stat-card-active">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-primary" />
+          <div className="stat-card p-4 md:p-6" data-testid="stat-card-active">
+            <div className="flex items-start justify-between mb-3 md:mb-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/20 rounded-lg flex items-center justify-center">
+                <UserCheck className="w-5 h-5 md:w-6 md:h-6 text-primary" />
               </div>
             </div>
-            <div className="text-3xl font-oswald font-bold text-text-primary mb-2">
+            <div className="text-2xl md:text-3xl font-oswald font-bold text-text-primary mb-1 md:mb-2">
               {stats?.active_memberships || 0}
             </div>
-            <div className="text-sm text-text-secondary font-manrope">Adhésions actives</div>
-            <div className="flex items-center gap-2 mt-3">
-              <ArrowUp className="w-4 h-4 text-primary" />
-              <span className="text-xs text-primary font-manrope">En ce mois-ci</span>
+            <div className="text-xs md:text-sm text-text-secondary font-manrope">Adhésions actives</div>
+            <div className="flex items-center gap-2 mt-2 md:mt-3">
+              <ArrowUp className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+              <span className="text-[10px] md:text-xs text-primary font-manrope">En ce mois-ci</span>
             </div>
           </div>
 
-          <div className="stat-card" data-testid="stat-card-new">
-            <div className="flex items-start justify-between mb-4">
-              <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-secondary" />
+          <div className="stat-card p-4 md:p-6" data-testid="stat-card-new">
+            <div className="flex items-start justify-between mb-3 md:mb-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
               </div>
             </div>
-            <div className="text-3xl font-oswald font-bold text-text-primary mb-2">
+            <div className="text-2xl md:text-3xl font-oswald font-bold text-text-primary mb-1 md:mb-2">
               {stats?.new_members_this_month || 0}
             </div>
-            <div className="text-sm text-text-secondary font-manrope">Nouveaux membres</div>
-            <div className="flex items-center gap-2 mt-3">
-              <ArrowUp className="w-4 h-4 text-primary" />
-              <span className="text-xs text-primary font-manrope">Ce mois</span>
+            <div className="text-xs md:text-sm text-text-secondary font-manrope">Nouveaux membres</div>
+            <div className="flex items-center gap-2 mt-2 md:mt-3">
+              <ArrowUp className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+              <span className="text-[10px] md:text-xs text-primary font-manrope">Ce mois</span>
             </div>
           </div>
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Charts Section - Mobile First */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
           {/* Bar Chart */}
           <div className="lg:col-span-8 stat-card" data-testid="chart-members-by-month">
             <h3 className="font-oswald text-xl font-bold text-text-primary uppercase mb-6 tracking-wide">
