@@ -90,7 +90,7 @@ const LandingPage = () => {
             Les 3 Piliers de Nos Méthodes
           </h3>
           <p className="text-center text-text-secondary font-manrope text-sm md:text-lg mb-2 max-w-3xl mx-auto">
-            Krav Maga Self-Défense - Canne Défense - Bâton Défense - Self-Défense Femmes - Self-Défense Enfants
+            Krav Maga SPK - Self Pro Krav - Canne Défense - Bâton Défense - Self-Défense Femmes - Self-Défense Enfants
           </p>
           <p className="text-center text-primary font-manrope text-xs md:text-base mb-8 md:mb-16 max-w-3xl mx-auto">
             Pour les professionnels de la sécurité et Forces de l'ordre : Real Operational System
@@ -103,7 +103,7 @@ const LandingPage = () => {
                 Héritage du Capitaine Jacques Levinet, Champion de France de Karaté
               </p>
               <p className="text-text-muted font-manrope text-xs md:text-sm">
-                Méthode éprouvée et reconnue mondialement (WKMO, IPC)
+                Méthodes éprouvées et reconnues mondialement (WKMO, IPC)
               </p>
             </div>
 
@@ -114,7 +114,7 @@ const LandingPage = () => {
                 Respect de la légitime défense
               </p>
               <p className="text-text-muted font-manrope text-xs md:text-sm">
-                Une pratique simple basée sur l'instinct de survie et réflexes
+                Une pratique simple basée sur l'instinct de survie et les réflexes
               </p>
             </div>
 
@@ -122,7 +122,7 @@ const LandingPage = () => {
               <Users className="w-10 h-10 md:w-12 md:h-12 text-accent mx-auto mb-3 md:mb-4" strokeWidth={1} />
               <h4 className="font-oswald text-lg md:text-xl font-bold text-text-primary uppercase mb-2 md:mb-3">Accessibilité & Communauté</h4>
               <p className="text-text-secondary font-manrope leading-relaxed mb-2 md:mb-3 text-sm md:text-base">
-                Conçue pour tous : hommes, femmes, enfants
+                Conçue pour tous : hommes, femmes, enfants, seniors
               </p>
               <p className="text-text-muted font-manrope text-xs md:text-sm">
                 Esprit familial avec présence internationale forte
