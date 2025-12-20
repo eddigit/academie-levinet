@@ -148,7 +148,7 @@ const LandingPage = () => {
           <div className="grid gap-4 md:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {/* Adultes & Enfants Card - Kinetic Shutter Design */}
             <div 
-              className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-accent/20 hover:border-accent/50"
+              className="group relative h-[350px] sm:h-[400px] md:h-[500px] w-full overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-accent/20 hover:border-accent/50"
               data-testid="audience-card-public"
             >
               <div 
@@ -157,26 +157,26 @@ const LandingPage = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
-              <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8">
                 <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
-                  <div className="h-1 w-12 bg-accent mb-4 transition-all duration-500 group-hover:w-24" />
-                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
+                  <div className="h-1 w-8 md:w-12 bg-accent mb-3 md:mb-4 transition-all duration-500 group-hover:w-16 md:group-hover:w-24" />
+                  <h4 className="font-oswald text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-tight text-white mb-2 md:mb-3 drop-shadow-lg">
                     Krav Maga Self-Défense
                   </h4>
-                  <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
+                  <p className="font-manrope text-sm md:text-base text-gray-300 mb-4 md:mb-6 opacity-90 max-w-xs">
                     Apprenez à vous défendre avec notre méthode Self-Pro Krav, adaptée à tous
                   </p>
-                  <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-accent">Je veux apprendre</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent w-5 h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  <div className="flex items-center gap-2 md:gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-accent">Je veux apprendre</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Les Femmes Card - Kinetic Shutter Design */}
+            {/* Les Femmes Card - Mobile First */}
             <div 
-              className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-secondary/20 hover:border-secondary/50"
+              className="group relative h-[350px] sm:h-[400px] md:h-[500px] w-full overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-secondary/20 hover:border-secondary/50"
               data-testid="audience-card-women"
             >
               <div 
@@ -185,26 +185,26 @@ const LandingPage = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
-              <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8">
                 <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
-                  <div className="h-1 w-12 bg-secondary mb-4 transition-all duration-500 group-hover:w-24" />
-                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
+                  <div className="h-1 w-8 md:w-12 bg-secondary mb-3 md:mb-4 transition-all duration-500 group-hover:w-16 md:group-hover:w-24" />
+                  <h4 className="font-oswald text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-tight text-white mb-2 md:mb-3 drop-shadow-lg">
                     Pour les Femmes
                   </h4>
-                  <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
+                  <p className="font-manrope text-sm md:text-base text-gray-300 mb-4 md:mb-6 opacity-90 max-w-xs">
                     Apprenez à vous défendre avec des gestes simples. On est là pour vous aider.
                   </p>
-                  <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-secondary">Je veux apprendre</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary w-5 h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  <div className="flex items-center gap-2 md:gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-secondary">Je veux apprendre</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Forces de Sécurité Card - Kinetic Shutter Design */}
+            {/* Forces de Sécurité Card - Mobile First */}
             <div 
-              className="group relative h-[500px] w-full overflow-hidden rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50"
+              className="group relative h-[350px] sm:h-[400px] md:h-[500px] w-full overflow-hidden rounded-xl md:rounded-2xl border border-white/10 bg-gray-900 shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:border-primary/50 sm:col-span-2 lg:col-span-1"
               data-testid="audience-card-pro"
             >
               <div 
@@ -213,18 +213,18 @@ const LandingPage = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
-              <div className="absolute inset-0 flex flex-col justify-end p-8">
+              <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8">
                 <div className="relative z-10 transform transition-transform duration-500 group-hover:-translate-y-2">
-                  <div className="h-1 w-12 bg-primary mb-4 transition-all duration-500 group-hover:w-24" />
-                  <h4 className="font-oswald text-3xl font-bold uppercase tracking-tight text-white mb-3 drop-shadow-lg">
+                  <div className="h-1 w-8 md:w-12 bg-primary mb-3 md:mb-4 transition-all duration-500 group-hover:w-16 md:group-hover:w-24" />
+                  <h4 className="font-oswald text-xl sm:text-2xl md:text-3xl font-bold uppercase tracking-tight text-white mb-2 md:mb-3 drop-shadow-lg">
                     Forces de Sécurité
                   </h4>
-                  <p className="font-manrope text-base text-gray-300 mb-6 opacity-90 max-w-xs">
+                  <p className="font-manrope text-sm md:text-base text-gray-300 mb-4 md:mb-6 opacity-90 max-w-xs">
                     Formation opérationnelle pour les forces de l'ordre et les agents de sécurité
                   </p>
-                  <div className="flex items-center gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="font-oswald text-sm font-bold uppercase tracking-wider text-primary">Formation Pro</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary w-5 h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  <div className="flex items-center gap-2 md:gap-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary">Formation Pro</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                   </div>
                 </div>
               </div>
@@ -233,19 +233,19 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Mapmonde - Communauté Mondiale */}
-      <section className="py-20 px-6 bg-background">
+      {/* Mapmonde - Communauté Mondiale - Mobile First */}
+      <section className="py-12 md:py-20 px-4 md:px-6 bg-background">
         <div className="container mx-auto">
-          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-4 tracking-wide">
+          <h3 className="font-oswald text-2xl sm:text-3xl md:text-4xl font-bold text-center text-text-primary uppercase mb-3 md:mb-4 tracking-wide">
             Communauté Mondiale
           </h3>
-          <p className="text-center text-text-secondary font-manrope text-lg mb-12 max-w-3xl mx-auto">
+          <p className="text-center text-text-secondary font-manrope text-sm md:text-lg mb-8 md:mb-12 max-w-3xl mx-auto">
             Un réseau mondial pour s'entraîner partout - Découvrez tous nos clubs et membres
           </p>
           <div className="max-w-6xl mx-auto">
-            <div className="relative w-full rounded-lg border border-white/10 overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+            <div className="relative w-full rounded-lg border border-white/10 overflow-hidden" style={{ paddingBottom: '75%' }}>
               <iframe
-                src="https://www.google.com/maps/d/u/0/embed?mid=1RdKNrRv4jEPjQTr7BDBCpXuuYAs&ll=-0.10736278113021733%2C0&z=2"
+                src="https://www.google.com/maps/d/u/0/embed?mid=1RdKNrRv4jEPjQTr7BDBCpXuuYAs&ll=-0.10736278113021733%2C0&z=1"
                 className="absolute inset-0 w-full h-full"
                 style={{ border: 0 }}
                 allowFullScreen=""
@@ -255,29 +255,29 @@ const LandingPage = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
-            <div className="text-center">
-              <p className="text-4xl font-oswald font-bold text-primary mb-2">40+</p>
-              <p className="text-text-secondary font-manrope text-sm">Pays</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8 md:mt-12 max-w-4xl mx-auto">
+            <div className="text-center p-3 md:p-4 rounded-lg bg-white/5">
+              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">40+</p>
+              <p className="text-text-secondary font-manrope text-xs md:text-sm">Pays</p>
             </div>
-            <div className="text-center">
-              <p className="text-4xl font-oswald font-bold text-primary mb-2">40</p>
-              <p className="text-text-secondary font-manrope text-sm">Directeurs Techniques</p>
+            <div className="text-center p-3 md:p-4 rounded-lg bg-white/5">
+              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">40</p>
+              <p className="text-text-secondary font-manrope text-xs md:text-sm">Directeurs Techniques</p>
             </div>
-            <div className="text-center">
-              <p className="text-4xl font-oswald font-bold text-primary mb-2">500+</p>
-              <p className="text-text-secondary font-manrope text-sm">Clubs et Membres</p>
+            <div className="text-center p-3 md:p-4 rounded-lg bg-white/5">
+              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">500+</p>
+              <p className="text-text-secondary font-manrope text-xs md:text-sm">Clubs et Membres</p>
             </div>
-            <div className="text-center">
-              <p className="text-4xl font-oswald font-bold text-primary mb-2">50 ans</p>
-              <p className="text-text-secondary font-manrope text-sm">d'Expertise</p>
+            <div className="text-center p-3 md:p-4 rounded-lg bg-white/5">
+              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">50 ans</p>
+              <p className="text-text-secondary font-manrope text-xs md:text-sm">d'Expertise</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Cours en Ligne */}
-      <section className="py-20 px-6 bg-paper">
+      <section className="py-12 md:py-20 px-4 md:px-6 bg-paper">
         <div className="container mx-auto">
           <div className="max-w-5xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
