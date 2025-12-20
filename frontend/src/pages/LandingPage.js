@@ -280,58 +280,58 @@ const LandingPage = () => {
       <section className="py-12 md:py-20 px-4 md:px-6 bg-paper">
         <div className="container mx-auto">
           <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
-                <h3 className="font-oswald text-4xl font-bold text-text-primary uppercase mb-6 tracking-wide">
+                <h3 className="font-oswald text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary uppercase mb-4 md:mb-6 tracking-wide">
                   Formations en Ligne
                 </h3>
-                <p className="text-text-secondary font-manrope text-lg mb-6 leading-relaxed">
+                <p className="text-text-secondary font-manrope text-sm md:text-lg mb-4 md:mb-6 leading-relaxed">
                   Accédez à une bibliothèque complète de cours vidéo et cahiers techniques pour vous former où que vous soyez, à votre rythme.
                 </p>
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-start gap-3">
-                    <span className="text-primary text-xl">✓</span>
+                <ul className="space-y-3 md:space-y-4 mb-6 md:mb-8">
+                  <li className="flex items-start gap-2 md:gap-3">
+                    <span className="text-primary text-lg md:text-xl">✓</span>
                     <div>
-                      <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-1">Cours Vidéo HD</h5>
-                      <p className="text-text-secondary font-manrope text-sm">Techniques détaillées filmées sous tous les angles</p>
+                      <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1">Cours Vidéo HD</h5>
+                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Techniques détaillées filmées sous tous les angles</p>
                     </div>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-primary text-xl">✓</span>
+                  <li className="flex items-start gap-2 md:gap-3">
+                    <span className="text-primary text-lg md:text-xl">✓</span>
                     <div>
-                      <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-1">Programmes Structurés</h5>
-                      <p className="text-text-secondary font-manrope text-sm">Progressions adaptées à chaque niveau</p>
+                      <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1">Programmes Structurés</h5>
+                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Progressions adaptées à chaque niveau</p>
                     </div>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-primary text-xl">✓</span>
+                  <li className="flex items-start gap-2 md:gap-3">
+                    <span className="text-primary text-lg md:text-xl">✓</span>
                     <div>
-                      <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-1">Manuels Numériques</h5>
-                      <p className="text-text-secondary font-manrope text-sm">Support papier et vidéo téléchargeables</p>
+                      <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1">Manuels Numériques</h5>
+                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Support papier et vidéo téléchargeables</p>
                     </div>
                   </li>
                 </ul>
               </div>
               <div className="relative">
-                <div className="stat-card p-8 text-center">
-                  <Video className="w-16 h-16 text-primary mx-auto mb-4" strokeWidth={1} />
-                  <h4 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-4">E-Learning Self Défense</h4>
-                  <p className="text-text-secondary font-manrope mb-6">
+                <div className="stat-card p-6 md:p-8 text-center">
+                  <Video className="w-12 h-12 md:w-16 md:h-16 text-primary mx-auto mb-3 md:mb-4" strokeWidth={1} />
+                  <h4 className="font-oswald text-xl md:text-2xl font-bold text-text-primary uppercase mb-3 md:mb-4">E-Learning Self Défense</h4>
+                  <p className="text-text-secondary font-manrope mb-4 md:mb-6 text-sm md:text-base">
                     Rejoignez des centaines d'élèves qui se forment en ligne
                   </p>
-                  <div className="grid grid-cols-2 gap-4 text-center">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4 text-center">
                     <div>
-                      <p className="text-3xl font-oswald font-bold text-primary">50+</p>
-                      <p className="text-xs text-text-muted font-manrope">Cours Vidéo</p>
+                      <p className="text-2xl md:text-3xl font-oswald font-bold text-primary">50+</p>
+                      <p className="text-[10px] md:text-xs text-text-muted font-manrope">Cours Vidéo</p>
                     </div>
                     <div>
-                      <p className="text-3xl font-oswald font-bold text-primary">24/7</p>
-                      <p className="text-xs text-text-muted font-manrope">Accès Illimité</p>
+                      <p className="text-2xl md:text-3xl font-oswald font-bold text-primary">24/7</p>
+                      <p className="text-[10px] md:text-xs text-text-muted font-manrope">Accès Illimité</p>
                     </div>
                   </div>
                   <Link 
                     to="/onboarding"
-                    className="inline-flex items-center justify-center mt-6 px-6 py-3 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider leading-none rounded-sm transition-all"
+                    className="inline-flex items-center justify-center mt-4 md:mt-6 px-5 md:px-6 py-3 bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider leading-none rounded-sm transition-all text-sm md:text-base w-full sm:w-auto"
                   >
                     Apprendre en Ligne
                   </Link>
@@ -342,41 +342,41 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Encart Défense Féminine */}
-      <section className="py-20 px-6 bg-gradient-to-br from-secondary/10 to-accent/10 relative overflow-hidden">
+      {/* Encart Défense Féminine - Mobile First */}
+      <section className="py-12 md:py-20 px-4 md:px-6 bg-gradient-to-br from-secondary/10 to-accent/10 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-10 left-10 w-64 h-64 bg-secondary rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent rounded-full blur-3xl"></div>
+          <div className="absolute top-10 left-10 w-32 md:w-64 h-32 md:h-64 bg-secondary rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-48 md:w-96 h-48 md:h-96 bg-accent rounded-full blur-3xl"></div>
         </div>
         <div className="container mx-auto relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-block px-4 py-2 bg-secondary/20 rounded-full mb-6">
-              <span className="text-secondary font-oswald text-sm uppercase tracking-wide">Spécial Femmes</span>
+            <div className="inline-block px-3 md:px-4 py-1.5 md:py-2 bg-secondary/20 rounded-full mb-4 md:mb-6">
+              <span className="text-secondary font-oswald text-xs md:text-sm uppercase tracking-wide">Spécial Femmes</span>
             </div>
-            <h3 className="font-oswald text-5xl font-bold text-text-primary uppercase mb-6 tracking-wide">
+            <h3 className="font-oswald text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary uppercase mb-4 md:mb-6 tracking-wide">
               Self-Défense Féminine
             </h3>
-            <p className="text-xl text-text-secondary font-manrope mb-8 leading-relaxed">
+            <p className="text-base md:text-xl text-text-secondary font-manrope mb-6 md:mb-8 leading-relaxed">
               Reprenez le Contrôle de Votre Sécurité
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-white/10 text-center">
-                <Sparkles className="w-12 h-12 text-secondary mx-auto mb-3" strokeWidth={1} />
-                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Empowerment</h5>
-                <p className="text-text-secondary font-manrope text-sm">Développez votre confiance et votre force intérieure</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-10">
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 md:p-6 border border-white/10 text-center">
+                <Sparkles className="w-10 h-10 md:w-12 md:h-12 text-secondary mx-auto mb-2 md:mb-3" strokeWidth={1} />
+                <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Empowerment</h5>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Développez votre confiance et votre force intérieure</p>
               </div>
-              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-white/10 text-center">
-                <Target className="w-12 h-12 text-accent mx-auto mb-3" strokeWidth={1} />
-                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Scénarios Réalistes</h5>
-                <p className="text-text-secondary font-manrope text-sm">Techniques adaptées aux situations réelles</p>
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 md:p-6 border border-white/10 text-center">
+                <Target className="w-10 h-10 md:w-12 md:h-12 text-accent mx-auto mb-2 md:mb-3" strokeWidth={1} />
+                <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Scénarios Réalistes</h5>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Techniques adaptées aux situations réelles</p>
               </div>
-              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-6 border border-white/10 text-center">
-                <Shield className="w-12 h-12 text-primary mx-auto mb-3" strokeWidth={1} />
-                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Sans Agressivité</h5>
-                <p className="text-text-secondary font-manrope text-sm">Pratique sûre et respectueuse des lois</p>
+              <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 md:p-6 border border-white/10 text-center">
+                <Shield className="w-10 h-10 md:w-12 md:h-12 text-primary mx-auto mb-2 md:mb-3" strokeWidth={1} />
+                <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Sans Agressivité</h5>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Pratique sûre et respectueuse des lois</p>
               </div>
             </div>
-            <p className="text-lg text-text-primary/90 font-manrope mb-8 max-w-2xl mx-auto">
+            <p className="text-sm md:text-lg text-text-primary/90 font-manrope mb-6 md:mb-8 max-w-2xl mx-auto">
               <strong>Dans un contexte où la sécurité personnelle est plus importante que jamais</strong>, 
               notre programme vous donne les outils pour vous défendre efficacement contre toutes formes de violences.
             </p>
@@ -384,19 +384,19 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Valeurs Section */}
-      <section className="py-20 px-6 bg-paper">
+      {/* Valeurs Section - Mobile First */}
+      <section className="py-12 md:py-20 px-4 md:px-6 bg-paper">
         <div className="container mx-auto max-w-4xl">
-          <h3 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-4 tracking-wide">
+          <h3 className="font-oswald text-2xl sm:text-3xl md:text-4xl font-bold text-center text-text-primary uppercase mb-3 md:mb-4 tracking-wide">
             Pourquoi Nous Choisir ?
           </h3>
-          <p className="text-center text-text-secondary font-manrope text-lg mb-4 max-w-3xl mx-auto">
+          <p className="text-center text-text-secondary font-manrope text-sm md:text-lg mb-3 md:mb-4 max-w-3xl mx-auto">
             Une méthode de self-défense éprouvée depuis des décennies
           </p>
-          <p className="text-center text-primary font-manrope text-base mb-16 max-w-3xl mx-auto">
+          <p className="text-center text-primary font-manrope text-xs md:text-base mb-8 md:mb-16 max-w-3xl mx-auto">
             Organisme de formation professionnelle à reconnaissance internationale
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
             <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
               <CheckCircle className="w-8 h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
