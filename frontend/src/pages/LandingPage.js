@@ -378,7 +378,7 @@ const LandingPage = () => {
             </div>
             <p className="text-sm md:text-lg text-text-primary/90 font-manrope mb-6 md:mb-8 max-w-2xl mx-auto">
               <strong>Dans un contexte où la sécurité personnelle est plus importante que jamais</strong>, 
-              notre programme vous donne les outils pour vous défendre efficacement contre toutes formes de violences.
+              notre programme vous donne les outils pour vous défendre efficacement contre toutes les formes de violence.
             </p>
           </div>
         </div>
@@ -391,31 +391,31 @@ const LandingPage = () => {
             Pourquoi Nous Choisir ?
           </h3>
           <p className="text-center text-text-secondary font-manrope text-sm md:text-lg mb-3 md:mb-4 max-w-3xl mx-auto">
-            Une méthode de self-défense éprouvée depuis des décennies
+            Des méthodes de self-défense éprouvées depuis des décennies
           </p>
           <p className="text-center text-primary font-manrope text-xs md:text-base mb-8 md:mb-16 max-w-3xl mx-auto">
-            Organisme de formation professionnelle à reconnaissance internationale
+            Organisme de formation professionnelle à vocation internationale
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
             <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
               <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
                 <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">100% Légal</h5>
-                <p className="text-text-secondary font-manrope text-xs md:text-sm">Notre méthode Self-Pro Krav respecte les lois françaises sur la légitime défense</p>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Nos méthodes respectent les lois françaises sur la légitime défense</p>
               </div>
             </div>
             <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
               <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
                 <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Simple & Efficace</h5>
-                <p className="text-text-secondary font-manrope text-xs md:text-sm">Des techniques basées sur vos réflexes naturels, pas besoin d'être sportif</p>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Des techniques basées sur vos réflexes naturels. Nul besoin d'être sportif</p>
               </div>
             </div>
             <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
               <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
                 <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Pour Tous</h5>
-                <p className="text-text-secondary font-manrope text-xs md:text-sm">Hommes, femmes, enfants — chacun progresse à son rythme</p>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Hommes, femmes, enfants, seniors — chacun progresse à son rythme</p>
               </div>
             </div>
             <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
