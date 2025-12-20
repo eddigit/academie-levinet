@@ -34,7 +34,7 @@ const MegaMenu = () => {
     {
       title: 'Nos Disciplines',
       items: [
-        { name: 'Krav Maga Self-Défense', href: '/disciplines/spk', icon: Target, description: 'Apprenez à vous défendre' },
+        { name: 'Krav Maga SPK', href: '/disciplines/spk', icon: Target, description: 'Apprenez à vous défendre' },
         { name: 'Self-Défense Femmes', href: '/disciplines/sfjl', icon: Shield, description: 'Pour vous, mesdames' },
         { name: 'Self-Défense Enfants', href: '/disciplines/wkmo', icon: Users, description: 'Pour toute la famille' },
         { name: 'Formation Pro (ROS)', href: '/disciplines/ipc', icon: Shield, description: 'Forces de l\'ordre et sécurité' },
