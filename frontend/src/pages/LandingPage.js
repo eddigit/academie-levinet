@@ -397,41 +397,41 @@ const LandingPage = () => {
             Organisme de formation professionnelle à reconnaissance internationale
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
-              <CheckCircle className="w-8 h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
+            <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
+              <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
-                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">100% Légal</h5>
-                <p className="text-text-secondary font-manrope text-sm">Notre méthode Self-Pro Krav respecte les lois françaises sur la légitime défense</p>
+                <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">100% Légal</h5>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Notre méthode Self-Pro Krav respecte les lois françaises sur la légitime défense</p>
               </div>
             </div>
-            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
-              <CheckCircle className="w-8 h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
+            <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
+              <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
-                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Simple & Efficace</h5>
-                <p className="text-text-secondary font-manrope text-sm">Des techniques basées sur vos réflexes naturels, pas besoin d'être sportif</p>
+                <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Simple & Efficace</h5>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Des techniques basées sur vos réflexes naturels, pas besoin d'être sportif</p>
               </div>
             </div>
-            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
-              <CheckCircle className="w-8 h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
+            <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
+              <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
-                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Pour Tous</h5>
-                <p className="text-text-secondary font-manrope text-sm">Hommes, femmes, enfants — chacun progresse à son rythme</p>
+                <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Pour Tous</h5>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Hommes, femmes, enfants — chacun progresse à son rythme</p>
               </div>
             </div>
-            <div className="flex gap-4 p-6 bg-background/50 rounded-lg border border-white/5">
-              <CheckCircle className="w-8 h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
+            <div className="flex gap-3 md:gap-4 p-4 md:p-6 bg-background/50 rounded-lg border border-white/5">
+              <CheckCircle className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" strokeWidth={1.5} />
               <div>
-                <h5 className="font-oswald text-lg font-bold text-text-primary uppercase mb-2">Réseau International</h5>
-                <p className="text-text-secondary font-manrope text-sm">Plus de 40 pays, des clubs partout pour s'entraîner près de chez vous</p>
+                <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1 md:mb-2">Réseau International</h5>
+                <p className="text-text-secondary font-manrope text-xs md:text-sm">Plus de 40 pays, des clubs partout pour s'entraîner près de chez vous</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section - Mobile First */}
       <section 
-        className="py-20 px-6 relative" 
+        className="py-12 md:py-20 px-4 md:px-6 relative" 
         style={{
           backgroundImage: `linear-gradient(rgba(11, 17, 32, 0.85), rgba(11, 17, 32, 0.9)), url('https://images.unsplash.com/photo-1644594570589-ef85bd03169f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwyfHxrcmF2JTIwbWFnYSUyMHRyYWluaW5nJTIwY2xhc3N8ZW58MHx8fHwxNzY1NzM2Njg0fDA&ixlib=rb-4.1.0&q=85')`,
           backgroundSize: 'cover',
@@ -440,17 +440,17 @@ const LandingPage = () => {
         data-testid="cta-section"
       >
         <div className="container mx-auto text-center max-w-3xl">
-          <h3 className="font-oswald text-4xl md:text-5xl font-bold text-text-primary uppercase mb-6 tracking-wide">
+          <h3 className="font-oswald text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary uppercase mb-4 md:mb-6 tracking-wide">
             Rejoignez Notre Fédération Internationale
           </h3>
-          <p className="text-lg text-text-secondary font-manrope mb-10 leading-relaxed">
+          <p className="text-sm md:text-lg text-text-secondary font-manrope mb-6 md:mb-10 leading-relaxed">
             Développez votre confiance, votre sécurité et vos capacités avec l'Académie Jacques Levinet
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link 
               to="/onboarding" 
               data-testid="cta-button"
-              className="inline-flex items-center justify-center px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-lg tracking-wider leading-none rounded-sm transition-smooth glow-effect"
+              className="inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-base md:text-lg tracking-wider leading-none rounded-sm transition-smooth glow-effect w-full sm:w-auto"
             >
               Devenir Membre
             </Link>
@@ -458,65 +458,63 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-paper py-16 px-6 border-t border-white/5" data-testid="footer">
+      {/* Footer - Mobile First */}
+      <footer className="bg-paper py-10 md:py-16 px-4 md:px-6 border-t border-white/5" data-testid="footer">
         <div className="container mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-12 mb-8 md:mb-12">
             {/* Brand */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
                 <img 
                   src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
                   alt="Logo Académie Jacques Levinet" 
-                  className="w-10 h-10 rounded-full object-cover"
+                  className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
                 />
                 <div>
-                  <h3 className="font-oswald text-lg font-bold text-text-primary uppercase">Académie Jacques Levinet</h3>
-                  <p className="text-xs text-text-muted">Depuis 1998</p>
+                  <h3 className="font-oswald text-sm md:text-lg font-bold text-text-primary uppercase">Académie Jacques Levinet</h3>
+                  <p className="text-[10px] md:text-xs text-text-muted">Depuis 1998</p>
                 </div>
               </div>
-              <p className="text-text-secondary font-manrope text-sm leading-relaxed">
+              <p className="text-text-secondary font-manrope text-xs md:text-sm leading-relaxed hidden md:block">
                 L'Académie Jacques Levinet forme l'élite de la self-défense mondiale depuis plus de 25 ans.
               </p>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Navigation</h4>
-              <ul className="space-y-3">
-                <li><Link to="/founder" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Le Fondateur</Link></li>
-                <li><Link to="/about" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">À Propos</Link></li>
-                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self-Pro Krav</Link></li>
-                <li><Link to="/pedagogy" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Pédagogie</Link></li>
+              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Navigation</h4>
+              <ul className="space-y-2 md:space-y-3">
+                <li><Link to="/founder" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Le Fondateur</Link></li>
+                <li><Link to="/about" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">À Propos</Link></li>
+                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Self-Pro Krav</Link></li>
+                <li><Link to="/pedagogy" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Pédagogie</Link></li>
               </ul>
             </div>
 
             {/* Disciplines */}
             <div>
-              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Nos Disciplines</h4>
-              <ul className="space-y-3">
-                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Krav Maga Self-Défense</Link></li>
-                <li><Link to="/disciplines/canne" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Canne Défense</Link></li>
-                <li><Link to="/disciplines/baton" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Bâton Défense</Link></li>
-                <li><Link to="/disciplines/enfants" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self-Défense Enfants</Link></li>
-                <li><Link to="/disciplines/sfjl" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Self-Défense Femmes</Link></li>
-                <li><Link to="/disciplines/ipc" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Real Operational System</Link></li>
+              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Disciplines</h4>
+              <ul className="space-y-2 md:space-y-3">
+                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Krav Maga</Link></li>
+                <li><Link to="/disciplines/sfjl" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Self-Défense Femmes</Link></li>
+                <li><Link to="/disciplines/wkmo" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Self-Défense Enfants</Link></li>
+                <li><Link to="/disciplines/ipc" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Formation Pro</Link></li>
               </ul>
             </div>
 
             {/* Contact */}
             <div>
-              <h4 className="font-oswald text-sm font-bold uppercase tracking-wider text-primary mb-6">Rejoindre</h4>
-              <ul className="space-y-3">
-                <li><Link to="/join" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Devenir Membre</Link></li>
-                <li><Link to="/onboarding" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">S'inscrire</Link></li>
-                <li><Link to="/international" className="text-text-secondary hover:text-primary transition-colors font-manrope text-sm">Trouver un Club</Link></li>
+              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Rejoindre</h4>
+              <ul className="space-y-2 md:space-y-3">
+                <li><Link to="/join" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Devenir Membre</Link></li>
+                <li><Link to="/onboarding" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">S'inscrire</Link></li>
+                <li><Link to="/international" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Trouver un Club</Link></li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/5 text-center">
-            <p className="text-text-muted font-manrope text-sm">
+          <div className="pt-6 md:pt-8 border-t border-white/5 text-center">
+            <p className="text-text-muted font-manrope text-xs md:text-sm">
               © 2025 Académie Jacques Levinet. Tous droits réservés.
             </p>
           </div>
