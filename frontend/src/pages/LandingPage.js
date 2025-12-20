@@ -454,7 +454,7 @@ const LandingPage = () => {
             <Link 
               to="/onboarding" 
               data-testid="cta-button"
-              className="inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-base md:text-lg tracking-wider leading-none rounded-sm transition-smooth glow-effect w-full sm:w-auto"
+              className="inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-base md:text-lg tracking-wider leading-none rounded-sm transition-all btn-glow glow-pulse w-full sm:w-auto"
             >
               Devenir Membre
             </Link>
