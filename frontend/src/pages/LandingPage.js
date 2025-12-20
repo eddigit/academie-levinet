@@ -290,14 +290,14 @@ const LandingPage = () => {
                   Formations en Ligne
                 </h3>
                 <p className="text-text-secondary font-manrope text-sm md:text-lg mb-4 md:mb-6 leading-relaxed">
-                  Accédez à une bibliothèque complète de cours vidéo et cahiers techniques pour vous former où que vous soyez, à votre rythme.
+                  Accédez à une bibliothèque complète de supports pédagogiques pour vous former où que vous soyez, à votre rythme.
                 </p>
                 <ul className="space-y-3 md:space-y-4 mb-6 md:mb-8">
                   <li className="flex items-start gap-2 md:gap-3">
                     <span className="text-primary text-lg md:text-xl">✓</span>
                     <div>
-                      <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1">Cours Vidéo HD</h5>
-                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Techniques détaillées filmées sous tous les angles</p>
+                      <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1">Supports Pédagogiques</h5>
+                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Vidéos et PDF téléchargeables</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-2 md:gap-3">
@@ -311,7 +311,7 @@ const LandingPage = () => {
                     <span className="text-primary text-lg md:text-xl">✓</span>
                     <div>
                       <h5 className="font-oswald text-base md:text-lg font-bold text-text-primary uppercase mb-1">Manuels Numériques</h5>
-                      <p className="text-text-secondary font-manrope text-xs md:text-sm">Support PDF et vidéos téléchargeables</p>
+                      <p className="text-text-secondary font-manrope text-xs md:text-sm">PDF téléchargeables</p>
                     </div>
                   </li>
                 </ul>
@@ -326,7 +326,7 @@ const LandingPage = () => {
                   <div className="grid grid-cols-2 gap-3 md:gap-4 text-center">
                     <div>
                       <p className="text-2xl md:text-3xl font-oswald font-bold text-primary">50+</p>
-                      <p className="text-[10px] md:text-xs text-text-muted font-manrope">Cours Vidéo</p>
+                      <p className="text-[10px] md:text-xs text-text-muted font-manrope">Supports</p>
                     </div>
                     <div>
                       <p className="text-2xl md:text-3xl font-oswald font-bold text-primary">24/7</p>
