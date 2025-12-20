@@ -100,7 +100,7 @@ const LandingPage = () => {
             Pour les professionnels de la sécurité et Forces de l'ordre : Real Operational System
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 max-w-6xl mx-auto">
-            <div className="stat-card text-center p-4 md:p-6" data-testid="feature-card-legitimite">
+            <div className="stat-card text-center p-4 md:p-6 glow-soft card-glow" data-testid="feature-card-legitimite">
               <Award className="w-10 h-10 md:w-12 md:h-12 text-primary mx-auto mb-3 md:mb-4" strokeWidth={1} />
               <h4 className="font-oswald text-lg md:text-xl font-bold text-text-primary uppercase mb-2 md:mb-3">Légitimité & Expertise</h4>
               <p className="text-text-secondary font-manrope leading-relaxed mb-2 md:mb-3 text-sm md:text-base">
@@ -111,7 +111,7 @@ const LandingPage = () => {
               </p>
             </div>
 
-            <div className="stat-card text-center p-4 md:p-6" data-testid="feature-card-securite">
+            <div className="stat-card text-center p-4 md:p-6 glow-soft card-glow" data-testid="feature-card-securite">
               <Shield className="w-10 h-10 md:w-12 md:h-12 text-secondary mx-auto mb-3 md:mb-4" strokeWidth={1} />
               <h4 className="font-oswald text-lg md:text-xl font-bold text-text-primary uppercase mb-2 md:mb-3">Sécurité & Éthique</h4>
               <p className="text-text-secondary font-manrope leading-relaxed mb-2 md:mb-3 text-sm md:text-base">
