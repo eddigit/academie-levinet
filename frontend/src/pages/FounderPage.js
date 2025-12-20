@@ -89,8 +89,8 @@ const FounderPage = () => {
           <div className="bg-white/5 border border-white/10 rounded-lg p-8 md:p-12">
             <blockquote className="text-xl md:text-2xl text-text-secondary font-manrope italic leading-relaxed text-center">
               "J'ai parcouru le monde pour analyser les meilleures techniques de self-défense 
-              et d'entraînement policier. Mon objectif : créer une méthode efficace, réaliste, 
-              et adaptée à la législation française."
+              et d'entraînement policier. Mon objectif : créer des méthodes efficaces, réalistes, 
+              et adaptées à la législation française."
             </blockquote>
             <p className="text-center text-primary font-oswald uppercase leading-none tracking-wider mt-6">
               — Capitaine Jacques Levinet
