@@ -39,8 +39,6 @@ const Dashboard = () => {
     );
   }
 
-  const COLORS = ['#3B82F6', '#EF4444', '#F97316', '#10B981', '#8B5CF6'];
-
   return (
     <DashboardLayout>
       <div className="space-y-6 md:space-y-8" data-testid="dashboard-page">
