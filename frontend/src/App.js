@@ -129,6 +129,7 @@ const AppContent = () => {
         <Route path="/members" element={<ProtectedRoute><MembersPage /></ProtectedRoute>} />
         <Route path="/members/:memberId" element={<ProtectedRoute><MemberDetailPage /></ProtectedRoute>} />
         <Route path="/technical-directors" element={<ProtectedRoute><TechnicalDirectorsPage /></ProtectedRoute>} />
+        <Route path="/instructors" element={<ProtectedRoute><InstructorsPage /></ProtectedRoute>} />
         <Route path="/clubs" element={<ProtectedRoute><ClubsPage /></ProtectedRoute>} />
         <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
         <Route path="/leads" element={<ProtectedRoute><LeadsPage /></ProtectedRoute>} />
