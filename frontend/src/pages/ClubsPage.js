@@ -4,7 +4,7 @@ import {
   Edit, Trash2, Loader2, X, Save, Calendar, Award, Eye, Filter,
   UserCog, Globe, Clock
 } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
+import DashboardLayout from '../components/DashboardLayout';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
