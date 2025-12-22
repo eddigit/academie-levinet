@@ -70,8 +70,8 @@ const AboutPage = () => {
                 Notre <span className="text-primary">Mission</span>
               </h2>
               <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-6">
-                Unifier les pratiquants de diverses disciplines — Krav Maga, KAPAP, et autres 
-                méthodes de self-défense — sous une bannière commune d'excellence et d'efficacité.
+                Unifier les pratiquants de diverses disciplines — Self-Pro Krav, Krav Maga, KAPAP, Canne Défense, 
+                Self Féminine et autres méthodes de self-défense — sous une bannière commune d'excellence et d'efficacité.
               </p>
               <p className="text-text-secondary font-manrope text-lg leading-relaxed mb-8">
                 Optimiser l'entraînement des forces de police à travers le monde pour une 
