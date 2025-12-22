@@ -715,6 +715,65 @@ async def upload_profile_photo(photo_url: str, current_user: dict = Depends(get_
     )
     return {"message": "Photo mise à jour", "photo_url": photo_url}
 
+# ==================== FILE UPLOAD ====================
+
+class PhotoUploadRequest(BaseModel):
+    photo_base64: str  # Base64 encoded image data
+    filename: str = "photo.jpg"
+
+@api_router.post("/upload/photo")
+async def upload_photo(data: PhotoUploadRequest, current_user: dict = Depends(get_current_user)):
+    """Upload a photo and return the URL (stores as base64 data URL)"""
+    try:
+        # Validate base64
+        if not data.photo_base64:
+            raise HTTPException(status_code=400, detail="Photo data required")
+        
+        # Create data URL (this approach stores the image as a data URL)
+        # For production, you'd want to use cloud storage like S3
+        if data.photo_base64.startswith('data:'):
+            photo_url = data.photo_base64
+        else:
+            # Determine mime type from filename
+            ext = data.filename.lower().split('.')[-1]
+            mime_types = {
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'png': 'image/png',
+                'gif': 'image/gif',
+                'webp': 'image/webp'
+            }
+            mime_type = mime_types.get(ext, 'image/jpeg')
+            photo_url = f"data:{mime_type};base64,{data.photo_base64}"
+        
+        return {"photo_url": photo_url, "message": "Photo uploadée avec succès"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors de l'upload: {str(e)}")
+
+@api_router.post("/admin/users/{user_id}/photo")
+async def update_user_photo(user_id: str, data: PhotoUploadRequest, current_user: dict = Depends(get_current_user)):
+    """Admin: Update a user's photo"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Check user exists
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    # Create photo URL
+    if data.photo_base64.startswith('data:'):
+        photo_url = data.photo_base64
+    else:
+        ext = data.filename.lower().split('.')[-1]
+        mime_types = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png', 'gif': 'image/gif', 'webp': 'image/webp'}
+        mime_type = mime_types.get(ext, 'image/jpeg')
+        photo_url = f"data:{mime_type};base64,{data.photo_base64}"
+    
+    await db.users.update_one({"id": user_id}, {"$set": {"photo_url": photo_url}})
+    
+    return {"photo_url": photo_url, "message": "Photo mise à jour"}
+
 # ==================== ADMIN USER MANAGEMENT ====================
 
 @api_router.get("/admin/users")
