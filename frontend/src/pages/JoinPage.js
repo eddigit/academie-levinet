@@ -7,7 +7,7 @@ const JoinPage = () => {
   const benefits = [
     { icon: Award, title: 'Certifications Reconnues', description: 'Grades et diplômes validés par la Commission Internationale.' },
     { icon: Globe, title: 'Réseau Mondial', description: 'Accès aux clubs et événements dans plus de 50 pays.' },
-    { icon: BookOpen, title: 'E-Learning Exclusif', description: 'Bibliothèque de cours vidéo HD accessible 24/7.' },
+    { icon: BookOpen, title: 'E-Learning Exclusif', description: 'Supports pédagogiques, vidéos et PDF téléchargeables 24/7.' },
     { icon: Users, title: 'Communauté', description: 'Rejoignez une famille de 50 000+ pratiquants.' },
   ];
 
