@@ -1,9 +1,81 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Users, Award, Globe, Video, CheckCircle, Target, Sparkles } from 'lucide-react';
+import { Shield, Users, Award, Globe, Video, CheckCircle, Target, Sparkles, Loader2 } from 'lucide-react';
 import MegaMenu from '../components/MegaMenu';
+import api from '../utils/api';
 
 const LandingPage = () => {
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await api.get('/site-content');
+        const data = response.data || response;
+        setContent(data);
+      } catch (error) {
+        console.error('Error fetching site content:', error);
+        // Fallback to default content if API fails
+        setContent(getDefaultContent());
+      }
+      setLoading(false);
+    };
+    fetchContent();
+  }, []);
+
+  // Default content fallback
+  const getDefaultContent = () => ({
+    hero: {
+      title: "ACADÉMIE JACQUES LEVINET",
+      subtitle: "L'Excellence en Self-Défense",
+      description: "Méthode brevetée par l'ex-capitaine de police et champion de France de karaté.",
+      cta_text: "Rejoindre l'Académie",
+      cta_link: "/onboarding",
+      video_url: "https://www.youtube.com/embed/mX3cGUHUgKo",
+      background_image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&q=80"
+    },
+    about: {
+      stats: { countries: "50+", directors: "50", clubs: "100+", members: "10000+" }
+    },
+    contact: { phone: "+33 1 48 05 16 10" },
+    footer: {
+      tagline: "Académie Jacques Levinet – World Krav Maga Organization – International Police Confederation",
+      copyright: "© 2025 Académie Jacques Levinet. Tous droits réservés."
+    },
+    images: {
+      logo: "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"
+    }
+  });
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Get content with fallbacks
+  const hero = content?.hero || getDefaultContent().hero;
+  const about = content?.about || getDefaultContent().about;
+  const contact = content?.contact || getDefaultContent().contact;
+  const footer = content?.footer || getDefaultContent().footer;
+  const images = content?.images || getDefaultContent().images;
+
+  // Logo URL with fallback
+  const logoUrl = images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg";
+  
+  // Video URL with proper embed format
+  const videoUrl = hero.video_url?.includes('embed') 
+    ? `${hero.video_url}?autoplay=1&mute=1&loop=1&playlist=${hero.video_url.split('/').pop()}&controls=0&showinfo=0&modestbranding=1&rel=0&enablejsapi=1&playsinline=1`
+    : hero.video_url;
+
+  // Background image fallback
+  const backgroundImage = hero.background_image || "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&q=80";
+
   return (
     <div className="min-h-screen bg-background" data-testid="landing-page">
       {/* Header - Mobile First */}
@@ -11,7 +83,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 md:gap-3">
             <img 
-              src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
+              src={logoUrl}
               alt="Logo Académie Jacques Levinet" 
               className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
               data-testid="header-logo"
@@ -44,27 +116,30 @@ const LandingPage = () => {
       >
         {/* Background with Video and Fallback Image */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          {/* Fallback background image (shows if video doesn't load) */}
+          {/* Fallback background image (always present, covered by video when loaded) */}
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: 'url(https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&q=80)',
+              backgroundImage: `url(${backgroundImage})`,
               filter: 'brightness(0.4)'
             }}
           />
-          {/* YouTube Video Background */}
-          <iframe
-            className="absolute top-1/2 left-1/2 w-[300vw] md:w-[100vw] h-[300vw] md:h-[56.25vw] min-h-[100vh] min-w-[177.77vh] z-10"
-            style={{
-              transform: 'translate(-50%, -50%)',
-              pointerEvents: 'none',
-            }}
-            src="https://www.youtube.com/embed/mX3cGUHUgKo?autoplay=1&mute=1&loop=1&playlist=mX3cGUHUgKo&controls=0&showinfo=0&modestbranding=1&rel=0&enablejsapi=1&playsinline=1"
-            title="Académie Jacques Levinet Video"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          {/* YouTube Video Background - only show if no error and video URL exists */}
+          {!videoError && hero.video_url && (
+            <iframe
+              className="absolute top-1/2 left-1/2 w-[300vw] md:w-[100vw] h-[300vw] md:h-[56.25vw] min-h-[100vh] min-w-[177.77vh] z-10"
+              style={{
+                transform: 'translate(-50%, -50%)',
+                pointerEvents: 'none',
+              }}
+              src={videoUrl}
+              title="Académie Jacques Levinet Video"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              onError={() => setVideoError(true)}
+            />
+          )}
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 z-20"></div>
         </div>
@@ -75,18 +150,18 @@ const LandingPage = () => {
             La Self-Défense Efficace,<br />Réaliste et Sécurisée
           </h2>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-text-secondary font-manrope mb-4 md:mb-8 leading-relaxed drop-shadow-lg">
-            Validée par l'Expérience d'Élite du Capitaine Jacques Levinet
+            {hero.subtitle || "Validée par l'Expérience d'Élite du Capitaine Jacques Levinet"}
           </p>
           <p className="text-sm sm:text-base md:text-lg text-text-primary/90 font-manrope mb-8 md:mb-12 leading-relaxed drop-shadow-lg max-w-3xl mx-auto">
-            Méthode brevetée par l'ex-capitaine de police et champion de France de karaté.
+            {hero.description || "Méthode brevetée par l'ex-capitaine de police et champion de France de karaté."}
           </p>
           <div className="flex gap-4 md:gap-6 justify-center flex-wrap">
             <Link 
-              to="/onboarding" 
+              to={hero.cta_link || "/onboarding"} 
               data-testid="hero-cta-button"
               className="flex items-center justify-center px-6 md:px-8 py-3 md:py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase text-base md:text-lg tracking-wider leading-none rounded-sm transition-all w-full sm:w-auto"
             >
-              Rejoindre l'Académie
+              {hero.cta_text || "Rejoindre l'Académie"}
             </Link>
           </div>
         </div>
@@ -266,11 +341,11 @@ const LandingPage = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-8 md:mt-12 max-w-4xl mx-auto">
             <div className="text-center p-3 md:p-4 rounded-lg bg-white/5">
-              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">50+</p>
+              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">{about?.stats?.countries || "50+"}</p>
               <p className="text-text-secondary font-manrope text-xs md:text-sm">Pays</p>
             </div>
             <div className="text-center p-3 md:p-4 rounded-lg bg-white/5">
-              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">50</p>
+              <p className="text-2xl md:text-4xl font-oswald font-bold text-primary mb-1 md:mb-2">{about?.stats?.directors || "50"}</p>
               <p className="text-text-secondary font-manrope text-xs md:text-sm">Directeurs Techniques</p>
             </div>
             <div className="text-center p-3 md:p-4 rounded-lg bg-white/5 col-span-2 md:col-span-1">
@@ -471,7 +546,7 @@ const LandingPage = () => {
             <div className="col-span-2 md:col-span-3 lg:col-span-2">
               <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
                 <img 
-                  src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" 
+                  src={logoUrl}
                   alt="Logo Académie Jacques Levinet" 
                   className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
                 />
@@ -522,7 +597,7 @@ const LandingPage = () => {
               <ul className="space-y-2 md:space-y-3">
                 <li><Link to="/international" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Trouver un Club</Link></li>
                 <li><Link to="/onboarding" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">S'inscrire</Link></li>
-                <li><a href="tel:+33148051610" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">+33 1 48 05 16 10</a></li>
+                <li><a href={`tel:${contact?.phone || '+33148051610'}`} className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">{contact?.phone || '+33 1 48 05 16 10'}</a></li>
                 <li><a href="https://www.linkedin.com/in/worldkravmagaorganization/" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">LinkedIn</a></li>
               </ul>
             </div>
@@ -530,10 +605,10 @@ const LandingPage = () => {
 
           <div className="pt-6 md:pt-8 border-t border-white/5 text-center">
             <p className="text-text-secondary font-oswald text-sm md:text-base uppercase tracking-wide mb-2">
-              Académie Jacques Levinet – World Krav Maga Organization – International Police Confederation
+              {footer?.tagline || "Académie Jacques Levinet – World Krav Maga Organization – International Police Confederation"}
             </p>
             <p className="text-text-muted font-manrope text-xs md:text-sm">
-              © 2025 Académie Jacques Levinet. Tous droits réservés.
+              {footer?.copyright || "© 2025 Académie Jacques Levinet. Tous droits réservés."}
             </p>
           </div>
         </div>
