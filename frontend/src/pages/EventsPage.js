@@ -274,20 +274,7 @@ const EventsPage = () => {
   };
 
   const resetForm = useCallback(() => {
-    setTitle('');
-    setDescription('');
-    setEventType('Stage');
-    setStartDate('');
-    setEndDate('');
-    setStartTime('');
-    setEndTime('');
-    setLocation('');
-    setCity('');
-    setCountry('');
-    setInstructor('');
-    setMaxParticipants('');
-    setPrice('');
-    setImageUrl('');
+    setFormData(initialFormData);
     setCurrentEvent(null);
   }, []);
 
@@ -303,20 +290,22 @@ const EventsPage = () => {
 
   const openEditModal = (event) => {
     setCurrentEvent(event);
-    setTitle(event.title || '');
-    setDescription(event.description || '');
-    setEventType(event.event_type || 'Stage');
-    setStartDate(event.start_date || '');
-    setEndDate(event.end_date || '');
-    setStartTime(event.start_time || '');
-    setEndTime(event.end_time || '');
-    setLocation(event.location || '');
-    setCity(event.city || '');
-    setCountry(event.country || '');
-    setInstructor(event.instructor || '');
-    setMaxParticipants(event.max_participants?.toString() || '');
-    setPrice(event.price?.toString() || '');
-    setImageUrl(event.image_url || '');
+    setFormData({
+      title: event.title || '',
+      description: event.description || '',
+      eventType: event.event_type || 'Stage',
+      startDate: event.start_date || '',
+      endDate: event.end_date || '',
+      startTime: event.start_time || '',
+      endTime: event.end_time || '',
+      location: event.location || '',
+      city: event.city || '',
+      country: event.country || '',
+      instructor: event.instructor || '',
+      maxParticipants: event.max_participants?.toString() || '',
+      price: event.price?.toString() || '',
+      imageUrl: event.image_url || ''
+    });
     setIsEditModalOpen(true);
   };
 
@@ -325,21 +314,21 @@ const EventsPage = () => {
     resetForm();
   };
 
-  const getFormData = () => ({
-    title,
-    description,
-    event_type: eventType,
-    start_date: startDate,
-    end_date: endDate,
-    start_time: startTime,
-    end_time: endTime,
-    location,
-    city,
-    country,
-    instructor,
-    max_participants: maxParticipants ? parseInt(maxParticipants) : null,
-    price: parseFloat(price) || 0,
-    image_url: imageUrl
+  const getFormDataPayload = () => ({
+    title: formData.title,
+    description: formData.description,
+    event_type: formData.eventType,
+    start_date: formData.startDate,
+    end_date: formData.endDate,
+    start_time: formData.startTime,
+    end_time: formData.endTime,
+    location: formData.location,
+    city: formData.city,
+    country: formData.country,
+    instructor: formData.instructor,
+    max_participants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null,
+    price: parseFloat(formData.price) || 0,
+    image_url: formData.imageUrl
   });
 
   const handleAddEvent = async (e) => {
