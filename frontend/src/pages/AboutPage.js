@@ -54,9 +54,9 @@ const AboutPage = () => {
           </h1>
           
           <p className="text-xl text-text-secondary font-manrope mb-8 leading-relaxed max-w-3xl mx-auto">
-            Depuis plus de 25 ans, nous formons l'élite de la self-défense mondiale. 
-            Une fédération internationale spécialisée dans le Self-Pro Krav et la formation 
-            professionnelle des forces de l'ordre.
+            Depuis plus de 25 ans, l'Académie est spécialisée dans la self-défense de rue et la formation 
+            professionnelle des forces de l'ordre. Une structure tripartite internationale regroupant 
+            Self-Pro Krav, Krav Maga, KAPAP et autres disciplines de combat.
           </p>
         </div>
       </section>
