@@ -142,8 +142,8 @@ const LandingPage = () => {
               filter: 'brightness(0.4)'
             }}
           />
-          {/* YouTube Video Background - only show if no error and video URL exists */}
-          {!videoError && hero.video_url && (
+          {/* YouTube Video Background - only show if video URL exists and showVideo is true */}
+          {showVideo && hero.video_url && (
             <iframe
               className="absolute top-1/2 left-1/2 w-[300vw] md:w-[100vw] h-[300vw] md:h-[56.25vw] min-h-[100vh] min-w-[177.77vh] z-10"
               style={{
@@ -155,7 +155,7 @@ const LandingPage = () => {
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              onError={() => setVideoError(true)}
+              onLoad={() => setVideoLoaded(true)}
             />
           )}
           {/* Dark overlay for text readability */}
