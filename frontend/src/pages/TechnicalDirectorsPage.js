@@ -43,14 +43,16 @@ const TechnicalDirectorsPage = () => {
     try {
       // Fetch users with technical_director role
       const response = await api.get('/admin/users?role=technical_director');
-      setDirectors(response.data || []);
+      const data = response.data || response;
+      setDirectors(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching directors:', error);
       // Fallback to old endpoint
       try {
         const data = await api.getTechnicalDirectors();
-        setDirectors(data || []);
+        setDirectors(Array.isArray(data) ? data : []);
       } catch (e) {
+        setDirectors([]);
         toast.error('Erreur lors du chargement');
       }
     } finally {
