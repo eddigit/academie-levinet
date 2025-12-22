@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, UserCog, CreditCard, LogOut, UserPlus, 
   Newspaper, Calendar, MessageSquare, Shield, ShoppingBag, UserCheck, 
-  Settings, Bot, Receipt, Globe, Building2, X, Menu, Home, User
+  Settings, Bot, Receipt, Globe, Building2, X, Menu, Home, User, BarChart3
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
