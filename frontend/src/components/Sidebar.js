@@ -54,7 +54,8 @@ const Sidebar = () => {
     { path: '/leads', icon: UserPlus, label: 'Leads', testId: 'nav-leads' },
     { path: '/members', icon: Users, label: 'Membres', testId: 'nav-members' },
     { path: '/clubs', icon: Building2, label: 'Clubs', testId: 'nav-clubs' },
-    { path: '/technical-directors', icon: UserCog, label: 'Directeurs Techniques', testId: 'nav-directors' },
+    { path: '/technical-directors', icon: UserCog, label: 'Directeurs Tech.', testId: 'nav-directors' },
+    { path: '/instructors', icon: User, label: 'Instructeurs', testId: 'nav-instructors' },
     { path: '/subscriptions', icon: CreditCard, label: 'Cotisations', testId: 'nav-subscriptions' },
   ];
 
