@@ -73,8 +73,11 @@ const LandingPage = () => {
     ? `${hero.video_url}?autoplay=1&mute=1&loop=1&playlist=${hero.video_url.split('/').pop()}&controls=0&showinfo=0&modestbranding=1&rel=0&enablejsapi=1&playsinline=1`
     : hero.video_url;
 
-  // Background image fallback
-  const backgroundImage = hero.background_image || "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&q=80";
+  // Background image fallback - ensure we have a valid image even if the value is empty string
+  const defaultBackgroundImage = "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&q=80";
+  const backgroundImage = (hero.background_image && hero.background_image.trim() !== '') 
+    ? hero.background_image 
+    : defaultBackgroundImage;
 
   return (
     <div className="min-h-screen bg-background" data-testid="landing-page">
