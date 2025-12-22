@@ -180,15 +180,18 @@ const InternationalPage = () => {
                 </div>
               </div>
               <div className="text-center md:text-left">
-                <h3 className="font-oswald text-3xl text-white uppercase mb-4">Magazine International</h3>
+                <h3 className="font-oswald text-3xl text-white uppercase mb-2">KRAV MAG AJL</h3>
+                <p className="font-oswald text-lg text-primary uppercase tracking-wide mb-4">
+                  Magazine International
+                </p>
                 <p className="text-text-secondary font-manrope mb-4">
-                  Publication trimestrielle diffusée en version numérique et papier haute qualité. 
-                  Interviews, techniques, actualités de l'Académie et du monde de la self-défense.
+                  Le magazine du monde de la self-défense, des sports de combat et des arts martiaux. 
+                  Publication trimestrielle diffusée en version numérique et papier haute qualité.
                 </p>
                 <div className="flex items-center gap-6 justify-center md:justify-start">
                   <div>
-                    <p className="font-oswald text-2xl text-primary">1M+</p>
-                    <p className="text-text-muted font-manrope text-sm">Followers</p>
+                    <p className="font-oswald text-2xl text-primary">50+</p>
+                    <p className="text-text-muted font-manrope text-sm">Pays</p>
                   </div>
                   <div>
                     <p className="font-oswald text-2xl text-primary">3</p>
