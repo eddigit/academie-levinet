@@ -7,7 +7,8 @@ import api from '../utils/api';
 const LandingPage = () => {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [showVideo, setShowVideo] = useState(true);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -24,6 +25,20 @@ const LandingPage = () => {
     };
     fetchContent();
   }, []);
+
+  // Set a timeout to hide video iframe if it doesn't load properly
+  // YouTube iframes don't trigger onError reliably, so we use a fallback approach
+  useEffect(() => {
+    const videoTimeout = setTimeout(() => {
+      if (!videoLoaded) {
+        // If video hasn't signaled it's loaded after 5 seconds, hide the iframe
+        // and show the background image instead
+        setShowVideo(false);
+      }
+    }, 5000);
+    
+    return () => clearTimeout(videoTimeout);
+  }, [videoLoaded]);
 
   // Default content fallback
   const getDefaultContent = () => ({
