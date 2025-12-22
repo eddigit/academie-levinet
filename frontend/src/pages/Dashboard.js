@@ -8,14 +8,19 @@ import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await api.getDashboardStats();
-        setStats(data);
+        // Only fetch stats for admins
+        if (isAdmin) {
+          const data = await api.getDashboardStats();
+          setStats(data);
+        }
       } catch (error) {
         console.error('Error fetching stats:', error);
       } finally {
@@ -23,7 +28,7 @@ const Dashboard = () => {
       }
     };
     fetchStats();
-  }, []);
+  }, [isAdmin]);
 
   if (loading) {
     return (
