@@ -1,42 +1,31 @@
-# Test Result Summary - Académie Jacques Levinet CRM
+# Test Results - Site Content Editor (CMS)
 
-## Last Updated: December 22, 2025
+## Test Date: 2024-12-22
 
-## Testing Session - Event Form Fix
+## Features to Test
 
-### Tests to Run:
-1. **Event Creation Form** - PRIORITY 1
-   - Navigate to /events as admin
-   - Click "Nouvel Événement" button
-   - Test that input fields retain focus while typing
-   - Fill all required fields and create event
-   - Verify event appears in list
+### 1. Site Content API
+- [x] GET /api/site-content - Public endpoint returns content
+- [x] GET /api/admin/site-content - Protected endpoint for admins
+- [x] PUT /api/admin/site-content - Update site content
 
-2. **Event Edit Form** - PRIORITY 2
-   - Click "Modifier" on existing event
-   - Test that input fields retain focus while typing
-   - Modify fields and save
+### 2. Landing Page Dynamic Content
+- [ ] Page loads content from API instead of hardcoded values
+- [ ] Hero section displays dynamic subtitle and description
+- [ ] Stats section displays dynamic counts (countries, directors)
+- [ ] Footer displays dynamic tagline and copyright
+- [ ] Background image fallback works when video unavailable
 
-3. **Mobile Navigation** - PRIORITY 3
-   - Test on mobile viewport (375x800)
-   - Verify bottom navigation bar displays
-   - Click "Plus" button to open drawer
-   - Verify drawer opens and closes properly
-   - Test navigation to different pages
+### 3. Admin Site Content Page
+- [ ] Page loads at /admin/site-content
+- [ ] All sections display (Hero, Login, Founder, About, etc.)
+- [ ] Content fields are populated from database
+- [ ] Save functionality works
+- [ ] Image upload functionality works
 
-### Test Credentials:
-- Admin: admin@academie-levinet.com / Admin2025!
-- Member: membre@academie-levinet.com / Membre2025!
+## Credentials
+- Admin: ajl.wkmo.ipc@gmail.com / Admin2025!
+- Super Admin: coachdigitalparis@gmail.com / $$Reussite888!!
 
-### Known Issues:
-- YouTube video in hero section may not load in headless browser (works in real browser)
-- WebSocket connection warnings (not critical)
-
-### Previous Test Results:
-- Event form focus issue: IDENTIFIED - Component was defined inside parent causing re-renders
-- Fix applied: EventModal component extracted outside of EventsPage component
-- Mobile menu: Working correctly
-
-### Incorporate User Feedback:
-- Focus on testing the event creation/edit flow
-- Verify mobile responsiveness
+## Incorporate User Feedback
+- Focus on testing the CMS flow: admin edits content -> save -> changes reflected on public pages
