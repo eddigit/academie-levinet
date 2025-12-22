@@ -351,8 +351,26 @@ const MembersPage = () => {
                 <tbody>
                   {filteredMembers.map((member, index) => (
                     <tr key={member.id} className="border-b border-white/5 hover:bg-white/5 transition-smooth" data-testid={`member-row-${index}`}>
-                      <td className="py-3 px-4 text-text-primary font-manrope">
-                        {member.first_name} {member.last_name}
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          {/* Photo */}
+                          <div className="relative flex-shrink-0">
+                            {member.photo_url ? (
+                              <img src={member.photo_url} alt={`${member.first_name} ${member.last_name}`} className="w-10 h-10 rounded-lg object-cover" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                                <User className="w-5 h-5 text-primary" />
+                              </div>
+                            )}
+                            {/* Flag badge */}
+                            <span className="absolute -bottom-1 -right-1 text-sm">
+                              {member.country_code ? getFlag(member.country_code) : getFlagByName(member.country)}
+                            </span>
+                          </div>
+                          <span className="text-text-primary font-manrope">
+                            {member.first_name} {member.last_name}
+                          </span>
+                        </div>
                       </td>
                       <td className="py-3 px-4 text-text-secondary font-manrope text-sm">{member.email}</td>
                       <td className="py-3 px-4 text-text-secondary font-manrope">{member.city}, {member.country}</td>
