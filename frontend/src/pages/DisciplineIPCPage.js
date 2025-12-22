@@ -110,10 +110,10 @@ const DisciplineIPCPage = () => {
               <div className="bg-primary/10 border border-primary/30 rounded-lg p-6">
                 <div className="flex items-center gap-3 mb-3">
                   <Award className="w-6 h-6 text-primary" strokeWidth={1.5} />
-                  <span className="font-oswald text-lg text-primary uppercase">Dan de Self-Pro Krav</span>
+                  <span className="font-oswald text-lg text-primary uppercase">Dan ROS</span>
                 </div>
                 <p className="text-text-secondary font-manrope">
-                  Véritables qualifications professionnelles reconnues par la Commission des Grades internationale.
+                  Les Dan ROS sont reconnus sur le plan international par l'ensemble des partenaires de l'IPC.
                 </p>
               </div>
             </div>
