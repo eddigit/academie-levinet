@@ -529,11 +529,11 @@ class Club(BaseModel):
     address: Optional[str] = None
     city: str
     country: str = "France"
+    country_code: str = "FR"  # ISO country code for flag display
     phone: Optional[str] = None
     email: Optional[str] = None
     logo_url: Optional[str] = None
-    technical_director_id: str
-    technical_director_name: Optional[str] = None
+    technical_director_ids: List[str] = []  # Multiple DTs allowed
     instructor_ids: List[str] = []
     disciplines: List[str] = []
     schedule: Optional[str] = None
@@ -546,10 +546,11 @@ class ClubCreate(BaseModel):
     address: Optional[str] = None
     city: str
     country: str = "France"
+    country_code: str = "FR"
     phone: Optional[str] = None
     email: Optional[str] = None
     logo_url: Optional[str] = None
-    technical_director_id: str
+    technical_director_ids: List[str] = []
     instructor_ids: List[str] = []
     disciplines: List[str] = []
     schedule: Optional[str] = None
@@ -559,10 +560,11 @@ class ClubUpdate(BaseModel):
     address: Optional[str] = None
     city: Optional[str] = None
     country: Optional[str] = None
+    country_code: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None
     logo_url: Optional[str] = None
-    technical_director_id: Optional[str] = None
+    technical_director_ids: Optional[List[str]] = None
     instructor_ids: Optional[List[str]] = None
     disciplines: Optional[List[str]] = None
     schedule: Optional[str] = None
