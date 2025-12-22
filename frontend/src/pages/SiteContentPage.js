@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Globe, Save, Loader2, Image, Type, Link, Mail, Phone, MapPin,
-  Facebook, Instagram, Youtube, Plus, Trash2, Edit, ChevronDown, ChevronUp
+  Globe, Save, Loader2, Image, Type, Mail, Upload, X,
+  Facebook, Instagram, Youtube, Linkedin, Home, User, BookOpen, MapPin, Phone
 } from 'lucide-react';
-import Sidebar from '../components/Sidebar';
+import DashboardLayout from '../components/DashboardLayout';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -11,18 +11,105 @@ import { Label } from '../components/ui/label';
 import api from '../utils/api';
 import { toast } from 'sonner';
 
+// Composant d'upload d'image
+const ImageUploader = ({ label, value, onChange, placeholder }) => {
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState(value || '');
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    setPreview(value || '');
+  }, [value]);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const response = await api.post('/upload/image', { image_data: reader.result });
+          const url = response.data?.url || response.url;
+          setPreview(url);
+          onChange(url);
+          toast.success('Image uploadée');
+        } catch (error) {
+          toast.error('Erreur lors de l\'upload');
+        }
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      setUploading(false);
+      toast.error('Erreur');
+    }
+  };
+
+  const handleClear = () => {
+    setPreview('');
+    onChange('');
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-text-secondary">{label}</Label>
+      <div className="flex gap-4 items-start">
+        {/* Preview */}
+        <div className="relative w-32 h-24 rounded-lg border border-white/10 overflow-hidden bg-background flex items-center justify-center">
+          {preview ? (
+            <>
+              <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+              <button
+                onClick={handleClear}
+                className="absolute top-1 right-1 w-6 h-6 bg-secondary/80 rounded-full flex items-center justify-center hover:bg-secondary"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </>
+          ) : (
+            <Image className="w-8 h-8 text-text-muted" />
+          )}
+        </div>
+        
+        {/* Upload controls */}
+        <div className="flex-1 space-y-2">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleUpload}
+            accept="image/*"
+            className="hidden"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="border-white/10"
+          >
+            {uploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
+            {uploading ? 'Upload...' : 'Choisir une image'}
+          </Button>
+          <Input
+            value={preview}
+            onChange={(e) => { setPreview(e.target.value); onChange(e.target.value); }}
+            placeholder={placeholder || "ou collez une URL d'image"}
+            className="bg-background border-white/10 text-sm"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SiteContentPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
-  const [content, setContent] = useState({
-    hero: { title: '', subtitle: '', description: '', cta_text: '', cta_link: '' },
-    about: { title: '', description: '', image_url: '' },
-    features: [],
-    contact: { email: '', phone: '', address: '' },
-    social_links: { facebook: '', instagram: '', youtube: '' },
-    footer: { copyright: '' }
-  });
+  const [content, setContent] = useState({});
 
   useEffect(() => {
     fetchContent();
@@ -31,7 +118,8 @@ const SiteContentPage = () => {
   const fetchContent = async () => {
     try {
       const response = await api.get('/admin/site-content');
-      setContent(response.data);
+      const data = response.data || response;
+      setContent(data);
     } catch (error) {
       console.error('Error fetching content:', error);
       toast.error('Erreur lors du chargement');
@@ -43,7 +131,7 @@ const SiteContentPage = () => {
     setSaving(true);
     try {
       await api.put('/admin/site-content', content);
-      toast.success('Contenu du site mis à jour');
+      toast.success('Contenu du site mis à jour !');
     } catch (error) {
       console.error('Error saving content:', error);
       toast.error('Erreur lors de la sauvegarde');
@@ -51,109 +139,104 @@ const SiteContentPage = () => {
     setSaving(false);
   };
 
-  const updateSection = (section, field, value) => {
+  const updateField = (section, field, value) => {
     setContent(prev => ({
       ...prev,
       [section]: {
-        ...prev[section],
+        ...(prev[section] || {}),
         [field]: value
       }
     }));
   };
 
-  const addFeature = () => {
+  const updateNestedField = (section, subsection, field, value) => {
     setContent(prev => ({
       ...prev,
-      features: [...(prev.features || []), { title: '', description: '', icon: 'star' }]
-    }));
-  };
-
-  const updateFeature = (index, field, value) => {
-    setContent(prev => ({
-      ...prev,
-      features: prev.features.map((f, i) => i === index ? { ...f, [field]: value } : f)
-    }));
-  };
-
-  const removeFeature = (index) => {
-    setContent(prev => ({
-      ...prev,
-      features: prev.features.filter((_, i) => i !== index)
+      [section]: {
+        ...(prev[section] || {}),
+        [subsection]: {
+          ...(prev[section]?.[subsection] || {}),
+          [field]: value
+        }
+      }
     }));
   };
 
   const sections = [
-    { id: 'hero', label: 'Section Héro', icon: Type },
-    { id: 'about', label: 'À Propos', icon: Edit },
-    { id: 'features', label: 'Fonctionnalités', icon: Plus },
+    { id: 'hero', label: 'Page d\'Accueil', icon: Home },
+    { id: 'login', label: 'Page Connexion', icon: User },
+    { id: 'founder', label: 'Fondateur', icon: User },
+    { id: 'about', label: 'À Propos', icon: BookOpen },
+    { id: 'disciplines', label: 'Disciplines', icon: BookOpen },
+    { id: 'international', label: 'International', icon: MapPin },
     { id: 'contact', label: 'Contact', icon: Mail },
     { id: 'social', label: 'Réseaux Sociaux', icon: Facebook },
-    { id: 'footer', label: 'Pied de Page', icon: Type }
+    { id: 'images', label: 'Images Globales', icon: Image },
   ];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex">
-        <Sidebar />
-        <main className="flex-1 ml-64 p-8 flex items-center justify-center">
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </main>
-      </div>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <Sidebar />
-      
-      <main className="flex-1 ml-64 p-8 overflow-y-auto">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide flex items-center gap-3">
-                <Globe className="w-8 h-8 text-primary" />
-                Gestion du Site Internet
-              </h1>
-              <p className="text-text-muted font-manrope mt-1">
-                Modifiez le contenu de la page d'accueil
-              </p>
-            </div>
-            <Button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary-dark">
-              {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-              Enregistrer tout
-            </Button>
+    <DashboardLayout>
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="font-oswald text-2xl sm:text-3xl font-bold text-text-primary uppercase tracking-wide flex items-center gap-3">
+              <Globe className="w-7 h-7 text-primary" />
+              Gestion du Site
+            </h1>
+            <p className="text-text-muted font-manrope mt-1 text-sm">
+              Modifiez les textes et images du site public
+            </p>
           </div>
+          <Button onClick={handleSave} disabled={saving} className="bg-primary hover:bg-primary-dark">
+            {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+            Enregistrer tout
+          </Button>
+        </div>
 
-          {/* Section Tabs */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => setActiveSection(section.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  activeSection === section.id
-                    ? 'bg-primary text-white'
-                    : 'bg-paper border border-white/10 text-text-secondary hover:border-primary/50'
-                }`}
-              >
-                <section.icon className="w-4 h-4" />
-                {section.label}
-              </button>
-            ))}
-          </div>
+        {/* Section Tabs */}
+        <div className="flex flex-wrap gap-2">
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              onClick={() => setActiveSection(section.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm ${
+                activeSection === section.id
+                  ? 'bg-primary text-white'
+                  : 'bg-paper border border-white/10 text-text-secondary hover:border-primary/50'
+              }`}
+            >
+              <section.icon className="w-4 h-4" />
+              {section.label}
+            </button>
+          ))}
+        </div>
 
-          {/* Hero Section */}
-          {activeSection === 'hero' && (
-            <div className="bg-paper rounded-xl border border-white/10 p-6">
-              <h2 className="font-oswald text-xl text-text-primary uppercase mb-6">Section Héro (Bannière principale)</h2>
+        {/* HERO SECTION */}
+        {activeSection === 'hero' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Page d'Accueil - Section Héro
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
                   <Label className="text-text-secondary">Titre principal</Label>
                   <Input
                     value={content.hero?.title || ''}
-                    onChange={(e) => updateSection('hero', 'title', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
+                    onChange={(e) => updateField('hero', 'title', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
                     placeholder="ACADÉMIE JACQUES LEVINET"
                   />
                 </div>
@@ -161,244 +244,502 @@ const SiteContentPage = () => {
                   <Label className="text-text-secondary">Sous-titre</Label>
                   <Input
                     value={content.hero?.subtitle || ''}
-                    onChange={(e) => updateSection('hero', 'subtitle', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="Self-Pro Krav (SPK)"
+                    onChange={(e) => updateField('hero', 'subtitle', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    placeholder="L'Excellence en Self-Défense"
                   />
                 </div>
                 <div>
                   <Label className="text-text-secondary">Description</Label>
                   <Textarea
                     value={content.hero?.description || ''}
-                    onChange={(e) => updateSection('hero', 'description', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary min-h-[100px]"
-                    placeholder="Méthode de self-défense réaliste et efficace..."
+                    onChange={(e) => updateField('hero', 'description', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    rows={3}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-text-secondary">Texte du bouton CTA</Label>
+                    <Label className="text-text-secondary">Texte bouton</Label>
                     <Input
                       value={content.hero?.cta_text || ''}
-                      onChange={(e) => updateSection('hero', 'cta_text', e.target.value)}
-                      className="mt-1 bg-background border-white/10 text-text-primary"
-                      placeholder="Rejoindre l'Académie"
+                      onChange={(e) => updateField('hero', 'cta_text', e.target.value)}
+                      className="mt-1 bg-background border-white/10"
                     />
                   </div>
                   <div>
-                    <Label className="text-text-secondary">Lien du bouton</Label>
+                    <Label className="text-text-secondary">Lien bouton</Label>
                     <Input
                       value={content.hero?.cta_link || ''}
-                      onChange={(e) => updateSection('hero', 'cta_link', e.target.value)}
-                      className="mt-1 bg-background border-white/10 text-text-primary"
-                      placeholder="/onboarding"
+                      onChange={(e) => updateField('hero', 'cta_link', e.target.value)}
+                      className="mt-1 bg-background border-white/10"
                     />
                   </div>
                 </div>
+                <div>
+                  <Label className="text-text-secondary">URL Vidéo YouTube (fond)</Label>
+                  <Input
+                    value={content.hero?.video_url || ''}
+                    onChange={(e) => updateField('hero', 'video_url', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    placeholder="https://www.youtube.com/embed/..."
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <ImageUploader
+                  label="Image de fond (fallback si vidéo indisponible)"
+                  value={content.hero?.background_image || ''}
+                  onChange={(url) => updateField('hero', 'background_image', url)}
+                  placeholder="URL de l'image de fond"
+                />
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* About Section */}
-          {activeSection === 'about' && (
-            <div className="bg-paper rounded-xl border border-white/10 p-6">
-              <h2 className="font-oswald text-xl text-text-primary uppercase mb-6">Section À Propos</h2>
+        {/* LOGIN SECTION */}
+        {activeSection === 'login' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Page de Connexion
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-text-secondary">Titre</Label>
+                  <Input
+                    value={content.login?.title || ''}
+                    onChange={(e) => updateField('login', 'title', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Sous-titre</Label>
+                  <Input
+                    value={content.login?.subtitle || ''}
+                    onChange={(e) => updateField('login', 'subtitle', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Tagline</Label>
+                  <Input
+                    value={content.login?.tagline || ''}
+                    onChange={(e) => updateField('login', 'tagline', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    placeholder="L'excellence en self-défense"
+                  />
+                </div>
+              </div>
+              
+              <ImageUploader
+                label="Image de fond (côté gauche)"
+                value={content.login?.background_image || ''}
+                onChange={(url) => updateField('login', 'background_image', url)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* FOUNDER SECTION */}
+        {activeSection === 'founder' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Page Fondateur
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-text-secondary">Nom</Label>
+                  <Input
+                    value={content.founder?.name || ''}
+                    onChange={(e) => updateField('founder', 'name', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    placeholder="Capitaine Jacques LEVINET"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Titre / Fonction</Label>
+                  <Input
+                    value={content.founder?.title || ''}
+                    onChange={(e) => updateField('founder', 'title', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Grade</Label>
+                  <Input
+                    value={content.founder?.grade || ''}
+                    onChange={(e) => updateField('founder', 'grade', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    placeholder="10ème Dan"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Biographie</Label>
+                  <Textarea
+                    value={content.founder?.bio || ''}
+                    onChange={(e) => updateField('founder', 'bio', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Citation</Label>
+                  <Textarea
+                    value={content.founder?.quote || ''}
+                    onChange={(e) => updateField('founder', 'quote', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              
+              <ImageUploader
+                label="Photo du fondateur"
+                value={content.founder?.photo || ''}
+                onChange={(url) => updateField('founder', 'photo', url)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ABOUT SECTION */}
+        {activeSection === 'about' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Page À Propos
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
                   <Label className="text-text-secondary">Titre</Label>
                   <Input
                     value={content.about?.title || ''}
-                    onChange={(e) => updateSection('about', 'title', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
+                    onChange={(e) => updateField('about', 'title', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
                   />
                 </div>
                 <div>
                   <Label className="text-text-secondary">Description</Label>
                   <Textarea
                     value={content.about?.description || ''}
-                    onChange={(e) => updateSection('about', 'description', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary min-h-[150px]"
+                    onChange={(e) => updateField('about', 'description', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    rows={4}
                   />
                 </div>
                 <div>
-                  <Label className="text-text-secondary">URL de l'image</Label>
-                  <Input
-                    value={content.about?.image_url || ''}
-                    onChange={(e) => updateSection('about', 'image_url', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="https://..."
+                  <Label className="text-text-secondary">Mission</Label>
+                  <Textarea
+                    value={content.about?.mission || ''}
+                    onChange={(e) => updateField('about', 'mission', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    rows={3}
                   />
-                  {content.about?.image_url && (
-                    <img src={content.about.image_url} alt="Preview" className="mt-2 max-h-40 rounded-lg" />
-                  )}
+                </div>
+                
+                <h3 className="font-oswald text-lg text-text-primary pt-4">Statistiques</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-text-secondary">Pays</Label>
+                    <Input
+                      value={content.about?.stats?.countries || ''}
+                      onChange={(e) => updateNestedField('about', 'stats', 'countries', e.target.value)}
+                      className="mt-1 bg-background border-white/10"
+                      placeholder="50+"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-text-secondary">Directeurs</Label>
+                    <Input
+                      value={content.about?.stats?.directors || ''}
+                      onChange={(e) => updateNestedField('about', 'stats', 'directors', e.target.value)}
+                      className="mt-1 bg-background border-white/10"
+                      placeholder="50"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-text-secondary">Clubs</Label>
+                    <Input
+                      value={content.about?.stats?.clubs || ''}
+                      onChange={(e) => updateNestedField('about', 'stats', 'clubs', e.target.value)}
+                      className="mt-1 bg-background border-white/10"
+                      placeholder="100+"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-text-secondary">Membres</Label>
+                    <Input
+                      value={content.about?.stats?.members || ''}
+                      onChange={(e) => updateNestedField('about', 'stats', 'members', e.target.value)}
+                      className="mt-1 bg-background border-white/10"
+                      placeholder="10000+"
+                    />
+                  </div>
                 </div>
               </div>
+              
+              <ImageUploader
+                label="Image À propos"
+                value={content.about?.image || ''}
+                onChange={(url) => updateField('about', 'image', url)}
+              />
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Features Section */}
-          {activeSection === 'features' && (
-            <div className="bg-paper rounded-xl border border-white/10 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-oswald text-xl text-text-primary uppercase">Fonctionnalités / Points forts</h2>
-                <Button onClick={addFeature} variant="outline" className="border-white/10">
-                  <Plus className="w-4 h-4 mr-2" /> Ajouter
-                </Button>
-              </div>
-              <div className="space-y-4">
-                {(content.features || []).map((feature, idx) => (
-                  <div key={idx} className="bg-background/50 border border-white/5 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-text-muted text-sm">Fonctionnalité {idx + 1}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFeature(idx)}
-                        className="text-red-500 hover:bg-red-500/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+        {/* DISCIPLINES SECTION */}
+        {activeSection === 'disciplines' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Pages Disciplines
+            </h2>
+            
+            {['wkmo', 'ipc', 'spk', 'sfjl'].map((disc) => (
+              <div key={disc} className="border border-white/10 rounded-lg p-4 space-y-4">
+                <h3 className="font-oswald text-lg text-primary uppercase">{disc.toUpperCase()}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-text-secondary">Titre</Label>
+                      <Input
+                        value={content.disciplines?.[disc]?.title || ''}
+                        onChange={(e) => updateNestedField('disciplines', disc, 'title', e.target.value)}
+                        className="mt-1 bg-background border-white/10"
+                      />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label className="text-text-secondary text-sm">Titre</Label>
-                        <Input
-                          value={feature.title}
-                          onChange={(e) => updateFeature(idx, 'title', e.target.value)}
-                          className="mt-1 bg-background border-white/10 text-text-primary"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-text-secondary text-sm">Icône</Label>
-                        <Input
-                          value={feature.icon}
-                          onChange={(e) => updateFeature(idx, 'icon', e.target.value)}
-                          className="mt-1 bg-background border-white/10 text-text-primary"
-                          placeholder="shield, globe, award..."
-                        />
-                      </div>
+                    <div>
+                      <Label className="text-text-secondary">Sous-titre</Label>
+                      <Input
+                        value={content.disciplines?.[disc]?.subtitle || ''}
+                        onChange={(e) => updateNestedField('disciplines', disc, 'subtitle', e.target.value)}
+                        className="mt-1 bg-background border-white/10"
+                      />
                     </div>
-                    <div className="mt-3">
-                      <Label className="text-text-secondary text-sm">Description</Label>
+                    <div>
+                      <Label className="text-text-secondary">Description</Label>
                       <Textarea
-                        value={feature.description}
-                        onChange={(e) => updateFeature(idx, 'description', e.target.value)}
-                        className="mt-1 bg-background border-white/10 text-text-primary"
+                        value={content.disciplines?.[disc]?.description || ''}
+                        onChange={(e) => updateNestedField('disciplines', disc, 'description', e.target.value)}
+                        className="mt-1 bg-background border-white/10"
+                        rows={2}
                       />
                     </div>
                   </div>
-                ))}
-                {(!content.features || content.features.length === 0) && (
-                  <p className="text-text-muted text-center py-8">Aucune fonctionnalité. Cliquez sur "Ajouter" pour en créer une.</p>
-                )}
+                  <ImageUploader
+                    label={`Image ${disc.toUpperCase()}`}
+                    value={content.disciplines?.[disc]?.image || ''}
+                    onChange={(url) => updateNestedField('disciplines', disc, 'image', url)}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        )}
 
-          {/* Contact Section */}
-          {activeSection === 'contact' && (
-            <div className="bg-paper rounded-xl border border-white/10 p-6">
-              <h2 className="font-oswald text-xl text-text-primary uppercase mb-6">Informations de Contact</h2>
+        {/* INTERNATIONAL SECTION */}
+        {activeSection === 'international' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Page International
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <Label className="text-text-secondary flex items-center gap-2">
-                    <Mail className="w-4 h-4" /> Email
-                  </Label>
+                  <Label className="text-text-secondary">Titre</Label>
+                  <Input
+                    value={content.international?.title || ''}
+                    onChange={(e) => updateField('international', 'title', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Sous-titre</Label>
+                  <Input
+                    value={content.international?.subtitle || ''}
+                    onChange={(e) => updateField('international', 'subtitle', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Nom du Magazine</Label>
+                  <Input
+                    value={content.international?.magazine_name || ''}
+                    onChange={(e) => updateField('international', 'magazine_name', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                    placeholder="KRAV MAG AJL"
+                  />
+                </div>
+                <div>
+                  <Label className="text-text-secondary">Sous-titre Magazine</Label>
+                  <Input
+                    value={content.international?.magazine_subtitle || ''}
+                    onChange={(e) => updateField('international', 'magazine_subtitle', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
+                  />
+                </div>
+              </div>
+              
+              <ImageUploader
+                label="Carte / Image International"
+                value={content.international?.map_image || ''}
+                onChange={(url) => updateField('international', 'map_image', url)}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* CONTACT SECTION */}
+        {activeSection === 'contact' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Informations de Contact
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-text-secondary flex items-center gap-2"><Mail className="w-4 h-4" /> Email</Label>
                   <Input
                     value={content.contact?.email || ''}
-                    onChange={(e) => updateSection('contact', 'email', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="contact@academie-levinet.com"
+                    onChange={(e) => updateField('contact', 'email', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
                   />
                 </div>
                 <div>
-                  <Label className="text-text-secondary flex items-center gap-2">
-                    <Phone className="w-4 h-4" /> Téléphone
-                  </Label>
+                  <Label className="text-text-secondary flex items-center gap-2"><Phone className="w-4 h-4" /> Téléphone</Label>
                   <Input
                     value={content.contact?.phone || ''}
-                    onChange={(e) => updateSection('contact', 'phone', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="+33 1 23 45 67 89"
+                    onChange={(e) => updateField('contact', 'phone', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
                   />
                 </div>
                 <div>
-                  <Label className="text-text-secondary flex items-center gap-2">
-                    <MapPin className="w-4 h-4" /> Adresse
-                  </Label>
-                  <Textarea
+                  <Label className="text-text-secondary flex items-center gap-2"><MapPin className="w-4 h-4" /> Adresse</Label>
+                  <Input
                     value={content.contact?.address || ''}
-                    onChange={(e) => updateSection('contact', 'address', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="123 Rue de la Self-Défense, 75000 Paris"
+                    onChange={(e) => updateField('contact', 'address', e.target.value)}
+                    className="mt-1 bg-background border-white/10"
                   />
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Social Links */}
-          {activeSection === 'social' && (
-            <div className="bg-paper rounded-xl border border-white/10 p-6">
-              <h2 className="font-oswald text-xl text-text-primary uppercase mb-6">Réseaux Sociaux</h2>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-text-secondary flex items-center gap-2">
-                    <Facebook className="w-4 h-4" /> Facebook
-                  </Label>
-                  <Input
-                    value={content.social_links?.facebook || ''}
-                    onChange={(e) => updateSection('social_links', 'facebook', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="https://facebook.com/..."
-                  />
-                </div>
-                <div>
-                  <Label className="text-text-secondary flex items-center gap-2">
-                    <Instagram className="w-4 h-4" /> Instagram
-                  </Label>
-                  <Input
-                    value={content.social_links?.instagram || ''}
-                    onChange={(e) => updateSection('social_links', 'instagram', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="https://instagram.com/..."
-                  />
-                </div>
-                <div>
-                  <Label className="text-text-secondary flex items-center gap-2">
-                    <Youtube className="w-4 h-4" /> YouTube
-                  </Label>
-                  <Input
-                    value={content.social_links?.youtube || ''}
-                    onChange={(e) => updateSection('social_links', 'youtube', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="https://youtube.com/..."
-                  />
-                </div>
+        {/* SOCIAL SECTION */}
+        {activeSection === 'social' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Réseaux Sociaux
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2"><Facebook className="w-4 h-4" /> Facebook</Label>
+                <Input
+                  value={content.social_links?.facebook || ''}
+                  onChange={(e) => updateField('social_links', 'facebook', e.target.value)}
+                  className="mt-1 bg-background border-white/10"
+                  placeholder="https://facebook.com/..."
+                />
+              </div>
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2"><Instagram className="w-4 h-4" /> Instagram</Label>
+                <Input
+                  value={content.social_links?.instagram || ''}
+                  onChange={(e) => updateField('social_links', 'instagram', e.target.value)}
+                  className="mt-1 bg-background border-white/10"
+                  placeholder="https://instagram.com/..."
+                />
+              </div>
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2"><Youtube className="w-4 h-4" /> YouTube</Label>
+                <Input
+                  value={content.social_links?.youtube || ''}
+                  onChange={(e) => updateField('social_links', 'youtube', e.target.value)}
+                  className="mt-1 bg-background border-white/10"
+                  placeholder="https://youtube.com/..."
+                />
+              </div>
+              <div>
+                <Label className="text-text-secondary flex items-center gap-2"><Linkedin className="w-4 h-4" /> LinkedIn</Label>
+                <Input
+                  value={content.social_links?.linkedin || ''}
+                  onChange={(e) => updateField('social_links', 'linkedin', e.target.value)}
+                  className="mt-1 bg-background border-white/10"
+                  placeholder="https://linkedin.com/..."
+                />
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Footer */}
-          {activeSection === 'footer' && (
-            <div className="bg-paper rounded-xl border border-white/10 p-6">
-              <h2 className="font-oswald text-xl text-text-primary uppercase mb-6">Pied de Page</h2>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-text-secondary">Texte de copyright</Label>
-                  <Input
-                    value={content.footer?.copyright || ''}
-                    onChange={(e) => updateSection('footer', 'copyright', e.target.value)}
-                    className="mt-1 bg-background border-white/10 text-text-primary"
-                    placeholder="© 2025 Académie Jacques Levinet. Tous droits réservés."
-                  />
-                </div>
-              </div>
+        {/* IMAGES GLOBALES */}
+        {activeSection === 'images' && (
+          <div className="bg-paper rounded-xl border border-white/10 p-6 space-y-6">
+            <h2 className="font-oswald text-xl text-text-primary uppercase border-b border-white/10 pb-3">
+              Images Globales du Site
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <ImageUploader
+                label="Logo principal"
+                value={content.images?.logo || ''}
+                onChange={(url) => updateField('images', 'logo', url)}
+              />
+              <ImageUploader
+                label="Logo blanc (pour fonds sombres)"
+                value={content.images?.logo_white || ''}
+                onChange={(url) => updateField('images', 'logo_white', url)}
+              />
+              <ImageUploader
+                label="Favicon"
+                value={content.images?.favicon || ''}
+                onChange={(url) => updateField('images', 'favicon', url)}
+              />
+              <ImageUploader
+                label="Image Open Graph (partage réseaux sociaux)"
+                value={content.images?.og_image || ''}
+                onChange={(url) => updateField('images', 'og_image', url)}
+              />
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Footer copyright */}
+        <div className="bg-paper rounded-xl border border-white/10 p-6">
+          <h2 className="font-oswald text-lg text-text-primary uppercase mb-4">Pied de Page</h2>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-text-secondary">Tagline</Label>
+              <Input
+                value={content.footer?.tagline || ''}
+                onChange={(e) => updateField('footer', 'tagline', e.target.value)}
+                className="mt-1 bg-background border-white/10"
+                placeholder="Académie Jacques Levinet – World Krav Maga Organization – International Police Confederation"
+              />
+            </div>
+            <div>
+              <Label className="text-text-secondary">Copyright</Label>
+              <Input
+                value={content.footer?.copyright || ''}
+                onChange={(e) => updateField('footer', 'copyright', e.target.value)}
+                className="mt-1 bg-background border-white/10"
+                placeholder="© 2025 Académie Jacques Levinet. Tous droits réservés."
+              />
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
 
