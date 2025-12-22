@@ -6,17 +6,18 @@ import { Globe, Users, MapPin, Star, ChevronRight, Newspaper } from 'lucide-reac
 const InternationalPage = () => {
   const stats = [
     { value: '50+', label: 'Pays' },
-    { value: '200+', label: 'Directeurs Techniques' },
-    { value: '500+', label: 'Clubs Affiliés' },
-    { value: '50K+', label: 'Membres' },
+    { value: '50', label: 'Directeurs Techniques' },
+    { value: '100+', label: 'Clubs Affiliés' },
+    { value: '10K+', label: 'Membres' },
   ];
 
   const eliteUnits = [
-    { name: 'Spetsnaz', country: 'Russie', flag: '🇷🇺' },
+    { name: 'OMON', country: 'Russie', flag: '🇷🇺' },
     { name: 'BOPE', country: 'Brésil', flag: '🇧🇷' },
     { name: 'ROTAM', country: 'Brésil', flag: '🇧🇷' },
     { name: 'ERIS', country: 'France', flag: '🇫🇷' },
     { name: 'GAD', country: 'Argentine', flag: '🇦🇷' },
+    { name: 'OSTTU', country: 'Australie', flag: '🇦🇺' },
   ];
 
   const regions = [
