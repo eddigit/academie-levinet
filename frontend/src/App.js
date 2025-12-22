@@ -45,6 +45,7 @@ import AIConfigPage from './pages/AIConfigPage';
 import SubscriptionManagementPage from './pages/SubscriptionManagementPage';
 import SiteContentPage from './pages/SiteContentPage';
 import ClubsPage from './pages/ClubsPage';
+import AdminStatsPage from './pages/admin/AdminStatsPage';
 // Payment pages
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
