@@ -70,7 +70,7 @@ const LandingPage = () => {
         </div>
 
         {/* Content - Mobile First */}
-        <div className="container mx-auto text-center max-w-4xl relative z-10 px-4">
+        <div className="container mx-auto text-center max-w-4xl relative z-30 px-4">
           <h2 className="font-oswald text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary uppercase mb-6 md:mb-10 tracking-wide drop-shadow-2xl leading-tight">
             La Self-Défense Efficace,<br />Réaliste et Sécurisée
           </h2>
