@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class OnboardingFlowTester:
-    def __init__(self, base_url="https://defense-manager.preview.emergentagent.com"):
+    def __init__(self, base_url="https://martial-defense-app.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
@@ -157,7 +157,7 @@ class OnboardingFlowTester:
         """Test Step 5: Stripe checkout for membership license"""
         checkout_data = {
             "package_id": "licence",
-            "origin_url": "https://defense-manager.preview.emergentagent.com"
+            "origin_url": "https://martial-defense-app.preview.emergentagent.com"
         }
         
         success, response = self.run_test(
