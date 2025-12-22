@@ -12,20 +12,21 @@ const DisciplineIPCPage = () => {
   ];
 
   const eliteUnits = [
-    { name: 'Spetsnaz', country: 'Russie', description: 'Forces spéciales russes' },
+    { name: 'OMON', country: 'Russie', description: 'Escadron d\'élite de la police russe' },
     { name: 'BOPE', country: 'Brésil', description: 'Batallão de Operações Policiais Especiais' },
     { name: 'ROTAM', country: 'Brésil', description: 'Rondas Ostensivas Tático Móvel' },
     { name: 'ERIS', country: 'France', description: 'Équipes Régionales d\'Intervention et de Sécurité' },
-    { name: 'GAD', country: 'Argentine', description: 'Groupe d\'Action Directe' },
+    { name: 'GAD', country: 'Argentine', description: 'Grupo de Apoyo Departamental' },
+    { name: 'OSTTU', country: 'Australie', description: 'Partenaire australien de formation tactique' },
   ];
 
   const modules = [
     'Techniques d\'interpellation',
     'Maîtrise sans arme',
     'Usage proportionné de la force',
-    'Gestion de foule',
-    'Protection de personnalités',
-    'Intervention en milieu confiné',
+    'Tonfa police',
+    'Bâton télescopique',
+    'GTPI (Gestion Tactique de la Personne Interpellée)',
     'Défense contre armes',
     'Techniques de menottage',
   ];
