@@ -59,6 +59,7 @@ const Sidebar = () => {
   ];
 
   const adminItems = [
+    { path: '/admin/stats', icon: BarChart3, label: 'Statistiques', testId: 'nav-stats' },
     { path: '/admin/pending-members', icon: UserCheck, label: 'Validations', testId: 'nav-pending', highlight: true },
     { path: '/admin/users', icon: Users, label: 'Utilisateurs', testId: 'nav-users' },
     { path: '/admin/subscriptions', icon: Receipt, label: 'Cotisations', testId: 'nav-admin-subs' },
