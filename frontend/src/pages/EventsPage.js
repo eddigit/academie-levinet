@@ -224,6 +224,23 @@ const EventModal = ({
   );
 };
 
+const initialFormData = {
+  title: '',
+  description: '',
+  eventType: 'Stage',
+  startDate: '',
+  endDate: '',
+  startTime: '',
+  endTime: '',
+  location: '',
+  city: '',
+  country: '',
+  instructor: '',
+  maxParticipants: '',
+  price: '',
+  imageUrl: ''
+};
+
 const EventsPage = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -232,21 +249,13 @@ const EventsPage = () => {
   const [currentEvent, setCurrentEvent] = useState(null);
   const [saving, setSaving] = useState(false);
   
-  // Use separate state for form fields to prevent re-renders
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [eventType, setEventType] = useState('Stage');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [location, setLocation] = useState('');
-  const [city, setCity] = useState('');
-  const [country, setCountry] = useState('');
-  const [instructor, setInstructor] = useState('');
-  const [maxParticipants, setMaxParticipants] = useState('');
-  const [price, setPrice] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  // Single form state object to prevent re-renders
+  const [formData, setFormData] = useState(initialFormData);
+  
+  // Handler to update a single field
+  const handleFieldChange = useCallback((field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  }, []);
 
   useEffect(() => {
     fetchEvents();
