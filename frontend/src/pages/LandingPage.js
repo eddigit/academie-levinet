@@ -512,7 +512,7 @@ const LandingPage = () => {
               <ul className="space-y-2 md:space-y-3">
                 <li><Link to="/international" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Trouver un Club</Link></li>
                 <li><Link to="/onboarding" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">S'inscrire</Link></li>
-                <li><a href="tel:+33123456789" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Téléphone</a></li>
+                <li><a href="tel:+33148051610" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">+33 1 48 05 16 10</a></li>
                 <li><a href="https://www.linkedin.com/in/worldkravmagaorganization/" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">LinkedIn</a></li>
               </ul>
             </div>
