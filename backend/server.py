@@ -548,23 +548,23 @@ class NewsUpdate(BaseModel):
 class Event(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    title: str
-    description: str
-    event_type: EventType
-    start_date: str
-    end_date: str
-    start_time: str
-    end_time: str
-    location: str
-    city: str
-    country: str
+    title: str = ""
+    description: str = ""
+    event_type: Optional[EventType] = None
+    start_date: str = ""
+    end_date: str = ""
+    start_time: str = ""
+    end_time: str = ""
+    location: str = ""
+    city: str = ""
+    country: str = ""
     instructor: Optional[str] = None
     max_participants: Optional[int] = None
     current_participants: int = 0
     price: float = 0.0
     image_url: Optional[str] = None
-    status: EventStatus = EventStatus.UPCOMING
-    created_by: str
+    status: Optional[EventStatus] = EventStatus.UPCOMING
+    created_by: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
