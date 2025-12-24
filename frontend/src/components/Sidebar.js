@@ -73,6 +73,7 @@ const Sidebar = () => {
     { path: '/technical-directors', icon: UserCog, label: 'Directeurs Tech.', testId: 'nav-directors' },
     { path: '/instructors', icon: User, label: 'Instructeurs', testId: 'nav-instructors' },
     { path: '/subscriptions', icon: CreditCard, label: 'Cotisations', testId: 'nav-subscriptions' },
+    { path: '/shop', icon: ShoppingBag, label: 'Boutique AJL', testId: 'nav-shop' },
   ];
 
   const adminItems = [
@@ -81,7 +82,7 @@ const Sidebar = () => {
     { path: '/admin/users', icon: Users, label: 'Utilisateurs', testId: 'nav-users' },
     { path: '/admin/subscriptions', icon: Receipt, label: 'Cotisations', testId: 'nav-admin-subs' },
     { path: '/admin/site-content', icon: Globe, label: 'Site Internet', testId: 'nav-site' },
-    { path: '/admin/products', icon: ShoppingBag, label: 'Boutique', testId: 'nav-products' },
+    { path: '/admin/products', icon: ShoppingBag, label: 'Gestion Produits', testId: 'nav-products' },
     { path: '/admin/ai-config', icon: Bot, label: 'Config. IA', testId: 'nav-ai-config' },
     { path: '/admin/messages', icon: Shield, label: 'Modération', testId: 'nav-moderation' },
     { path: '/admin/settings', icon: Settings, label: 'Paramètres', testId: 'nav-settings' },

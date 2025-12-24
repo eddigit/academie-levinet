@@ -40,6 +40,7 @@ import MemberShopPage from './pages/member/MemberShopPage';
 // Shop pages
 import ShopPage from './pages/ShopPage';
 import AdminProductsPage from './pages/AdminProductsPage';
+import DashboardShopPage from './pages/DashboardShopPage';
 // Admin pages
 import PendingMembersPage from './pages/PendingMembersPage';
 import SettingsPage from './pages/SettingsPage';
@@ -138,6 +139,7 @@ const AppContent = () => {
         <Route path="/instructors" element={<ProtectedRoute><InstructorsPage /></ProtectedRoute>} />
         <Route path="/clubs" element={<ProtectedRoute><ClubsPage /></ProtectedRoute>} />
         <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
+        <Route path="/shop" element={<ProtectedRoute><DashboardShopPage /></ProtectedRoute>} />
         <Route path="/leads" element={<ProtectedRoute><LeadsPage /></ProtectedRoute>} />
         <Route path="/news" element={<ProtectedRoute><NewsPage /></ProtectedRoute>} />
         <Route path="/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
