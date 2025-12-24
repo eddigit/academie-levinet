@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PublicLayout from '../components/PublicLayout';
 import { Link } from 'react-router-dom';
-import { Award, Shield, Globe, Star, ChevronRight } from 'lucide-react';
+import { Award, Shield, Globe, Star, ChevronRight, Loader2 } from 'lucide-react';
+import api from '../utils/api';
 
 const FounderPage = () => {
+  const [founderContent, setFounderContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const response = await api.get('/site-content');
+        const data = response.data || response;
+        setFounderContent(data.founder || {});
+      } catch (error) {
+        console.error('Error fetching founder content:', error);
+      }
+      setLoading(false);
+    };
+    fetchContent();
+  }, []);
+
+  // Valeurs par défaut si pas de données du CMS
+  const founderName = founderContent?.name || 'Capitaine Jacques Levinet';
+  const founderTitle = founderContent?.title || '10ème Dan · Champion de France · Créateur du Self-Pro Krav';
+  const founderGrade = founderContent?.grade || '10ème Dan';
+  const founderBio = founderContent?.bio || "Ancien membre de la Police Nationale avec une forte expérience de terrain, expert en arts martiaux et visionnaire qui a révolutionné l'approche de la self-défense en créant une méthode adaptée aux réalités modernes.";
+  const founderQuote = founderContent?.quote || "J'ai parcouru le monde pour analyser les meilleures techniques de self-défense et d'entraînement policier. Mon objectif : créer des méthodes efficaces, réalistes et adaptées à la législation française.";
+  const founderPhoto = founderContent?.photo || 'https://images.unsplash.com/photo-1616005639387-9d59e4b1bdb9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxtYXJ0aWFsJTIwYXJ0cyUyMGdyYW5kbWFzdGVyJTIwcG9ydHJhaXQlMjBzZXJpb3VzfGVufDB8fHxibGFja19hbmRfd2hpdGV8MTc2NTgwMzY5N3ww&ixlib=rb-4.1.0&q=85';
+
   const achievements = [
     { icon: Award, title: '10ème Dan', description: 'Plus haut grade en Self-Pro Krav' },
     { icon: Star, title: 'Champion de France', description: 'Karaté - Compétition nationale' },
@@ -22,6 +48,12 @@ const FounderPage = () => {
 
   return (
     <PublicLayout>
+      {loading ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : (
+      <>
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
@@ -35,18 +67,15 @@ const FounderPage = () => {
               </div>
               
               <h1 className="font-oswald text-5xl md:text-6xl font-bold text-text-primary uppercase mb-6 tracking-tight">
-                Capitaine<br />
-                <span className="text-primary">Jacques Levinet</span>
+                <span className="text-primary">{founderName}</span>
               </h1>
               
               <p className="text-xl text-text-secondary font-manrope mb-4 leading-relaxed">
-                10ème Dan · Champion de France · Créateur du Self-Pro Krav
+                {founderTitle}
               </p>
               
               <p className="text-text-muted font-manrope mb-8 leading-relaxed">
-                Ancien membre de la Police Nationale avec une forte expérience de terrain, 
-                expert en arts martiaux et visionnaire qui a révolutionné l'approche de la 
-                self-défense en créant une méthode adaptée aux réalités modernes.
+                {founderBio}
               </p>
 
               <div className="grid grid-cols-2 gap-4">
@@ -63,11 +92,10 @@ const FounderPage = () => {
             {/* Image */}
             <div className="relative">
               <div className="aspect-[3/4] rounded-lg overflow-hidden border border-white/10">
-                {/* Placeholder for founder image */}
-                <div 
-                  className="w-full h-full bg-cover bg-center bg-gray-800"
-                  style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1616005639387-9d59e4b1bdb9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxtYXJ0aWFsJTIwYXJ0cyUyMGdyYW5kbWFzdGVyJTIwcG9ydHJhaXQlMjBzZXJpb3VzfGVufDB8fHxibGFja19hbmRfd2hpdGV8MTc2NTgwMzY5N3ww&ixlib=rb-4.1.0&q=85)' }}
-                  data-placeholder="founder-portrait"
+                <img 
+                  src={founderPhoto}
+                  alt={founderName}
+                  className="w-full h-full object-cover bg-gray-800"
                 />
               </div>
               <div className="absolute -bottom-4 -right-4 bg-primary p-4 rounded-lg">
@@ -88,12 +116,10 @@ const FounderPage = () => {
           
           <div className="bg-white/5 border border-white/10 rounded-lg p-8 md:p-12">
             <blockquote className="text-xl md:text-2xl text-text-secondary font-manrope italic leading-relaxed text-center">
-              "J'ai parcouru le monde pour analyser les meilleures techniques de self-défense 
-              et d'entraînement policier. Mon objectif : créer des méthodes efficaces, réalistes 
-              et adaptées à la législation française."
+              "{founderQuote}"
             </blockquote>
             <p className="text-center text-primary font-oswald uppercase leading-none tracking-wider mt-6">
-              — Capitaine Jacques Levinet
+              — {founderName}
             </p>
           </div>
         </div>
@@ -154,6 +180,8 @@ const FounderPage = () => {
           </div>
         </div>
       </section>
+      </>
+      )}
     </PublicLayout>
   );
 };
