@@ -828,14 +828,14 @@ const MemberDetailPage = () => {
                     <div className="space-y-2">
                       <Label className="text-text-secondary">Club</Label>
                       <Select
-                        value={editForm.club_id || ''}
-                        onValueChange={(value) => setEditForm({ ...editForm, club_id: value })}
+                        value={editForm.club_id || '_none'}
+                        onValueChange={(value) => setEditForm({ ...editForm, club_id: value === '_none' ? '' : value })}
                       >
                         <SelectTrigger className="bg-white/5 border-white/10">
                           <SelectValue placeholder="Sélectionner un club" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Aucun</SelectItem>
+                          <SelectItem value="_none">Aucun</SelectItem>
                           {clubs.map((club) => (
                             <SelectItem key={club.id || club._id} value={club.id || club._id}>
                               {club.name} {club.city && `(${club.city})`}
@@ -850,14 +850,14 @@ const MemberDetailPage = () => {
                     <div className="space-y-2">
                       <Label className="text-text-secondary">Instructeur référent</Label>
                       <Select
-                        value={editForm.instructor_id || ''}
-                        onValueChange={(value) => setEditForm({ ...editForm, instructor_id: value })}
+                        value={editForm.instructor_id || '_none'}
+                        onValueChange={(value) => setEditForm({ ...editForm, instructor_id: value === '_none' ? '' : value })}
                       >
                         <SelectTrigger className="bg-white/5 border-white/10">
                           <SelectValue placeholder="Sélectionner un instructeur" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Aucun</SelectItem>
+                          <SelectItem value="_none">Aucun</SelectItem>
                           {instructors.map((instr) => (
                             <SelectItem key={instr.id || instr._id} value={instr.id || instr._id}>
                               {instr.full_name}
@@ -872,14 +872,14 @@ const MemberDetailPage = () => {
                     <div className="space-y-2">
                       <Label className="text-text-secondary">Directeur Technique référent</Label>
                       <Select
-                        value={editForm.technical_director_id || ''}
-                        onValueChange={(value) => setEditForm({ ...editForm, technical_director_id: value })}
+                        value={editForm.technical_director_id || '_none'}
+                        onValueChange={(value) => setEditForm({ ...editForm, technical_director_id: value === '_none' ? '' : value })}
                       >
                         <SelectTrigger className="bg-white/5 border-white/10">
                           <SelectValue placeholder="Sélectionner un DT" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Aucun</SelectItem>
+                          <SelectItem value="_none">Aucun</SelectItem>
                           {technicalDirectors.map((dt) => (
                             <SelectItem key={dt.id || dt._id} value={dt.id || dt._id}>
                               {dt.full_name}
