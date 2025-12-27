@@ -50,6 +50,7 @@ import SubscriptionManagementPage from './pages/SubscriptionManagementPage';
 import SiteContentPage from './pages/SiteContentPage';
 import ClubsPage from './pages/ClubsPage';
 import AdminStatsPage from './pages/admin/AdminStatsPage';
+import AdminPartnersPage from './pages/admin/AdminPartnersPage';
 import ProfilePage from './pages/ProfilePage';
 // Payment pages
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
@@ -145,6 +146,7 @@ const AppContent = () => {
         <Route path="/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><AdminProductsPage /></ProtectedRoute>} />
         <Route path="/admin/stats" element={<ProtectedRoute><AdminStatsPage /></ProtectedRoute>} />
+        <Route path="/admin/partners" element={<ProtectedRoute><AdminPartnersPage /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
         <Route path="/admin/messages" element={<ProtectedRoute><AdminMessagesPage /></ProtectedRoute>} />
         <Route path="/admin/pending-members" element={<ProtectedRoute><PendingMembersPage /></ProtectedRoute>} />

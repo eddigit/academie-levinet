@@ -2313,7 +2313,15 @@ async def get_wall_posts(
     for post in posts:
         # Get author info
         author = await db.users.find_one({"id": post.get("author_id")}, {"_id": 0, "password_hash": 0})
-        post["author"] = author
+        if author:
+            post["author"] = author
+        else:
+            # Fallback if author not found - use stored info if available
+            post["author"] = {
+                "id": post.get("author_id"),
+                "full_name": post.get("author_name", "Membre"),
+                "photo_url": post.get("author_photo")
+            }
         
         # Get comments count
         comments_count = await db.post_comments.count_documents({"post_id": post["id"]})
@@ -2344,6 +2352,8 @@ async def create_post(
     post = {
         "id": str(uuid.uuid4()),
         "author_id": current_user.get("id"),
+        "author_name": current_user.get("full_name", "Membre"),
+        "author_photo": current_user.get("photo_url"),
         "content": post_data.content,
         "post_type": post_data.post_type,
         "image_url": post_data.image_url,
@@ -2361,7 +2371,8 @@ async def create_post(
         "id": current_user.get("id"),
         "full_name": current_user.get("full_name"),
         "email": current_user.get("email"),
-        "role": current_user.get("role")
+        "role": current_user.get("role"),
+        "photo_url": current_user.get("photo_url")
     }
     post["comments_count"] = 0
     post["reactions"] = {}
@@ -2401,7 +2412,15 @@ async def get_post_comments(
     # Enrich with author info
     for comment in comments:
         author = await db.users.find_one({"id": comment.get("author_id")}, {"_id": 0, "password_hash": 0})
-        comment["author"] = author
+        if author:
+            comment["author"] = author
+        else:
+            # Fallback if author not found
+            comment["author"] = {
+                "id": comment.get("author_id"),
+                "full_name": comment.get("author_name", "Membre"),
+                "photo_url": comment.get("author_photo")
+            }
     
     return {"comments": comments}
 
@@ -2420,6 +2439,8 @@ async def create_comment(
         "id": str(uuid.uuid4()),
         "post_id": post_id,
         "author_id": current_user.get("id"),
+        "author_name": current_user.get("full_name", "Membre"),
+        "author_photo": current_user.get("photo_url"),
         "content": comment_data.content,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
@@ -2431,7 +2452,8 @@ async def create_comment(
     comment["author"] = {
         "id": current_user.get("id"),
         "full_name": current_user.get("full_name"),
-        "email": current_user.get("email")
+        "email": current_user.get("email"),
+        "photo_url": current_user.get("photo_url")
     }
     
     return comment
@@ -2545,6 +2567,184 @@ async def get_wall_stats(current_user: dict = Depends(get_current_user)):
         "posts_this_week": posts_this_week,
         "recent_members": recent_members
     }
+
+# ==================== PARTNERS & SPONSORS ENDPOINTS ====================
+
+class CampaignCreate(BaseModel):
+    name: str
+    type: str  # display, social, email, search
+    status: str = "draft"  # draft, active, paused, completed
+    budget: float = 0
+    start_date: str
+    end_date: str
+
+class CampaignUpdate(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    status: Optional[str] = None
+    budget: Optional[float] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+
+class AffiliateCreate(BaseModel):
+    name: str
+    email: str
+    code: str
+    commission_rate: int = 10
+    status: str = "active"
+
+class AffiliateUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    code: Optional[str] = None
+    commission_rate: Optional[int] = None
+    status: Optional[str] = None
+
+@api_router.get("/partners/stats")
+async def get_partner_stats(current_user: dict = Depends(get_current_user)):
+    """Get partner and affiliate statistics"""
+    campaigns = await db.campaigns.find({}, {"_id": 0}).to_list(1000)
+    affiliates = await db.affiliates.find({}, {"_id": 0}).to_list(1000)
+    
+    total_campaigns = len(campaigns)
+    active_campaigns = len([c for c in campaigns if c.get("status") == "active"])
+    total_clicks = sum(c.get("clicks", 0) for c in campaigns)
+    total_conversions = sum(c.get("conversions", 0) for c in campaigns)
+    
+    total_affiliates = len([a for a in affiliates if a.get("status") == "active"])
+    affiliate_clicks = sum(a.get("clicks", 0) for a in affiliates)
+    affiliate_conversions = sum(a.get("conversions", 0) for a in affiliates)
+    total_commissions = sum(a.get("total_earned", 0) for a in affiliates)
+    
+    # Estimate revenue (conversions * average order value)
+    avg_order_value = 85  # euros
+    total_revenue = (total_conversions + affiliate_conversions) * avg_order_value
+    
+    return {
+        "totalCampaigns": total_campaigns,
+        "activeCampaigns": active_campaigns,
+        "totalClicks": total_clicks + affiliate_clicks,
+        "totalConversions": total_conversions + affiliate_conversions,
+        "conversionRate": round((total_conversions + affiliate_conversions) / max(total_clicks + affiliate_clicks, 1) * 100, 2),
+        "totalAffiliates": total_affiliates,
+        "totalCommissions": total_commissions,
+        "totalRevenue": total_revenue
+    }
+
+@api_router.get("/partners/campaigns")
+async def get_campaigns(current_user: dict = Depends(get_current_user)):
+    """Get all campaigns"""
+    campaigns = await db.campaigns.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return campaigns
+
+@api_router.post("/partners/campaigns")
+async def create_campaign(data: CampaignCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new campaign"""
+    campaign = {
+        "id": str(uuid.uuid4()),
+        "name": data.name,
+        "type": data.type,
+        "status": data.status,
+        "budget": data.budget,
+        "spent": 0,
+        "clicks": 0,
+        "conversions": 0,
+        "start_date": data.start_date,
+        "end_date": data.end_date,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.campaigns.insert_one(campaign)
+    return campaign
+
+@api_router.put("/partners/campaigns/{campaign_id}")
+async def update_campaign(campaign_id: str, data: CampaignUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a campaign"""
+    update_data = {k: v for k, v in data.dict().items() if v is not None}
+    if update_data:
+        await db.campaigns.update_one({"id": campaign_id}, {"$set": update_data})
+    campaign = await db.campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    return campaign
+
+@api_router.delete("/partners/campaigns/{campaign_id}")
+async def delete_campaign(campaign_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a campaign"""
+    await db.campaigns.delete_one({"id": campaign_id})
+    return {"message": "Campagne supprimée"}
+
+@api_router.get("/partners/affiliates")
+async def get_affiliates(current_user: dict = Depends(get_current_user)):
+    """Get all affiliates"""
+    affiliates = await db.affiliates.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return affiliates
+
+@api_router.post("/partners/affiliates")
+async def create_affiliate(data: AffiliateCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new affiliate"""
+    # Check if code already exists
+    existing = await db.affiliates.find_one({"code": data.code})
+    if existing:
+        raise HTTPException(status_code=400, detail="Ce code affilié existe déjà")
+    
+    affiliate = {
+        "id": str(uuid.uuid4()),
+        "name": data.name,
+        "email": data.email,
+        "code": data.code,
+        "commission_rate": data.commission_rate,
+        "status": data.status,
+        "clicks": 0,
+        "conversions": 0,
+        "total_earned": 0,
+        "joined_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.affiliates.insert_one(affiliate)
+    return affiliate
+
+@api_router.put("/partners/affiliates/{affiliate_id}")
+async def update_affiliate(affiliate_id: str, data: AffiliateUpdate, current_user: dict = Depends(get_current_user)):
+    """Update an affiliate"""
+    update_data = {k: v for k, v in data.dict().items() if v is not None}
+    if update_data:
+        await db.affiliates.update_one({"id": affiliate_id}, {"$set": update_data})
+    affiliate = await db.affiliates.find_one({"id": affiliate_id}, {"_id": 0})
+    return affiliate
+
+@api_router.delete("/partners/affiliates/{affiliate_id}")
+async def delete_affiliate(affiliate_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete an affiliate"""
+    await db.affiliates.delete_one({"id": affiliate_id})
+    return {"message": "Affilié supprimé"}
+
+@api_router.post("/partners/track-click")
+async def track_affiliate_click(code: str):
+    """Track a click from an affiliate link (public endpoint)"""
+    affiliate = await db.affiliates.find_one({"code": code, "status": "active"})
+    if affiliate:
+        await db.affiliates.update_one(
+            {"id": affiliate["id"]},
+            {"$inc": {"clicks": 1}}
+        )
+        return {"success": True}
+    return {"success": False}
+
+@api_router.post("/partners/track-conversion")
+async def track_affiliate_conversion(code: str, amount: float = 0):
+    """Track a conversion from an affiliate (public endpoint)"""
+    affiliate = await db.affiliates.find_one({"code": code, "status": "active"})
+    if affiliate:
+        commission = amount * (affiliate.get("commission_rate", 10) / 100)
+        await db.affiliates.update_one(
+            {"id": affiliate["id"]},
+            {
+                "$inc": {
+                    "conversions": 1,
+                    "total_earned": commission
+                }
+            }
+        )
+        return {"success": True, "commission": commission}
+    return {"success": False}
 
 # ==================== E-COMMERCE ENDPOINTS ====================
 
