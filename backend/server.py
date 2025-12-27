@@ -2746,6 +2746,212 @@ async def track_affiliate_conversion(code: str, amount: float = 0):
         return {"success": True, "commission": commission}
     return {"success": False}
 
+# ==================== FORUMS ENDPOINTS ====================
+
+class ForumCreate(BaseModel):
+    name: str
+    description: str
+    icon: str = "💬"
+    is_private: bool = False
+    participants: Optional[List[str]] = []
+
+class ForumUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    icon: Optional[str] = None
+    is_private: Optional[bool] = None
+    participants: Optional[List[str]] = None
+
+class TopicCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    is_pinned: bool = False
+    is_locked: bool = False
+
+class TopicUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    is_pinned: Optional[bool] = None
+    is_locked: Optional[bool] = None
+
+class ForumMessageCreate(BaseModel):
+    content: str
+    topic_id: str
+
+@api_router.get("/forums/stats")
+async def get_forums_stats(current_user: dict = Depends(get_current_user)):
+    """Get forum statistics"""
+    total_forums = await db.forums.count_documents({})
+    total_topics = await db.forum_topics.count_documents({})
+    total_messages = await db.forum_messages.count_documents({})
+    
+    # Get unique authors from messages (last 30 days)
+    thirty_days_ago = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    recent_messages = await db.forum_messages.find(
+        {"created_at": {"$gte": thirty_days_ago}},
+        {"author_id": 1}
+    ).to_list(10000)
+    active_users = len(set(msg.get("author_id") for msg in recent_messages if msg.get("author_id")))
+    
+    return {
+        "totalForums": total_forums,
+        "totalTopics": total_topics,
+        "totalMessages": total_messages,
+        "activeUsers": active_users
+    }
+
+@api_router.get("/forums")
+async def get_forums(current_user: dict = Depends(get_current_user)):
+    """Get all forums"""
+    forums = await db.forums.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Add topic and message counts
+    for forum in forums:
+        forum["topic_count"] = await db.forum_topics.count_documents({"forum_id": forum["id"]})
+        forum["message_count"] = await db.forum_messages.count_documents({"forum_id": forum["id"]})
+    
+    return forums
+
+@api_router.post("/forums")
+async def create_forum(data: ForumCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new forum"""
+    forum = {
+        "id": str(uuid.uuid4()),
+        "name": data.name,
+        "description": data.description,
+        "icon": data.icon,
+        "is_private": data.is_private,
+        "participants": data.participants or [],
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "topic_count": 0,
+        "message_count": 0
+    }
+    await db.forums.insert_one(forum)
+    return forum
+
+@api_router.put("/forums/{forum_id}")
+async def update_forum(forum_id: str, data: ForumUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a forum"""
+    update_data = {k: v for k, v in data.dict().items() if v is not None}
+    if update_data:
+        await db.forums.update_one({"id": forum_id}, {"$set": update_data})
+    forum = await db.forums.find_one({"id": forum_id}, {"_id": 0})
+    return forum
+
+@api_router.delete("/forums/{forum_id}")
+async def delete_forum(forum_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a forum and all its topics and messages"""
+    # Delete all messages in topics of this forum
+    await db.forum_messages.delete_many({"forum_id": forum_id})
+    # Delete all topics
+    await db.forum_topics.delete_many({"forum_id": forum_id})
+    # Delete forum
+    await db.forums.delete_one({"id": forum_id})
+    return {"message": "Forum supprimé"}
+
+@api_router.get("/forums/{forum_id}/topics")
+async def get_forum_topics(forum_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all topics in a forum"""
+    topics = await db.forum_topics.find(
+        {"forum_id": forum_id}, 
+        {"_id": 0}
+    ).sort([("is_pinned", -1), ("created_at", -1)]).to_list(1000)
+    
+    # Add message counts and view counts
+    for topic in topics:
+        topic["message_count"] = await db.forum_messages.count_documents({"topic_id": topic["id"]})
+        if "view_count" not in topic:
+            topic["view_count"] = 0
+    
+    return topics
+
+@api_router.post("/forums/{forum_id}/topics")
+async def create_topic(forum_id: str, data: TopicCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new topic in a forum"""
+    topic = {
+        "id": str(uuid.uuid4()),
+        "forum_id": forum_id,
+        "title": data.title,
+        "description": data.description,
+        "author_id": current_user["id"],
+        "author_name": current_user.get("full_name", "Utilisateur"),
+        "author_photo": current_user.get("photo_url"),
+        "is_pinned": data.is_pinned,
+        "is_locked": data.is_locked,
+        "view_count": 0,
+        "message_count": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_activity": datetime.now(timezone.utc).isoformat()
+    }
+    await db.forum_topics.insert_one(topic)
+    return topic
+
+@api_router.put("/forums/topics/{topic_id}")
+async def update_topic(topic_id: str, data: TopicUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a topic"""
+    update_data = {k: v for k, v in data.dict().items() if v is not None}
+    if update_data:
+        await db.forum_topics.update_one({"id": topic_id}, {"$set": update_data})
+    topic = await db.forum_topics.find_one({"id": topic_id}, {"_id": 0})
+    return topic
+
+@api_router.delete("/forums/topics/{topic_id}")
+async def delete_topic(topic_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a topic and all its messages"""
+    topic = await db.forum_topics.find_one({"id": topic_id})
+    if topic:
+        # Delete all messages in this topic
+        await db.forum_messages.delete_many({"topic_id": topic_id})
+        # Delete topic
+        await db.forum_topics.delete_one({"id": topic_id})
+    return {"message": "Sujet supprimé"}
+
+@api_router.get("/forums/topics/{topic_id}/messages")
+async def get_topic_messages(topic_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all messages in a topic"""
+    # Increment view count
+    await db.forum_topics.update_one(
+        {"id": topic_id},
+        {"$inc": {"view_count": 1}}
+    )
+    
+    messages = await db.forum_messages.find(
+        {"topic_id": topic_id},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(10000)
+    
+    return messages
+
+@api_router.post("/forums/topics/{topic_id}/messages")
+async def create_message(topic_id: str, data: ForumMessageCreate, current_user: dict = Depends(get_current_user)):
+    """Post a message in a topic"""
+    # Check if topic is locked
+    topic = await db.forum_topics.find_one({"id": topic_id})
+    if topic and topic.get("is_locked"):
+        raise HTTPException(status_code=403, detail="Ce sujet est verrouillé")
+    
+    message = {
+        "id": str(uuid.uuid4()),
+        "topic_id": topic_id,
+        "forum_id": topic.get("forum_id") if topic else None,
+        "content": data.content,
+        "author_id": current_user["id"],
+        "author_name": current_user.get("full_name", "Utilisateur"),
+        "author_photo": current_user.get("photo_url"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.forum_messages.insert_one(message)
+    
+    # Update topic last activity
+    await db.forum_topics.update_one(
+        {"id": topic_id},
+        {"$set": {"last_activity": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return message
+
 # ==================== E-COMMERCE ENDPOINTS ====================
 
 class ProductCreate(BaseModel):
