@@ -49,7 +49,7 @@ const AdminForumsPage = () => {
     try {
       const [forumsRes, usersRes, statsRes] = await Promise.all([
         api.get('/forums'),
-        api.get('/users'),
+        api.get('/admin/users'),
         api.get('/forums/stats')
       ]);
       setForums(forumsRes.data);
