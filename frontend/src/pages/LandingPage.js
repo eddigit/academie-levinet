@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Shield, Users, Award, Globe, Video, CheckCircle, Target, Sparkles, Loader2 } from 'lucide-react';
 import MegaMenu from '../components/MegaMenu';
 import api from '../utils/api';
+import BUILD_INFO from '../buildInfo';
 
 const LandingPage = () => {
   const [content, setContent] = useState(null);
@@ -614,6 +615,9 @@ const LandingPage = () => {
             </p>
             <p className="text-text-muted font-manrope text-xs md:text-sm">
               {footerCopyright}
+            </p>
+            <p className="text-text-muted/50 font-mono text-[10px] mt-2" title={`Build ID: ${BUILD_INFO.buildId}`}>
+              v{BUILD_INFO.version} • Build: {BUILD_INFO.date} {BUILD_INFO.time}
             </p>
           </div>
         </div>
