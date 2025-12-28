@@ -982,7 +982,8 @@ async def get_all_users(
     - membership_status: Actif | Inactif | Suspendu | Expiré
     - belt_grade: Grade/Ceinture
     """
-    if current_user.get('role') not in ['admin', 'fondateur', 'directeur_national']:
+    # Seuls les admins peuvent voir tous les utilisateurs
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
 
     query = {}
@@ -1024,23 +1025,28 @@ async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(
         raise HTTPException(status_code=400, detail="Email déjà utilisé")
     
     # Normalize role (accept both French and English versions)
+    # Nouveaux rôles: admin, directeur_technique, instructeur, eleve (avec club), eleve_libre (sans club)
     role_mapping = {
         'directeur_technique': 'directeur_technique',
         'technical_director': 'directeur_technique',
-        'directeur_national': 'directeur_national',
-        'national_director': 'directeur_national',
         'instructeur': 'instructeur',
         'instructor': 'instructeur',
-        'membre': 'membre',
-        'member': 'membre',
+        'eleve': 'eleve',
+        'student': 'eleve',
+        'membre': 'eleve',  # Compatibilité ancienne appellation
+        'member': 'eleve',
+        'eleve_libre': 'eleve_libre',
+        'online_student': 'eleve_libre',
         'admin': 'admin',
-        'fondateur': 'fondateur'
+        # Compatibilité avec les anciens rôles (mappés vers admin)
+        'fondateur': 'admin',
+        'directeur_national': 'admin'
     }
     
     # Validate role
     valid_roles = list(role_mapping.keys())
     if data.role not in valid_roles:
-        raise HTTPException(status_code=400, detail=f"Rôle invalide. Utilisez: admin, fondateur, directeur_national, directeur_technique, instructeur, membre")
+        raise HTTPException(status_code=400, detail=f"Rôle invalide. Utilisez: admin, directeur_technique, instructeur, eleve, eleve_libre")
     
     # Use normalized role
     normalized_role = role_mapping.get(data.role, data.role)
@@ -1054,10 +1060,12 @@ async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(
     
     # Determine belt grade based on role if not provided
     belt_grade = data.belt_grade
-    if not belt_grade and normalized_role in ['instructeur', 'instructor']:
+    if not belt_grade and normalized_role == 'instructeur':
         belt_grade = 'Instructeur'
-    elif not belt_grade and normalized_role in ['directeur_technique', 'technical_director']:
+    elif not belt_grade and normalized_role == 'directeur_technique':
         belt_grade = 'Directeur Technique'
+    elif not belt_grade and normalized_role in ['eleve', 'eleve_libre']:
+        belt_grade = 'Ceinture Blanche'  # Défaut pour les élèves
     
     user = User(
         email=data.email,
@@ -1081,6 +1089,14 @@ async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(
     doc['user_type'] = normalized_role  # Store normalized type
     
     await db.users.insert_one(doc)
+    
+    # Synchronize clubs if this is a technical director
+    if normalized_role == 'directeur_technique' and data.club_ids:
+        for club_id in data.club_ids:
+            await db.clubs.update_one(
+                {"id": club_id},
+                {"$addToSet": {"technical_director_ids": user.id}}
+            )
     
     # Send email with credentials if requested
     if data.send_email:
@@ -1141,10 +1157,10 @@ async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(
 @api_router.put("/admin/users/{user_id}/role")
 async def update_user_role(user_id: str, role: str, current_user: dict = Depends(get_current_user)):
     """Admin: Update user role"""
-    if current_user.get('role') not in ['admin', 'fondateur']:
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
 
-    valid_roles = ['admin', 'fondateur', 'directeur_national', 'directeur_technique', 'instructeur', 'membre']
+    valid_roles = ['admin', 'directeur_technique', 'instructeur', 'eleve', 'eleve_libre']
     if role not in valid_roles:
         raise HTTPException(status_code=400, detail=f"Rôle invalide. Rôles valides: {', '.join(valid_roles)}")
 
@@ -1193,6 +1209,11 @@ async def update_user(user_id: str, data: AdminUserUpdate, current_user: dict = 
     if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
 
+    # Get current user data to check role changes
+    current_user_data = await db.users.find_one({"id": user_id})
+    if not current_user_data:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+
     # Get only non-None fields for partial update
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
 
@@ -1204,6 +1225,27 @@ async def update_user(user_id: str, data: AdminUserUpdate, current_user: dict = 
         existing = await db.users.find_one({"email": update_data['email'], "id": {"$ne": user_id}})
         if existing:
             raise HTTPException(status_code=400, detail="Cet email est déjà utilisé")
+
+    # Synchronize clubs if this is a technical director and club_ids changed
+    if 'club_ids' in update_data and current_user_data.get('role') == 'directeur_technique':
+        old_club_ids = set(current_user_data.get('club_ids', []))
+        new_club_ids = set(update_data['club_ids'])
+        
+        # Remove director from clubs no longer assigned
+        removed_clubs = old_club_ids - new_club_ids
+        for club_id in removed_clubs:
+            await db.clubs.update_one(
+                {"id": club_id},
+                {"$pull": {"technical_director_ids": user_id}}
+            )
+        
+        # Add director to newly assigned clubs
+        added_clubs = new_club_ids - old_club_ids
+        for club_id in added_clubs:
+            await db.clubs.update_one(
+                {"id": club_id},
+                {"$addToSet": {"technical_director_ids": user_id}}
+            )
 
     result = await db.users.update_one(
         {"id": user_id},
@@ -2869,23 +2911,27 @@ async def get_forum_topics(forum_id: str, current_user: dict = Depends(get_curre
 @api_router.post("/forums/{forum_id}/topics")
 async def create_topic(forum_id: str, data: TopicCreate, current_user: dict = Depends(get_current_user)):
     """Create a new topic in a forum"""
-    topic = {
-        "id": str(uuid.uuid4()),
-        "forum_id": forum_id,
-        "title": data.title,
-        "description": data.description,
-        "author_id": current_user["id"],
-        "author_name": current_user.get("full_name", "Utilisateur"),
-        "author_photo": current_user.get("photo_url"),
-        "is_pinned": data.is_pinned,
-        "is_locked": data.is_locked,
-        "view_count": 0,
-        "message_count": 0,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "last_activity": datetime.now(timezone.utc).isoformat()
-    }
-    await db.forum_topics.insert_one(topic)
-    return topic
+    try:
+        topic = {
+            "id": str(uuid.uuid4()),
+            "forum_id": forum_id,
+            "title": data.title,
+            "description": data.description or "",
+            "author_id": current_user.get("id", ""),
+            "author_name": current_user.get("full_name") or current_user.get("name") or "Utilisateur",
+            "author_photo": current_user.get("photo_url"),
+            "is_pinned": data.is_pinned if data.is_pinned is not None else False,
+            "is_locked": data.is_locked if data.is_locked is not None else False,
+            "view_count": 0,
+            "message_count": 0,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "last_activity": datetime.now(timezone.utc).isoformat()
+        }
+        await db.forum_topics.insert_one(topic)
+        return topic
+    except Exception as e:
+        print(f"Error creating topic: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.put("/forums/topics/{topic_id}")
 async def update_topic(topic_id: str, data: TopicUpdate, current_user: dict = Depends(get_current_user)):

@@ -14,7 +14,7 @@ import { useAuth } from '../context/AuthContext';
 
 const TechnicalDirectorsPage = () => {
   const { user: currentUser } = useAuth();
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'fondateur';
+  const isAdmin = currentUser?.role === 'admin';
   const [directors, setDirectors] = useState([]);
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,10 +64,13 @@ const TechnicalDirectorsPage = () => {
     try {
       const response = await api.get('/clubs');
       const data = response.data || response;
-      setClubs(Array.isArray(data) ? data : []);
+      const clubsList = Array.isArray(data) ? data : [];
+      console.log('Clubs chargés:', clubsList.length, clubsList);
+      setClubs(clubsList);
     } catch (error) {
       console.error('Error fetching clubs:', error);
       setClubs([]);
+      toast.error('Erreur lors du chargement des clubs');
     }
   };
 
@@ -179,6 +182,9 @@ const TechnicalDirectorsPage = () => {
         ...formData,
         role: 'directeur_technique',
       };
+
+      console.log('Payload envoyé:', payload);
+      console.log('Clubs sélectionnés:', payload.club_ids);
 
       if (editingDirector) {
         await api.put(`/admin/users/${editingDirector.id}`, payload);
@@ -537,25 +543,29 @@ const TechnicalDirectorsPage = () => {
               {/* Clubs */}
               <div>
                 <Label className="text-text-secondary">Clubs à gérer</Label>
-                <div className="mt-2 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-background rounded-lg border border-white/10">
-                  {clubs.map(club => (
-                    <label key={club.id} className="flex items-center gap-2 text-sm cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.club_ids.includes(club.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData(prev => ({ ...prev, club_ids: [...prev.club_ids, club.id] }));
-                          } else {
-                            setFormData(prev => ({ ...prev, club_ids: prev.club_ids.filter(id => id !== club.id) }));
-                          }
-                        }}
-                        className="rounded border-white/20"
-                      />
-                      <span className="text-text-secondary">{club.name}</span>
-                    </label>
-                  ))}
-                </div>
+                {clubs.length === 0 ? (
+                  <p className="text-xs text-text-muted mt-2">Aucun club disponible. Créez d'abord des clubs.</p>
+                ) : (
+                  <div className="mt-2 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-background rounded-lg border border-white/10">
+                    {clubs.map(club => (
+                      <label key={club.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white/5 p-1 rounded">
+                        <input
+                          type="checkbox"
+                          checked={formData.club_ids.includes(club.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData(prev => ({ ...prev, club_ids: [...prev.club_ids, club.id] }));
+                            } else {
+                              setFormData(prev => ({ ...prev, club_ids: prev.club_ids.filter(id => id !== club.id) }));
+                            }
+                          }}
+                          className="rounded border-white/20"
+                        />
+                        <span className="text-text-secondary">{club.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Buttons */}

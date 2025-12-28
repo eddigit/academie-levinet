@@ -53,7 +53,8 @@ const AdminForumsPage = () => {
         api.get('/forums/stats')
       ]);
       setForums(forumsRes.data);
-      setAllUsers(usersRes.data);
+      // L'API retourne { users: [...], total: N }
+      setAllUsers(usersRes.data?.users || usersRes.data || []);
       setStats(statsRes.data);
     } catch (error) {
       console.error('Error fetching forums:', error);
@@ -820,12 +821,15 @@ const TopicModal = ({ topic, forumId, onClose, onSave }) => {
 };
 
 // Participants Modal Component
-const ParticipantsModal = ({ forum, allUsers, onClose, onSave }) => {
+const ParticipantsModal = ({ forum, allUsers = [], onClose, onSave }) => {
   const [participants, setParticipants] = useState(forum.participants || []);
   const [searchQuery, setSearchQuery] = useState('');
   const [saving, setSaving] = useState(false);
 
-  const filteredUsers = allUsers.filter(u => 
+  // Protection: s'assurer que allUsers est un tableau
+  const usersArray = Array.isArray(allUsers) ? allUsers : [];
+
+  const filteredUsers = usersArray.filter(u => 
     !participants.includes(u.id) &&
     (u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
      u.email?.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -853,7 +857,7 @@ const ParticipantsModal = ({ forum, allUsers, onClose, onSave }) => {
     }
   };
 
-  const participantUsers = allUsers.filter(u => participants.includes(u.id));
+  const participantUsers = usersArray.filter(u => participants.includes(u.id));
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

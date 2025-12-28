@@ -97,6 +97,12 @@ h1.font-oswald, h2.font-oswald, h3.font-oswald, h4.font-oswald {
     border-right: 1px solid rgba(255, 255, 255, 0.05);
   }
   
+  .glassmorphism-header {
+    backdrop-filter: blur(12px);
+    background: rgba(11, 17, 32, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
   /* Mobile drawer */
   .mobile-drawer {
     backdrop-filter: blur(20px);

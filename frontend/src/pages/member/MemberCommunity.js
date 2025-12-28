@@ -194,7 +194,7 @@ const MemberCommunity = () => {
 
             {activeTab === 'members' && (
               <div className="bg-paper rounded-xl border border-white/5 p-6">
-                <h3 className="font-oswald text-xl text-text-primary uppercase mb-4">Membres de l'Academie</h3>
+                <h3 className="font-oswald text-xl text-text-primary uppercase mb-4">Membres de l'Académie</h3>
                 <div className="space-y-3">
                   {communityMembers.map((member, idx) => (
                     <div key={idx} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">

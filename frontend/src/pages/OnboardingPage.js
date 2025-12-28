@@ -243,7 +243,7 @@ const OnboardingPage = () => {
     'Vos motivations', 
     'Mode de formation',
     'Créer votre compte',
-    'Devenir Membre'
+    'Devenir Élève'
   ];
 
   // Pending confirmation screen
@@ -297,7 +297,7 @@ const OnboardingPage = () => {
               />
             </Link>
             <h1 className="font-oswald text-3xl font-bold text-text-primary uppercase tracking-wide mb-2">
-              Membre Existant
+              Élève Existant
             </h1>
             <p className="text-text-secondary font-manrope text-sm">
               Complétez vos informations pour activer votre accès
@@ -596,7 +596,7 @@ const OnboardingPage = () => {
                 Créez votre compte
               </h2>
               <p className="text-text-secondary font-manrope text-center mb-6 text-sm">
-                Vos informations pour accéder à l'espace membre
+                Vos informations pour accéder à l'espace élève
               </p>
               <div className="max-w-lg mx-auto space-y-4">
                 <div>
@@ -681,10 +681,10 @@ const OnboardingPage = () => {
           {step === 5 && (
             <div className="text-center">
               <h2 className="font-oswald text-2xl font-bold text-text-primary uppercase mb-2">
-                Devenir Membre
+                Devenir Élève
               </h2>
               <p className="text-text-secondary font-manrope mb-8 text-sm">
-                Cotisation membre de l'Académie Jacques Levinet
+                Cotisation élève de l'Académie Jacques Levinet
               </p>
 
               <div className="max-w-md mx-auto">
@@ -692,7 +692,7 @@ const OnboardingPage = () => {
                 <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl border border-primary/30 p-6 mb-6">
                   <div className="flex items-center justify-center gap-2 mb-4">
                     <Shield className="w-8 h-8 text-primary" />
-                    <span className="font-oswald text-xl text-text-primary uppercase">Membre AJL</span>
+                    <span className="font-oswald text-xl text-text-primary uppercase">Élève AJL</span>
                   </div>
                   
                   <div className="text-center mb-6">
@@ -704,7 +704,7 @@ const OnboardingPage = () => {
                   <div className="space-y-3 text-left mb-6">
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="text-text-secondary text-sm">Accès complet à l'espace membre</span>
+                      <span className="text-text-secondary text-sm">Accès complet à l'espace élève</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
@@ -743,9 +743,9 @@ const OnboardingPage = () => {
                         Création du compte...
                       </>
                     ) : (
-                      <>
+                      <>  
                         <CreditCard className="w-5 h-5" />
-                        Devenir membre - 35€
+                        Devenir élève - 35€
                       </>
                     )}
                   </button>
@@ -764,7 +764,7 @@ const OnboardingPage = () => {
                     className="w-full py-3 bg-white/5 hover:bg-white/10 text-text-secondary hover:text-text-primary font-oswald uppercase leading-none tracking-wider rounded-lg flex items-center justify-center gap-2 transition-colors"
                   >
                     <UserCheck className="w-5 h-5" />
-                    Je suis déjà membre
+                    Je suis déjà élève
                   </button>
                   <p className="text-text-muted text-xs mt-2">
                     Vous avez déjà payé votre cotisation en club ? Faites valider votre accès.
@@ -805,7 +805,7 @@ const OnboardingPage = () => {
         {/* Already have account */}
         <div className="text-center mt-6">
           <Link to="/login" className="text-text-muted hover:text-primary text-sm transition-colors">
-            Déjà membre ? <span className="text-primary">Connectez-vous</span>
+            Déjà élève ? <span className="text-primary">Connectez-vous</span>
           </Link>
         </div>
       </div>

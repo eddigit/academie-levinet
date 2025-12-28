@@ -143,13 +143,13 @@ const ClubsPage = () => {
     setIsRoleModalOpen(true);
   };
 
+  // Rôles valides - Nouvelle structure
   const VALID_ROLES = [
-    { value: 'membre', label: 'Membre', color: 'gray' },
+    { value: 'eleve', label: 'Élève', color: 'gray' },
+    { value: 'eleve_libre', label: 'Élève Libre', color: 'green' },
     { value: 'instructeur', label: 'Instructeur', color: 'primary' },
     { value: 'directeur_technique', label: 'Directeur Technique', color: 'accent' },
-    { value: 'directeur_national', label: 'Directeur National', color: 'purple' },
-    { value: 'admin', label: 'Administrateur', color: 'red' },
-    { value: 'fondateur', label: 'Fondateur', color: 'yellow' }
+    { value: 'admin', label: 'Administrateur', color: 'red' }
   ];
 
   const resetForm = () => {
@@ -642,10 +642,9 @@ const ClubsPage = () => {
                         <td className="p-4">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             user.role === 'admin' ? 'bg-red-500/20 text-red-400' :
-                            user.role === 'fondateur' ? 'bg-yellow-500/20 text-yellow-400' :
-                            user.role === 'directeur_national' ? 'bg-purple-500/20 text-purple-400' :
                             user.role === 'directeur_technique' ? 'bg-accent/20 text-accent' :
                             user.role === 'instructeur' ? 'bg-primary/20 text-primary' :
+                            user.role === 'eleve_libre' ? 'bg-green-500/20 text-green-400' :
                             'bg-gray-500/20 text-gray-400'
                           }`}>
                             {VALID_ROLES.find(r => r.value === user.role)?.label || user.role || 'Non défini'}
@@ -654,7 +653,7 @@ const ClubsPage = () => {
                         <td className="p-4">
                           <div className="flex items-center gap-2">
                             <Select
-                              value={user.role || 'membre'}
+                              value={user.role || 'eleve'}
                               onValueChange={(newRole) => updateUserRole(user.id, newRole)}
                               disabled={updatingRole === user.id}
                             >

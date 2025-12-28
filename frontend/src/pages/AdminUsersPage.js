@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Users, UserPlus, Shield, User, Search, Filter, 
-  Trash2, Edit, Mail, Phone, MapPin, Crown, Loader2, Key, Eye, EyeOff, X, Save, Award, Camera, Upload, GraduationCap, Building2
+  Trash2, Edit, Mail, Phone, MapPin, Crown, Loader2, Key, Eye, EyeOff, X, Save, Award, Camera, Upload, GraduationCap, Building2, Globe
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
@@ -23,14 +23,18 @@ const beltGrades = [
   "Ceinture Noire 5ème Dan", "Instructeur", "Directeur Technique", "Directeur National"
 ];
 
-// Rôles unifiés en français
+// Rôles unifiés - Nouvelle structure
+// Admin (3 personnes max) > Directeur Technique > Instructeur > Élève (avec club) > Élève Libre (sans club)
 const roleLabels = {
   'admin': { label: 'Administrateur', icon: Crown, color: 'text-amber-500', bg: 'bg-amber-500/20' },
-  'fondateur': { label: 'Fondateur', icon: Crown, color: 'text-yellow-500', bg: 'bg-yellow-500/20' },
-  'directeur_national': { label: 'Directeur National', icon: Shield, color: 'text-blue-500', bg: 'bg-blue-500/20' },
   'directeur_technique': { label: 'Directeur Technique', icon: Shield, color: 'text-purple-500', bg: 'bg-purple-500/20' },
   'instructeur': { label: 'Instructeur', icon: GraduationCap, color: 'text-red-500', bg: 'bg-red-500/20' },
-  'membre': { label: 'Membre', icon: User, color: 'text-primary', bg: 'bg-primary/20' }
+  'eleve': { label: 'Élève', icon: User, color: 'text-primary', bg: 'bg-primary/20' },
+  'eleve_libre': { label: 'Élève Libre', icon: Globe, color: 'text-green-500', bg: 'bg-green-500/20' },
+  // Compatibilité anciens rôles (redirigent vers les nouveaux)
+  'membre': { label: 'Élève', icon: User, color: 'text-primary', bg: 'bg-primary/20' },
+  'fondateur': { label: 'Administrateur', icon: Crown, color: 'text-amber-500', bg: 'bg-amber-500/20' },
+  'directeur_national': { label: 'Administrateur', icon: Crown, color: 'text-amber-500', bg: 'bg-amber-500/20' }
 };
 
 const AdminUsersPage = () => {
@@ -50,7 +54,7 @@ const AdminUsersPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newUser, setNewUser] = useState({
-    email: '', password: '', full_name: '', role: 'membre', phone: '', city: '',
+    email: '', password: '', full_name: '', role: 'eleve', phone: '', city: '',
     country: 'France', belt_grade: '', send_email: true, club_id: '', instructor_id: '', technical_director_id: ''
   });
   const [newUserPhoto, setNewUserPhoto] = useState(null);
@@ -183,7 +187,7 @@ const AdminUsersPage = () => {
       
       toast.success(`${roleLabels[newUser.role]?.label || 'Utilisateur'} créé avec succès`);
       setIsCreateOpen(false);
-      setNewUser({ email: '', password: '', full_name: '', role: 'membre', phone: '', city: '', country: 'France', belt_grade: '', send_email: true, club_id: '', instructor_id: '', technical_director_id: '' });
+      setNewUser({ email: '', password: '', full_name: '', role: 'eleve', phone: '', city: '', country: 'France', belt_grade: '', send_email: true, club_id: '', instructor_id: '', technical_director_id: '' });
       setNewUserPhoto(null);
       setNewUserPhotoPreview(null);
       fetchUsers();
@@ -284,22 +288,23 @@ const AdminUsersPage = () => {
   };
 
   // Vérifier si l'utilisateur courant est admin
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'fondateur';
+  const isAdmin = currentUser?.role === 'admin';
 
   const getCounts = () => {
     return {
       total: users.length,
-      admin: users.filter(u => u.role === 'admin' || u.role === 'fondateur').length,
+      admin: users.filter(u => u.role === 'admin').length,
       directeur_technique: users.filter(u => u.role === 'directeur_technique').length,
       instructeur: users.filter(u => u.role === 'instructeur').length,
-      membre: users.filter(u => u.role === 'membre').length
+      eleve: users.filter(u => u.role === 'eleve' || u.role === 'membre').length,
+      eleve_libre: users.filter(u => u.role === 'eleve_libre').length
     };
   };
   
   const counts = getCounts();
 
   const getRoleDisplay = (role) => {
-    const config = roleLabels[role] || roleLabels.membre;
+    const config = roleLabels[role] || roleLabels.eleve;
     const Icon = config.icon;
     return (
       <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 w-fit ${config.bg} ${config.color}`}>
@@ -320,7 +325,7 @@ const AdminUsersPage = () => {
               Gestion des Utilisateurs
             </h1>
             <p className="text-text-muted font-manrope mt-1 text-sm md:text-base">
-              {counts.total} utilisateurs • {counts.admin} admin(s) • {counts.instructeur} instructeur(s) • {counts.membre} membre(s)
+              {counts.total} utilisateurs • {counts.admin} admin(s) • {counts.instructeur} instructeur(s) • {counts.eleve} élève(s) • {counts.eleve_libre} élève(s) libre(s)
             </p>
           </div>
           
@@ -410,16 +415,6 @@ const AdminUsersPage = () => {
                             <Crown className="w-4 h-4 text-amber-500" /> Administrateur
                           </div>
                         </SelectItem>
-                        <SelectItem value="fondateur" className="text-text-primary">
-                          <div className="flex items-center gap-2">
-                            <Crown className="w-4 h-4 text-yellow-500" /> Fondateur
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="directeur_national" className="text-text-primary">
-                          <div className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-blue-500" /> Directeur National
-                          </div>
-                        </SelectItem>
                         <SelectItem value="directeur_technique" className="text-text-primary">
                           <div className="flex items-center gap-2">
                             <Shield className="w-4 h-4 text-purple-500" /> Directeur Technique
@@ -430,9 +425,14 @@ const AdminUsersPage = () => {
                             <GraduationCap className="w-4 h-4 text-red-500" /> Instructeur
                           </div>
                         </SelectItem>
-                        <SelectItem value="membre" className="text-text-primary">
+                        <SelectItem value="eleve" className="text-text-primary">
                           <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-primary" /> Membre
+                            <User className="w-4 h-4 text-primary" /> Élève (avec club)
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="eleve_libre" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-green-500" /> Élève Libre (sans club)
                           </div>
                         </SelectItem>
                       </SelectContent>
@@ -440,7 +440,7 @@ const AdminUsersPage = () => {
                   </div>
 
                   {/* Affectations conditionnelles selon le rôle */}
-                  {(newUser.role === 'membre' || newUser.role === 'instructeur') && (
+                  {(newUser.role === 'eleve' || newUser.role === 'instructeur') && (
                     <div className="md:col-span-2">
                       <Label className="text-text-secondary">Club</Label>
                       <Select
@@ -462,7 +462,7 @@ const AdminUsersPage = () => {
                     </div>
                   )}
 
-                  {newUser.role === 'membre' && (
+                  {newUser.role === 'eleve' && (
                     <div className="md:col-span-2">
                       <Label className="text-text-secondary">Instructeur référent</Label>
                       <Select
@@ -908,7 +908,7 @@ const AdminUsersPage = () => {
                 </div>
 
                 {/* Affectations conditionnelles selon le rôle */}
-                {(editingUser.role === 'membre' || editingUser.role === 'instructeur') && (
+                {(editingUser.role === 'eleve' || editingUser.role === 'instructeur') && (
                   <div className="mt-4">
                     <Label className="text-text-secondary">Club</Label>
                     <Select
@@ -930,7 +930,7 @@ const AdminUsersPage = () => {
                   </div>
                 )}
 
-                {editingUser.role === 'membre' && (
+                {editingUser.role === 'eleve' && (
                   <div className="mt-4">
                     <Label className="text-text-secondary">Instructeur référent</Label>
                     <Select

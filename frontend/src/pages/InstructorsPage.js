@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
 import api, { getErrorMessage } from '../utils/api';
 import { countries, getFlag, danGrades, disciplines } from '../utils/countries';
-import { Plus, Edit, Trash2, Search, X, Loader2, Upload, User, MapPin, Award, Building2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Loader2, Upload, User, MapPin, Award, Building2, MessageSquare, Eye } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -12,8 +13,9 @@ import UserAvatar from '../components/UserAvatar';
 import { useAuth } from '../context/AuthContext';
 
 const InstructorsPage = () => {
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'fondateur';
+  const isAdmin = currentUser?.role === 'admin';
   const [instructors, setInstructors] = useState([]);
   const [clubs, setClubs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -207,6 +209,20 @@ const InstructorsPage = () => {
     }
   };
 
+  const handleViewProfile = (instructor) => {
+    navigate(`/members/${instructor.id}`);
+  };
+
+  const handleSendMessage = async (instructor) => {
+    try {
+      const response = await api.post('/conversations', { recipient_id: instructor.id });
+      navigate('/messages', { state: { conversationId: response.data.id } });
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+      toast.error('Erreur lors de la création de la conversation');
+    }
+  };
+
   const filteredInstructors = instructors.filter(i => {
     const matchesSearch = i.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           i.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -237,13 +253,15 @@ const InstructorsPage = () => {
               Instructeurs
             </h1>
             <p className="text-text-secondary font-manrope mt-1 text-sm">
-              {instructors.length} instructeur(s) • Gestion des formateurs
+              {instructors.length} instructeur(s) • Réseau des formateurs AJL
             </p>
           </div>
-          <Button onClick={openAddModal} className="bg-primary hover:bg-primary-dark">
-            <Plus className="w-4 h-4 mr-2" />
-            Nouvel Instructeur
-          </Button>
+          {isAdmin && (
+            <Button onClick={openAddModal} className="bg-primary hover:bg-primary-dark">
+              <Plus className="w-4 h-4 mr-2" />
+              Nouvel Instructeur
+            </Button>
+          )}
         </div>
 
         {/* Filters */}
@@ -321,24 +339,50 @@ const InstructorsPage = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 mt-4 pt-4 border-t border-white/5">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openEditModal(instructor)}
-                  className="flex-1 border-white/10"
-                >
-                  <Edit className="w-4 h-4 mr-1" />
-                  Modifier
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDelete(instructor)}
-                  className="border-secondary/50 text-secondary hover:bg-secondary/10"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+              <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/5">
+                {/* Première ligne : Voir la fiche + Message */}
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleViewProfile(instructor)}
+                    className="flex-1 border-white/10"
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    Voir la fiche
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSendMessage(instructor)}
+                    className="flex-1 border-primary/50 text-primary hover:bg-primary/10"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-1" />
+                    Message
+                  </Button>
+                </div>
+                {/* Deuxième ligne : Actions admin uniquement */}
+                {isAdmin && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openEditModal(instructor)}
+                      className="flex-1 border-white/10"
+                    >
+                      <Edit className="w-4 h-4 mr-1" />
+                      Modifier
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(instructor)}
+                      className="border-secondary/50 text-secondary hover:bg-secondary/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -352,8 +396,8 @@ const InstructorsPage = () => {
         )}
       </div>
 
-      {/* Modal */}
-      {isModalOpen && (
+      {/* Modal - Admin only */}
+      {isModalOpen && isAdmin && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-paper rounded-xl border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b border-white/10 flex justify-between items-center">

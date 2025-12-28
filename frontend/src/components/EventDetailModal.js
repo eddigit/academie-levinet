@@ -43,7 +43,7 @@ const EventDetailModal = ({ event, isOpen, onClose, currentUser, onUpdate }) => 
     setRegistering(true);
     try {
       await api.post(`/events/${event.id}/register`);
-      toast.success('Inscription confirmee !');
+      toast.success('Inscription confirmée !');
       setIsRegistered(true);
       fetchParticipants();
       onUpdate && onUpdate();
@@ -55,17 +55,17 @@ const EventDetailModal = ({ event, isOpen, onClose, currentUser, onUpdate }) => 
   };
 
   const handleUnregister = async () => {
-    if (!window.confirm('Voulez-vous vraiment vous desinscrire de cet evenement ?')) return;
+    if (!window.confirm('Voulez-vous vraiment vous désinscrire de cet événement ?')) return;
 
     setRegistering(true);
     try {
       await api.delete(`/events/${event.id}/register`);
-      toast.success('Desinscription confirmee');
+      toast.success('Désinscription confirmée');
       setIsRegistered(false);
       fetchParticipants();
       onUpdate && onUpdate();
     } catch (error) {
-      toast.error('Erreur lors de la desinscription');
+      toast.error('Erreur lors de la désinscription');
     }
     setRegistering(false);
   };
@@ -240,7 +240,7 @@ const EventDetailModal = ({ event, isOpen, onClose, currentUser, onUpdate }) => 
                 <div className="flex items-center gap-3">
                   <div className="flex-1 flex items-center gap-2 text-green-500">
                     <Check className="w-5 h-5" />
-                    <span className="font-medium">Vous etes inscrit(e)</span>
+                    <span className="font-medium">Vous êtes inscrit(e)</span>
                   </div>
                   <Button
                     onClick={handleUnregister}
@@ -267,7 +267,7 @@ const EventDetailModal = ({ event, isOpen, onClose, currentUser, onUpdate }) => 
                   ) : isFull ? (
                     <>Complet</>
                   ) : (
-                    <><UserPlus className="w-4 h-4 mr-2" /> S'inscrire a cet evenement</>
+                    <><UserPlus className="w-4 h-4 mr-2" /> S'inscrire à cet événement</>
                   )}
                 </Button>
               )}

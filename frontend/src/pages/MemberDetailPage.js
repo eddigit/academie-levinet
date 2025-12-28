@@ -47,14 +47,17 @@ const membershipTypes = ['Standard', 'Premium', 'VIP', 'Instructeur', 'Directeur
 // Membership statuses
 const membershipStatuses = ['Actif', 'Inactif', 'Suspendu', 'Expiré'];
 
-// Rôle labels
+// Rôle labels - Nouvelle structure
 const roleLabels = {
   'admin': 'Administrateur',
-  'fondateur': 'Fondateur',
-  'directeur_national': 'Directeur National',
   'directeur_technique': 'Directeur Technique',
   'instructeur': 'Instructeur',
-  'membre': 'Membre'
+  'eleve': 'Élève',
+  'eleve_libre': 'Élève Libre',
+  // Compatibilité anciens rôles
+  'membre': 'Élève',
+  'fondateur': 'Administrateur',
+  'directeur_national': 'Administrateur'
 };
 
 const MemberDetailPage = () => {
@@ -66,7 +69,7 @@ const MemberDetailPage = () => {
   const [startingConversation, setStartingConversation] = useState(false);
 
   // Vérifier si l'utilisateur courant est admin
-  const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'fondateur';
+  const isAdmin = currentUser?.role === 'admin';
 
   // Listes pour les affectations
   const [clubs, setClubs] = useState([]);
@@ -505,7 +508,7 @@ const MemberDetailPage = () => {
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(member.role === 'membre' || member.role === 'instructeur') && (
+                {(member.role === 'eleve' || member.role === 'membre' || member.role === 'instructeur') && (
                   <div className="space-y-1">
                     <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Club</p>
                     <p className="text-lg text-text-primary font-manrope">
@@ -514,11 +517,20 @@ const MemberDetailPage = () => {
                   </div>
                 )}
 
-                {member.role === 'membre' && (
+                {(member.role === 'eleve' || member.role === 'membre') && (
                   <div className="space-y-1">
                     <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Instructeur référent</p>
                     <p className="text-lg text-text-primary font-manrope">
                       {member.instructor_id ? getUserName(member.instructor_id, instructors) : 'Non assigné'}
+                    </p>
+                  </div>
+                )}
+
+                {member.role === 'eleve_libre' && (
+                  <div className="space-y-1 md:col-span-2">
+                    <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Type d'inscription</p>
+                    <p className="text-lg text-text-primary font-manrope">
+                      Élève Libre - Accès e-learning
                     </p>
                   </div>
                 )}
@@ -541,7 +553,7 @@ const MemberDetailPage = () => {
                   </div>
                 )}
 
-                {(member.role === 'admin' || member.role === 'fondateur') && (
+                {member.role === 'admin' && (
                   <div className="space-y-1 md:col-span-2">
                     <p className="text-xs text-text-muted font-manrope uppercase tracking-wide">Accès</p>
                     <p className="text-lg text-text-primary font-manrope">
@@ -827,16 +839,15 @@ const MemberDetailPage = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="admin">Administrateur</SelectItem>
-                        <SelectItem value="fondateur">Fondateur</SelectItem>
-                        <SelectItem value="directeur_national">Directeur National</SelectItem>
                         <SelectItem value="directeur_technique">Directeur Technique</SelectItem>
                         <SelectItem value="instructeur">Instructeur</SelectItem>
-                        <SelectItem value="membre">Membre</SelectItem>
+                        <SelectItem value="eleve">Élève (avec club)</SelectItem>
+                        <SelectItem value="eleve_libre">Élève Libre (sans club)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {(editForm.role === 'membre' || editForm.role === 'instructeur') && (
+                  {(editForm.role === 'eleve' || editForm.role === 'membre' || editForm.role === 'instructeur') && (
                     <div className="space-y-2">
                       <Label className="text-text-secondary">Club</Label>
                       <Select
@@ -858,7 +869,7 @@ const MemberDetailPage = () => {
                     </div>
                   )}
 
-                  {editForm.role === 'membre' && (
+                  {(editForm.role === 'eleve' || editForm.role === 'membre') && (
                     <div className="space-y-2">
                       <Label className="text-text-secondary">Instructeur référent</Label>
                       <Select

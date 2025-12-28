@@ -6,8 +6,9 @@ import { formatFullName } from '../lib/utils';
 import {
   Heart, MessageCircle, Send, MoreHorizontal, Trash2,
   Flame, ThumbsUp, Award, Users, TrendingUp, Clock,
-  Image as ImageIcon, Video, Smile, X, ChevronDown, ChevronUp
+  Image as ImageIcon, Video, Smile, X, ChevronDown, ChevronUp, Crown
 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const REACTION_ICONS = {
   like: { icon: ThumbsUp, color: 'text-blue-500', label: 'J\'aime' },
@@ -273,9 +274,19 @@ const CreatePost = ({ onPostCreated }) => {
                   <button type="button" className="p-2 text-text-muted hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
                     <ImageIcon className="w-5 h-5" />
                   </button>
-                  <button type="button" className="p-2 text-text-muted hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
-                    <Video className="w-5 h-5" />
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="p-2 text-text-muted hover:text-amber-500 hover:bg-amber-500/10 rounded-lg transition-colors relative group">
+                          <Video className="w-5 h-5" />
+                          <Crown className="w-3 h-3 text-amber-500 absolute -top-1 -right-1" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent className="bg-amber-500 text-white">
+                        <p>Fonctionnalité Premium AJL</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                   <button type="button" className="p-2 text-text-muted hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
                     <Smile className="w-5 h-5" />
                   </button>

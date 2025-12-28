@@ -96,7 +96,7 @@ export const api = {
     const userData = {
       ...data,
       full_name: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
-      role: 'membre'
+      role: 'eleve'  // Nouveau rôle pour les élèves avec club
     };
     const response = await axios.post(`${API}/admin/users`, userData, {
       headers: getAuthHeader()
@@ -206,6 +206,14 @@ export const api = {
       headers: getAuthHeader()
     });
     return response.data;
+  },
+
+  // Forums
+  getForums: async () => {
+    const response = await axios.get(`${API}/forums`, {
+      headers: getAuthHeader()
+    });
+    return response.data?.forums || response.data || [];
   },
 };
 

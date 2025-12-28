@@ -5,7 +5,7 @@ import api, { getErrorMessage } from '../utils/api';
 import {
   User, Mail, Phone, MapPin, Calendar, Award, Edit, Camera,
   Save, X, Loader2, Lock, Check, Home, Users, Upload, Link,
-  Shield, Crown, GraduationCap, Building2
+  Shield, Crown, GraduationCap, Building2, Globe
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -32,13 +32,17 @@ const beltGrades = [
   "Ceinture Noire 5ème Dan"
 ];
 
+// Rôles: admin > directeur_technique > instructeur > eleve (avec club) > eleve_libre (sans club)
 const roleLabels = {
   'admin': { label: 'Administrateur', icon: Crown, color: 'text-amber-500', bg: 'bg-amber-500/20' },
-  'fondateur': { label: 'Fondateur', icon: Crown, color: 'text-yellow-500', bg: 'bg-yellow-500/20' },
-  'directeur_national': { label: 'Directeur National', icon: Shield, color: 'text-blue-500', bg: 'bg-blue-500/20' },
   'directeur_technique': { label: 'Directeur Technique', icon: Shield, color: 'text-purple-500', bg: 'bg-purple-500/20' },
   'instructeur': { label: 'Instructeur', icon: GraduationCap, color: 'text-red-500', bg: 'bg-red-500/20' },
-  'membre': { label: 'Membre', icon: User, color: 'text-primary', bg: 'bg-primary/20' }
+  'eleve': { label: 'Élève', icon: User, color: 'text-primary', bg: 'bg-primary/20' },
+  'eleve_libre': { label: 'Élève Libre', icon: Globe, color: 'text-green-500', bg: 'bg-green-500/20' },
+  // Compatibilité anciens rôles
+  'membre': { label: 'Élève', icon: User, color: 'text-primary', bg: 'bg-primary/20' },
+  'fondateur': { label: 'Administrateur', icon: Crown, color: 'text-amber-500', bg: 'bg-amber-500/20' },
+  'directeur_national': { label: 'Administrateur', icon: Crown, color: 'text-amber-500', bg: 'bg-amber-500/20' }
 };
 
 const ProfilePage = () => {

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserCog, CreditCard, LogOut, UserPlus,
   Newspaper, Calendar, MessageSquare, Shield, ShoppingBag, UserCheck,
   Settings, Bot, Receipt, Globe, Building2, X, Menu, Home, User, BarChart3,
-  ChevronDown, UserCircle, Handshake, MessageCircle
+  Handshake, MessageCircle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
@@ -12,28 +12,14 @@ import { formatFullName, getInitials } from '../lib/utils';
 
 const Sidebar = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { logout, user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const userMenuRef = useRef(null);
 
   useEffect(() => {
     fetchUnreadCount();
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
-  }, []);
-
-  // Close user menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setIsUserMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Close mobile menu on route change
@@ -62,16 +48,22 @@ const Sidebar = () => {
     }
   };
 
-  const menuItems = [
+  // General items visible to all roles
+  const generalItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Tableau de Bord', testId: 'nav-dashboard' },
     { path: '/messages', icon: MessageSquare, label: 'Messagerie', testId: 'nav-messages', badge: unreadCount },
+  ];
+
+  // Vie de l'Académie - organizational structure
+  const academyLifeItems = [
     { path: '/news', icon: Newspaper, label: 'News', testId: 'nav-news' },
     { path: '/events', icon: Calendar, label: 'Événements', testId: 'nav-events' },
-    { path: '/leads', icon: UserPlus, label: 'Leads', testId: 'nav-leads' },
-    { path: '/members', icon: Users, label: 'Membres', testId: 'nav-members' },
+    { path: '/admin/forums', icon: MessageCircle, label: 'Forums', testId: 'nav-forums' },
     { path: '/clubs', icon: Building2, label: 'Clubs', testId: 'nav-clubs' },
     { path: '/technical-directors', icon: UserCog, label: 'Directeurs Tech.', testId: 'nav-directors' },
     { path: '/instructors', icon: User, label: 'Instructeurs', testId: 'nav-instructors' },
+    { path: '/members', icon: Users, label: 'Élèves', testId: 'nav-members' },
+    { path: '/online-students', icon: Globe, label: 'Élèves Libres', testId: 'nav-online-students' },
     { path: '/subscriptions', icon: CreditCard, label: 'Cotisations', testId: 'nav-subscriptions' },
     { path: '/shop', icon: ShoppingBag, label: 'Boutique AJL', testId: 'nav-shop' },
   ];
@@ -79,7 +71,7 @@ const Sidebar = () => {
   const adminItems = [
     { path: '/admin/stats', icon: BarChart3, label: 'Statistiques', testId: 'nav-stats' },
     { path: '/admin/partners', icon: Handshake, label: 'Partenaires', testId: 'nav-partners' },
-    { path: '/admin/forums', icon: MessageCircle, label: 'Forums', testId: 'nav-forums' },
+    { path: '/leads', icon: UserPlus, label: 'Leads', testId: 'nav-leads' },
     { path: '/admin/pending-members', icon: UserCheck, label: 'Validations', testId: 'nav-pending', highlight: true },
     { path: '/admin/users', icon: Users, label: 'Utilisateurs', testId: 'nav-users' },
     { path: '/admin/subscriptions', icon: Receipt, label: 'Cotisations', testId: 'nav-admin-subs' },
@@ -95,7 +87,7 @@ const Sidebar = () => {
     { path: '/dashboard', icon: Home, label: 'Accueil' },
     { path: '/messages', icon: MessageSquare, label: 'Messages', badge: unreadCount },
     { path: '/events', icon: Calendar, label: 'Événements' },
-    { path: '/members', icon: Users, label: 'Membres' },
+    { path: '/members', icon: Users, label: 'Élèves' },
   ];
 
   const NavLink = ({ item, onClick }) => {
@@ -146,7 +138,16 @@ const Sidebar = () => {
       </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin scroll-touch" data-testid="sidebar-nav">
-        {menuItems.map((item) => (
+        {/* General navigation */}
+        {generalItems.map((item) => (
+          <NavLink key={item.path} item={item} />
+        ))}
+
+        {/* Vie de l'Académie section */}
+        <div className="pt-4 mt-4 border-t border-white/5">
+          <p className="px-4 text-xs font-oswald text-text-muted uppercase tracking-wider mb-2">Vie de l'Académie</p>
+        </div>
+        {academyLifeItems.map((item) => (
           <NavLink key={item.path} item={item} />
         ))}
 
@@ -161,74 +162,6 @@ const Sidebar = () => {
           </>
         )}
       </nav>
-
-      {/* User Profile Section */}
-      <div className="p-4 border-t border-white/5 flex-shrink-0" ref={userMenuRef}>
-        <div className="relative">
-          <button
-            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/5 transition-all"
-            data-testid="user-menu-toggle"
-          >
-            {/* Avatar */}
-            {user?.photo_url ? (
-              <img
-                src={user.photo_url}
-                alt={formatFullName(user.full_name || user.name)}
-                className="w-10 h-10 rounded-full object-cover border-2 border-primary/30"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border-2 border-primary/30">
-                <span className="font-oswald text-sm text-primary font-bold">
-                  {getInitials(user?.full_name || user?.name || user?.email || 'U')}
-                </span>
-              </div>
-            )}
-            <div className="flex-1 text-left min-w-0">
-              <p className="text-sm font-medium text-text-primary truncate">
-                {formatFullName(user?.full_name || user?.name) || 'Utilisateur'}
-              </p>
-              <p className="text-xs text-text-muted truncate">{user?.email}</p>
-            </div>
-            <ChevronDown className={`w-4 h-4 text-text-muted transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {/* Dropdown Menu */}
-          {isUserMenuOpen && (
-            <div className="absolute bottom-full left-0 right-0 mb-2 bg-paper border border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
-              <Link
-                to="/profile"
-                onClick={() => setIsUserMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5 transition-all"
-              >
-                <UserCircle className="w-5 h-5" strokeWidth={1.5} />
-                <span>Mon compte</span>
-              </Link>
-              <Link
-                to="/admin/settings"
-                onClick={() => setIsUserMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5 transition-all"
-              >
-                <Settings className="w-5 h-5" strokeWidth={1.5} />
-                <span>Paramètres</span>
-              </Link>
-              <div className="border-t border-white/5">
-                <button
-                  onClick={() => {
-                    setIsUserMenuOpen(false);
-                    logout();
-                  }}
-                  data-testid="logout-button"
-                  className="flex items-center gap-3 px-4 py-3 text-sm text-secondary hover:bg-secondary/10 w-full transition-all"
-                >
-                  <LogOut className="w-5 h-5" strokeWidth={1.5} />
-                  <span>Déconnexion</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
     </aside>
   );
 
@@ -326,7 +259,16 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto scroll-touch" style={{ maxHeight: 'calc(100vh - 180px)' }}>
-          {menuItems.map((item) => (
+          {/* General navigation */}
+          {generalItems.map((item) => (
+            <NavLink key={item.path} item={item} onClick={() => setIsMobileMenuOpen(false)} />
+          ))}
+
+          {/* Vie de l'Académie section */}
+          <div className="pt-4 mt-4 border-t border-white/10">
+            <p className="px-4 text-xs font-oswald text-text-muted uppercase tracking-wider mb-2">Vie de l'Académie</p>
+          </div>
+          {academyLifeItems.map((item) => (
             <NavLink key={item.path} item={item} onClick={() => setIsMobileMenuOpen(false)} />
           ))}
 
