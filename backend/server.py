@@ -2029,6 +2029,7 @@ async def search_users(q: str = "", current_user: dict = Depends(get_current_use
             "id": u['id'],
             "name": u['full_name'],
             "email": u['email'],
+            "photo_url": u.get('photo_url'),
             "type": "Admin"
         })
     
@@ -2047,6 +2048,7 @@ async def search_users(q: str = "", current_user: dict = Depends(get_current_use
                 "id": m['id'],
                 "name": f"{m['first_name']} {m['last_name']}",
                 "email": m['email'],
+                "photo_url": m.get('photo_url'),
                 "type": "Membre"
             })
     
@@ -2064,6 +2066,7 @@ async def search_users(q: str = "", current_user: dict = Depends(get_current_use
                 "id": d['id'],
                 "name": d['name'],
                 "email": d['email'],
+                "photo_url": d.get('photo_url'),
                 "type": "Directeur Technique"
             })
     
@@ -2094,10 +2097,18 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
         })
         conv['unread_count'] = unread_count
         
-        # Get the other participant's name
+        # Get the other participant's info
         other_participant_idx = 1 if conv['participants'][0] == current_user['id'] else 0
+        other_participant_id = conv['participants'][other_participant_idx] if len(conv['participants']) > other_participant_idx else None
         conv['other_participant_name'] = conv['participant_names'][other_participant_idx] if len(conv['participant_names']) > other_participant_idx else "Utilisateur"
-        conv['other_participant_id'] = conv['participants'][other_participant_idx] if len(conv['participants']) > other_participant_idx else None
+        conv['other_participant_id'] = other_participant_id
+        
+        # Get other participant's photo
+        if other_participant_id:
+            other_user = await db.users.find_one({"id": other_participant_id}, {"_id": 0, "photo_url": 1})
+            conv['other_participant_photo'] = other_user.get('photo_url') if other_user else None
+        else:
+            conv['other_participant_photo'] = None
     
     return conversations
 
