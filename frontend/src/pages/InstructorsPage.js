@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
 import api, { getErrorMessage } from '../utils/api';
 import { countries, getFlag, danGrades, disciplines } from '../utils/countries';
-import { Plus, Edit, Trash2, Search, X, Loader2, Upload, User, MapPin, Award, Building2, MessageSquare, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Loader2, Upload, User, MapPin, Award, Building2, MessageSquare, Eye, Info, Settings } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -257,12 +257,31 @@ const InstructorsPage = () => {
             </p>
           </div>
           {isAdmin && (
-            <Button onClick={openAddModal} className="bg-primary hover:bg-primary-dark">
-              <Plus className="w-4 h-4 mr-2" />
-              Nouvel Instructeur
+            <Button onClick={() => navigate('/admin/users')} className="bg-primary hover:bg-primary-dark">
+              <Settings className="w-4 h-4 mr-2" />
+              Gérer les utilisateurs
             </Button>
           )}
         </div>
+
+        {/* Info message for admins */}
+        {isAdmin && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-blue-300 font-medium">Gestion centralisée des utilisateurs</p>
+              <p className="text-blue-300/70 mt-1">
+                Pour ajouter, modifier ou supprimer un instructeur, rendez-vous dans la section{' '}
+                <button 
+                  onClick={() => navigate('/admin/users')} 
+                  className="text-blue-400 hover:text-blue-300 underline font-medium"
+                >
+                  Gestion des Utilisateurs
+                </button>.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
@@ -340,7 +359,7 @@ const InstructorsPage = () => {
 
               {/* Actions */}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/5">
-                {/* Première ligne : Voir la fiche + Message */}
+                {/* Voir la fiche + Message */}
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -361,28 +380,6 @@ const InstructorsPage = () => {
                     Message
                   </Button>
                 </div>
-                {/* Deuxième ligne : Actions admin uniquement */}
-                {isAdmin && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditModal(instructor)}
-                      className="flex-1 border-white/10"
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Modifier
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(instructor)}
-                      className="border-secondary/50 text-secondary hover:bg-secondary/10"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
           ))}
@@ -395,161 +392,6 @@ const InstructorsPage = () => {
           </div>
         )}
       </div>
-
-      {/* Modal - Admin only */}
-      {isModalOpen && isAdmin && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-paper rounded-xl border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-hidden">
-            <div className="p-6 border-b border-white/10 flex justify-between items-center">
-              <h2 className="font-oswald text-xl text-text-primary uppercase">
-                {editingInstructor ? 'Modifier l\'Instructeur' : 'Nouvel Instructeur'}
-              </h2>
-              <button onClick={closeModal} className="text-text-muted hover:text-text-primary">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-140px)]">
-              {/* Photo */}
-              <div className="flex items-center gap-4">
-                <UserAvatar
-                  user={{ full_name: formData.full_name, photo_url: formData.photo_url }}
-                  size="xl"
-                />
-                <div>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handlePhotoUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="border-white/10"
-                  >
-                    {uploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Upload className="w-4 h-4 mr-2" />}
-                    {uploading ? 'Upload...' : 'Changer la photo'}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Name & Email */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-text-secondary">Nom complet *</Label>
-                  <Input
-                    value={formData.full_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
-                    required
-                    className="mt-1 bg-background border-white/10"
-                  />
-                </div>
-                <div>
-                  <Label className="text-text-secondary">Email *</Label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    required
-                    className="mt-1 bg-background border-white/10"
-                  />
-                </div>
-              </div>
-
-              {/* Phone & City */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-text-secondary">Téléphone</Label>
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="mt-1 bg-background border-white/10"
-                  />
-                </div>
-                <div>
-                  <Label className="text-text-secondary">Ville</Label>
-                  <Input
-                    value={formData.city}
-                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                    className="mt-1 bg-background border-white/10"
-                  />
-                </div>
-              </div>
-
-              {/* Country & Dan */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-text-secondary">Pays</Label>
-                  <Select value={formData.country_code} onValueChange={handleCountryChange}>
-                    <SelectTrigger className="mt-1 bg-background border-white/10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-paper border-white/10 max-h-60">
-                      {countries.map(c => (
-                        <SelectItem key={c.code} value={c.code}>
-                          {c.flag} {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-text-secondary">Grade Dan</Label>
-                  <Select value={formData.dan_grade} onValueChange={(v) => setFormData(prev => ({ ...prev, dan_grade: v }))}>
-                    <SelectTrigger className="mt-1 bg-background border-white/10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-paper border-white/10">
-                      {danGrades.map(d => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Clubs */}
-              <div>
-                <Label className="text-text-secondary">Clubs associés</Label>
-                <div className="mt-2 grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-background rounded-lg border border-white/10">
-                  {clubs.map(club => (
-                    <label key={club.id} className="flex items-center gap-2 text-sm cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.club_ids.includes(club.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData(prev => ({ ...prev, club_ids: [...prev.club_ids, club.id] }));
-                          } else {
-                            setFormData(prev => ({ ...prev, club_ids: prev.club_ids.filter(id => id !== club.id) }));
-                          }
-                        }}
-                        className="rounded border-white/20"
-                      />
-                      <span className="text-text-secondary">{club.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={closeModal} className="flex-1 border-white/10">
-                  Annuler
-                </Button>
-                <Button type="submit" disabled={saving} className="flex-1 bg-primary hover:bg-primary-dark">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  {editingInstructor ? 'Mettre à jour' : 'Créer'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </DashboardLayout>
   );
 };

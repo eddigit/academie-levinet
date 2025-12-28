@@ -2,6 +2,21 @@
 # =============================================
 # Ce fichier est lu automatiquement par Claude/Cursor/Windsurf
 
+## ⚠️ CONFIGURATION CRITIQUE - NE JAMAIS TOUCHER
+
+```
+frontend/.env:
+  REACT_APP_BACKEND_URL=   ← DOIT ÊTRE VIDE (URLs relatives)
+  
+backend/.env:
+  Port local: 8000
+  CORS_ORIGINS=*
+```
+
+**⛔ SI CES VALEURS SONT MODIFIÉES, LE LOGIN NE FONCTIONNERA PLUS !**
+
+---
+
 ## RÈGLES DU PROJET ACADÉMIE LEVINET
 
 ### Démarrage Local
@@ -13,6 +28,7 @@
 ### Rebuild Frontend
 ```powershell
 cd frontend
+Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
 npm run build
 cd ..
 .\start.ps1
@@ -28,7 +44,8 @@ cd ..
 2. NE PAS créer de nouveaux scripts de démarrage
 3. NE PAS créer de nouveaux fichiers de doc à la racine
 4. NE PAS proposer de "nouvelle architecture"
-5. NE PAS modifier ce fichier
+5. NE PAS modifier frontend/.env ou backend/.env
+6. NE PAS changer REACT_APP_BACKEND_URL (doit rester VIDE)
 
 ### Infos Officielles
 - Tél: +33698070851

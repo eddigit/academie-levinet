@@ -12,6 +12,7 @@ import TechnicalDirectorsPage from './pages/TechnicalDirectorsPage';
 import InstructorsPage from './pages/InstructorsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import LeadsPage from './pages/LeadsPage';
+import TasksPage from './pages/TasksPage';
 import NewsPage from './pages/NewsPage';
 import EventsPage from './pages/EventsPage';
 // New public pages
@@ -143,6 +144,7 @@ const AppContent = () => {
         <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
         <Route path="/shop" element={<ProtectedRoute><DashboardShopPage /></ProtectedRoute>} />
         <Route path="/leads" element={<ProtectedRoute><LeadsPage /></ProtectedRoute>} />
+        <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
         <Route path="/news" element={<ProtectedRoute><NewsPage /></ProtectedRoute>} />
         <Route path="/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
         <Route path="/admin/products" element={<ProtectedRoute><AdminProductsPage /></ProtectedRoute>} />

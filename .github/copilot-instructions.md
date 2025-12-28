@@ -16,6 +16,18 @@
 - PAS de nouveaux fichiers à la racine
 - PAS de nouveaux scripts de démarrage
 
+### ⚠️ CONFIGURATION CRITIQUE - NE JAMAIS TOUCHER
+```
+frontend/.env:
+  REACT_APP_BACKEND_URL=   ← DOIT ÊTRE VIDE (URLs relatives)
+  
+backend/.env:
+  Port local: 8000
+  CORS_ORIGINS=*
+```
+
+**SI TU CHANGES CES VALEURS, LE LOGIN NE FONCTIONNERA PLUS !**
+
 ### Rebuild Frontend
 ```powershell
 cd frontend
@@ -43,10 +55,12 @@ cd ..
 - CONTEXT.md = État du projet
 - .claude/RULES.md = Règles détaillées
 - backend/.env = Config (NE PAS MODIFIER les ports)
+- frontend/.env = Config (REACT_APP_BACKEND_URL DOIT ÊTRE VIDE)
 
 ## ⚠️ AVANT TOUTE ACTION
 1. Lire CONTEXT.md
 2. Lire .claude/RULES.md
 3. NE PAS créer de nouveaux fichiers de config
+4. NE PAS modifier frontend/.env ou backend/.env
 4. NE PAS modifier les ports
 5. NE PAS proposer de "nouvelle architecture"

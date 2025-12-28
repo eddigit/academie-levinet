@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, UserCog, CreditCard, LogOut, UserPlus,
   Newspaper, Calendar, MessageSquare, Shield, ShoppingBag, UserCheck,
   Settings, Bot, Receipt, Globe, Building2, X, Menu, Home, User, BarChart3,
-  Handshake, MessageCircle
+  Handshake, MessageCircle, CheckSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
@@ -72,6 +72,7 @@ const Sidebar = () => {
     { path: '/admin/stats', icon: BarChart3, label: 'Statistiques', testId: 'nav-stats' },
     { path: '/admin/partners', icon: Handshake, label: 'Partenaires', testId: 'nav-partners' },
     { path: '/leads', icon: UserPlus, label: 'Leads', testId: 'nav-leads' },
+    { path: '/tasks', icon: CheckSquare, label: 'Tâches', testId: 'nav-tasks' },
     { path: '/admin/pending-members', icon: UserCheck, label: 'Validations', testId: 'nav-pending', highlight: true },
     { path: '/admin/users', icon: Users, label: 'Utilisateurs', testId: 'nav-users' },
     { path: '/admin/subscriptions', icon: Receipt, label: 'Cotisations', testId: 'nav-admin-subs' },

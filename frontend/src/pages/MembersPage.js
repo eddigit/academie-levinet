@@ -1,43 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
 import { api } from '../utils/api';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Search, Filter, Info, Settings } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'sonner';
 import { getFlag, getFlagByName } from '../utils/countries';
 import UserAvatar from '../components/UserAvatar';
-import { formatFullName, formatFirstName, formatLastName } from '../lib/utils';
+import { formatFirstName, formatLastName } from '../lib/utils';
+import { useAuth } from '../context/AuthContext';
 
 const MembersPage = () => {
+  const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+  const isAdmin = currentUser?.role === 'admin';
   const [members, setMembers] = useState([]);
-  const [directors, setDirectors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ country: '', city: '', technical_director_id: '', status: '' });
   const [searchTerm, setSearchTerm] = useState('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    country: '',
-    city: '',
-    technical_director_id: '',
-    belt_grade: 'Ceinture Blanche',
-    membership_type: 'Standard',
-    membership_start_date: '',
-    membership_end_date: ''
-  });
 
   useEffect(() => {
     fetchMembers();
-    fetchDirectors();
   }, [filters]);
 
   const fetchMembers = async () => {
@@ -52,54 +37,17 @@ const MembersPage = () => {
     }
   };
 
-  const fetchDirectors = async () => {
-    try {
-      const data = await api.getTechnicalDirectors();
-      setDirectors(data);
-    } catch (error) {
-      console.error('Error fetching directors:', error);
-    }
-  };
-
-  const handleAddMember = async (e) => {
-    e.preventDefault();
-    try {
-      await api.createMember(formData);
-      toast.success('Membre ajouté avec succès');
-      setIsAddModalOpen(false);
-      setFormData({
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        date_of_birth: '',
-        country: '',
-        city: '',
-        technical_director_id: '',
-        belt_grade: 'Ceinture Blanche',
-        membership_type: 'Standard',
-        membership_start_date: '',
-        membership_end_date: ''
-      });
-      fetchMembers();
-    } catch (error) {
-      console.error('Error adding member:', error);
-      toast.error('Erreur lors de l\'ajout du membre');
-    }
-  };
-
   const filteredMembers = members.filter(member => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      member.first_name.toLowerCase().includes(searchLower) ||
-      member.last_name.toLowerCase().includes(searchLower) ||
-      member.email.toLowerCase().includes(searchLower) ||
-      member.country.toLowerCase().includes(searchLower)
+      member.first_name?.toLowerCase().includes(searchLower) ||
+      member.last_name?.toLowerCase().includes(searchLower) ||
+      member.email?.toLowerCase().includes(searchLower) ||
+      member.country?.toLowerCase().includes(searchLower)
     );
   });
 
-  const countries = [...new Set(members.map(m => m.country))];
-  const cities = [...new Set(members.map(m => m.city))];
+  const countries = [...new Set(members.map(m => m.country).filter(Boolean))];
 
   return (
     <DashboardLayout>
@@ -112,191 +60,31 @@ const MembersPage = () => {
             </h1>
             <p className="text-text-secondary font-manrope mt-2">{filteredMembers.length} membres</p>
           </div>
-          <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-            <DialogTrigger asChild>
-              <Button data-testid="add-member-button" className="bg-primary hover:bg-primary-dark text-white font-oswald uppercase">
-                <Plus className="w-4 h-4 mr-2" /> Ajouter un Membre
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-paper border-border max-w-2xl max-h-[90vh] overflow-y-auto z-50" data-testid="add-member-modal">
-              <DialogHeader>
-                <DialogTitle className="font-oswald text-2xl text-text-primary uppercase">Nouveau Membre</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleAddMember} className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-text-secondary">Prénom</Label>
-                    <Input
-                      data-testid="input-first-name"
-                      value={formData.first_name}
-                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                      required
-                      className="bg-background border-border text-text-primary"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-text-secondary">Nom</Label>
-                    <Input
-                      data-testid="input-last-name"
-                      value={formData.last_name}
-                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                      required
-                      className="bg-background border-border text-text-primary"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-text-secondary">Email</Label>
-                  <Input
-                    data-testid="input-member-email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
-                    className="bg-background border-border text-text-primary"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-text-secondary">Téléphone</Label>
-                  <Input
-                    data-testid="input-phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    required
-                    className="bg-background border-border text-text-primary"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-text-secondary">Date de naissance</Label>
-                  <Input
-                    data-testid="input-dob"
-                    type="date"
-                    value={formData.date_of_birth}
-                    onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
-                    required
-                    className="bg-background border-border text-text-primary"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-text-secondary">Pays</Label>
-                    <Input
-                      data-testid="input-country"
-                      value={formData.country}
-                      onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                      required
-                      className="bg-background border-border text-text-primary"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-text-secondary">Ville</Label>
-                    <Input
-                      data-testid="input-city"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      required
-                      className="bg-background border-border text-text-primary"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-text-secondary">Directeur Technique</Label>
-                  <Select
-                    value={formData.technical_director_id}
-                    onValueChange={(value) => setFormData({ ...formData, technical_director_id: value })}
-                  >
-                    <SelectTrigger data-testid="select-director" className="bg-background border-border text-text-primary">
-                      <SelectValue placeholder="Sélectionner un directeur" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-paper border-border z-[100]">
-                      {directors.map((dir) => (
-                        <SelectItem key={dir.id} value={dir.id} className="text-text-primary">
-                          {dir.name} - {dir.city}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-text-secondary">Grade (Ceinture)</Label>
-                  <Select
-                    value={formData.belt_grade}
-                    onValueChange={(value) => setFormData({ ...formData, belt_grade: value })}
-                  >
-                    <SelectTrigger data-testid="select-belt" className="bg-background border-border text-text-primary">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-paper border-border">
-                      <SelectItem value="Ceinture Blanche" className="text-text-primary">Ceinture Blanche</SelectItem>
-                      <SelectItem value="Ceinture Jaune" className="text-text-primary">Ceinture Jaune</SelectItem>
-                      <SelectItem value="Ceinture Orange" className="text-text-primary">Ceinture Orange</SelectItem>
-                      <SelectItem value="Ceinture Verte" className="text-text-primary">Ceinture Verte</SelectItem>
-                      <SelectItem value="Ceinture Bleue" className="text-text-primary">Ceinture Bleue</SelectItem>
-                      <SelectItem value="Ceinture Marron" className="text-text-primary">Ceinture Marron</SelectItem>
-                      <SelectItem value="Ceinture Noire" className="text-text-primary">Ceinture Noire</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-text-secondary">Type d'adhésion</Label>
-                  <Select
-                    value={formData.membership_type}
-                    onValueChange={(value) => setFormData({ ...formData, membership_type: value })}
-                  >
-                    <SelectTrigger data-testid="select-membership-type" className="bg-background border-border text-text-primary">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-paper border-border">
-                      <SelectItem value="Standard" className="text-text-primary">Standard</SelectItem>
-                      <SelectItem value="Premium" className="text-text-primary">Premium</SelectItem>
-                      <SelectItem value="VIP" className="text-text-primary">VIP</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-text-secondary">Date de début</Label>
-                    <Input
-                      data-testid="input-start-date"
-                      type="date"
-                      value={formData.membership_start_date}
-                      onChange={(e) => setFormData({ ...formData, membership_start_date: e.target.value })}
-                      required
-                      className="bg-background border-border text-text-primary"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-text-secondary">Date de fin</Label>
-                    <Input
-                      data-testid="input-end-date"
-                      type="date"
-                      value={formData.membership_end_date}
-                      onChange={(e) => setFormData({ ...formData, membership_end_date: e.target.value })}
-                      required
-                      className="bg-background border-border text-text-primary"
-                    />
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  data-testid="submit-member-button"
-                  className="w-full bg-primary hover:bg-primary-dark text-white font-oswald uppercase"
-                >
-                  Ajouter le Membre
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+          {isAdmin && (
+            <Button onClick={() => navigate('/admin/users')} className="bg-primary hover:bg-primary-dark text-white font-oswald uppercase">
+              <Settings className="w-4 h-4 mr-2" /> Gérer les utilisateurs
+            </Button>
+          )}
         </div>
+
+        {/* Info message for admins */}
+        {isAdmin && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-blue-300 font-medium">Gestion centralisée des utilisateurs</p>
+              <p className="text-blue-300/70 mt-1">
+                Pour ajouter, modifier ou supprimer un membre, rendez-vous dans la section{' '}
+                <button 
+                  onClick={() => navigate('/admin/users')} 
+                  className="text-blue-400 hover:text-blue-300 underline font-medium"
+                >
+                  Gestion des Utilisateurs
+                </button>.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Filters and Search */}
         <div className="stat-card">

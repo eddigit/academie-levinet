@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
 import api, { getErrorMessage } from '../utils/api';
 import { countries, getFlag, danGrades, disciplines } from '../utils/countries';
-import { Plus, Edit, Trash2, Search, X, Loader2, Upload, User, MapPin, Award, Building2, Mail, Phone } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X, Loader2, Upload, User, MapPin, Award, Building2, Mail, Phone, Info, Settings } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -13,6 +14,7 @@ import { formatFullName } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
 
 const TechnicalDirectorsPage = () => {
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const isAdmin = currentUser?.role === 'admin';
   const [directors, setDirectors] = useState([]);
@@ -65,7 +67,6 @@ const TechnicalDirectorsPage = () => {
       const response = await api.get('/clubs');
       const data = response.data || response;
       const clubsList = Array.isArray(data) ? data : [];
-      console.log('Clubs chargés:', clubsList.length, clubsList);
       setClubs(clubsList);
     } catch (error) {
       console.error('Error fetching clubs:', error);
@@ -183,9 +184,6 @@ const TechnicalDirectorsPage = () => {
         role: 'directeur_technique',
       };
 
-      console.log('Payload envoyé:', payload);
-      console.log('Clubs sélectionnés:', payload.club_ids);
-
       if (editingDirector) {
         await api.put(`/admin/users/${editingDirector.id}`, payload);
         toast.success('Directeur Technique mis à jour');
@@ -257,12 +255,31 @@ const TechnicalDirectorsPage = () => {
             </p>
           </div>
           {isAdmin && (
-            <Button onClick={openAddModal} className="bg-primary hover:bg-primary-dark">
-              <Plus className="w-4 h-4 mr-2" />
-              Nouveau DT
+            <Button onClick={() => navigate('/admin/users')} className="bg-primary hover:bg-primary-dark">
+              <Settings className="w-4 h-4 mr-2" />
+              Gérer les utilisateurs
             </Button>
           )}
         </div>
+
+        {/* Info message for admins */}
+        {isAdmin && (
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="text-blue-300 font-medium">Gestion centralisée des utilisateurs</p>
+              <p className="text-blue-300/70 mt-1">
+                Pour ajouter, modifier ou supprimer un directeur technique, rendez-vous dans la section{' '}
+                <button 
+                  onClick={() => navigate('/admin/users')} 
+                  className="text-blue-400 hover:text-blue-300 underline font-medium"
+                >
+                  Gestion des Utilisateurs
+                </button>.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
@@ -372,29 +389,6 @@ const TechnicalDirectorsPage = () => {
                         </span>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* Actions - Admin only */}
-                {isAdmin && (
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-white/5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditModal(director)}
-                      className="flex-1 border-white/10"
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Modifier
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(director)}
-                      className="border-secondary/50 text-secondary hover:bg-secondary/10"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
                 )}
               </div>

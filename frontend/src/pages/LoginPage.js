@@ -38,7 +38,7 @@ const LoginPage = () => {
           setSiteContent(data);
         }
       } catch (error) {
-        console.log('Using default login content');
+        // Utilisation du contenu par défaut
       }
     };
     fetchSiteContent();

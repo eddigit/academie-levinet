@@ -1,5 +1,21 @@
 # ⛔ RÈGLES DU PROJET - NE PAS MODIFIER CE FICHIER ⛔
 
+## ⚠️ CONFIGURATION CRITIQUE - LIRE AVANT TOUTE ACTION
+
+### Fichiers .env - NE JAMAIS MODIFIER
+```
+frontend/.env:
+  REACT_APP_BACKEND_URL=   ← DOIT ÊTRE VIDE (URLs relatives)
+  
+backend/.env:
+  Port local: 8000
+  CORS_ORIGINS=*
+```
+
+**⛔ SI CES VALEURS SONT MODIFIÉES, LE LOGIN NE FONCTIONNERA PLUS !**
+
+---
+
 ## CONFIGURATION OBLIGATOIRE
 
 ### Démarrage Local
@@ -54,7 +70,8 @@ academie-levinet/
 ❌ NE PAS créer de scripts de démarrage alternatifs
 ❌ NE PAS modifier les ports (8000 pour tout)
 ❌ NE PAS dupliquer les fichiers de configuration
-❌ NE PAS modifier ce fichier RULES.md
+❌ NE PAS modifier frontend/.env ou backend/.env
+❌ NE PAS changer REACT_APP_BACKEND_URL (doit rester VIDE)
 
 ---
 
@@ -65,4 +82,4 @@ Visible dans le footer du site et dans la console du navigateur.
 
 ---
 
-Dernière mise à jour : 28/12/2025
+Dernière mise à jour : 28/12/2025 16:35

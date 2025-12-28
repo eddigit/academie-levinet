@@ -14,6 +14,21 @@
 
 ---
 
+## ⚠️ CONFIGURATION CRITIQUE - NE JAMAIS TOUCHER
+
+```
+frontend/.env:
+  REACT_APP_BACKEND_URL=   ← DOIT ÊTRE VIDE (URLs relatives)
+  
+backend/.env:
+  Port local: 8000
+  CORS_ORIGINS=*
+```
+
+**⛔ SI CES VALEURS SONT MODIFIÉES, LE LOGIN NE FONCTIONNERA PLUS !**
+
+---
+
 ## Structure (NE PAS MODIFIER)
 
 ```
@@ -55,8 +70,9 @@ Chaque build génère un timestamp visible :
 1. NE PAS créer de nouveaux fichiers de config/doc à la racine
 2. NE PAS changer les ports (8000 local, 8080 Render)
 3. NE PAS créer de scripts alternatifs
-4. NE PAS modifier ce fichier sans demande explicite
-5. TOUJOURS rebuild le frontend avant de tester : `cd frontend; npm run build`
+4. NE PAS modifier frontend/.env ou backend/.env
+5. NE PAS changer REACT_APP_BACKEND_URL (doit rester VIDE)
+6. TOUJOURS rebuild le frontend avant de tester : `cd frontend; npm run build`
 
 ---
 
@@ -72,4 +88,4 @@ cd ..
 
 ---
 
-Dernière mise à jour : 28/12/2025 15:41
+Dernière mise à jour : 28/12/2025 16:35

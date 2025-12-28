@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, UserCircle, Settings, ChevronDown, Bell } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { LogOut, UserCircle, Settings, ChevronDown, Bell, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { formatFullName, getInitials } from '../lib/utils';
 
 const Header = () => {
   const { logout, user } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -23,11 +25,17 @@ const Header = () => {
   return (
     <header className="hidden lg:flex h-16 glassmorphism-header fixed top-0 right-0 left-64 z-40 items-center justify-end px-6 border-b border-white/5">
       <div className="flex items-center gap-4">
-        {/* Notifications (optional - for future use) */}
-        {/* <button className="p-2 rounded-lg hover:bg-white/5 transition-colors relative">
-          <Bell className="w-5 h-5 text-text-secondary" strokeWidth={1.5} />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
-        </button> */}
+        {/* Nouvelle Tâche button for admins */}
+        {user?.role === 'admin' && (
+          <button
+            onClick={() => setShowTaskModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all font-medium text-sm"
+            title="Créer une nouvelle tâche"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nouvelle tâche</span>
+          </button>
+        )}
 
         {/* User Dropdown */}
         <div className="relative" ref={dropdownRef}>
@@ -119,7 +127,160 @@ const Header = () => {
           )}
         </div>
       </div>
+
+      {/* Task Creation Modal */}
+      {showTaskModal && createPortal(
+        <TaskCreationModal
+          onClose={() => setShowTaskModal(false)}
+          onTaskCreated={() => {
+            setShowTaskModal(false);
+            // Optionally show a success message
+          }}
+        />,
+        document.body
+      )}
     </header>
+  );
+};
+
+// Task Creation Modal Component
+const TaskCreationModal = ({ onClose, onTaskCreated }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    task_type: 'Bug',
+    assigned_to: ''
+  });
+  const [admins, setAdmins] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  // Load administrators list
+  useEffect(() => {
+    const loadAdmins = async () => {
+      try {
+        const api = require('../utils/api').default;
+        const response = await api.get('/admin/admins');
+        setAdmins(response.data || []);
+      } catch (err) {
+        console.error('Erreur chargement admins:', err);
+      }
+    };
+    loadAdmins();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSaving(true);
+
+    try {
+      const api = require('../utils/api').default;
+      await api.post('/tasks', formData);
+      onTaskCreated();
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Erreur lors de la création de la tâche');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999] p-4" onClick={onClose}>
+      <div className="bg-paper rounded-xl border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="p-6 border-b border-white/10 flex justify-between items-center">
+          <h2 className="font-oswald text-xl text-text-primary uppercase">Nouvelle Tâche</h2>
+          <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Task Type */}
+          <div>
+            <label className="block text-text-secondary text-sm font-medium mb-2">Type *</label>
+            <select
+              value={formData.task_type}
+              onChange={(e) => setFormData(prev => ({ ...prev, task_type: e.target.value }))}
+              className="w-full bg-background border border-white/10 rounded-lg px-4 py-2.5 text-text-primary focus:border-primary focus:outline-none"
+              required
+            >
+              <option value="Bug">🐛 Bug</option>
+              <option value="Amélioration">✨ Amélioration</option>
+              <option value="Intégration">🔧 Intégration</option>
+            </select>
+          </div>
+
+          {/* Assigned To */}
+          <div>
+            <label className="block text-text-secondary text-sm font-medium mb-2">Assigner à</label>
+            <select
+              value={formData.assigned_to}
+              onChange={(e) => setFormData(prev => ({ ...prev, assigned_to: e.target.value }))}
+              className="w-full bg-background border border-white/10 rounded-lg px-4 py-2.5 text-text-primary focus:border-primary focus:outline-none"
+            >
+              <option value="">Non assigné</option>
+              {admins.map(admin => (
+                <option key={admin.id} value={admin.id}>
+                  {admin.full_name} ({admin.email})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Title */}
+          <div>
+            <label className="block text-text-secondary text-sm font-medium mb-2">Titre *</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              className="w-full bg-background border border-white/10 rounded-lg px-4 py-2.5 text-text-primary focus:border-primary focus:outline-none"
+              placeholder="Ex: Corriger le bug de connexion"
+              required
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-text-secondary text-sm font-medium mb-2">Description *</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              className="w-full bg-background border border-white/10 rounded-lg px-4 py-2.5 text-text-primary focus:border-primary focus:outline-none min-h-[120px]"
+              placeholder="Décrivez la tâche en détail..."
+              required
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 border border-white/10 text-text-secondary hover:text-text-primary hover:bg-white/5 rounded-lg transition-all"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all font-medium disabled:opacity-50"
+            >
+              {saving ? 'Création...' : 'Créer la tâche'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

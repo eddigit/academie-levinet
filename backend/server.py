@@ -466,6 +466,44 @@ class LeadCreate(BaseModel):
     training_mode: Optional[str] = None  # 'online', 'club', 'both'
     nearest_club_city: Optional[str] = None
 
+# Task Management Models
+class TaskType(str, Enum):
+    BUG = "Bug"
+    IMPROVEMENT = "Amélioration"
+    INTEGRATION = "Intégration"
+
+class TaskStatus(str, Enum):
+    TODO = "À faire"
+    DONE = "Terminé"
+
+class Task(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    description: str
+    task_type: TaskType
+    status: TaskStatus = TaskStatus.TODO
+    created_by: str  # User ID
+    created_by_name: str  # User full name
+    assigned_to: Optional[str] = None  # Assigned admin user ID
+    assigned_to_name: Optional[str] = None  # Assigned admin full name
+    assigned_to_photo: Optional[str] = None  # Assigned admin photo URL
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TaskCreate(BaseModel):
+    title: str
+    description: str
+    task_type: TaskType
+    assigned_to: Optional[str] = None  # Admin user ID to assign
+
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    task_type: Optional[TaskType] = None
+    status: Optional[TaskStatus] = None
+    assigned_to: Optional[str] = None
+
 # Pending Member (existing members requesting access)
 class PendingMember(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -663,6 +701,28 @@ class MessageResponse(BaseModel):
     read: bool
     created_at: datetime
 
+class DashboardMemberSummary(BaseModel):
+    """Modèle allégé pour les membres récents du dashboard"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = ""
+    first_name: str = ""
+    last_name: str = ""
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    country: Optional[str] = None
+    city: Optional[str] = None
+    technical_director_id: Optional[str] = None
+    photo_url: Optional[str] = None
+    belt_grade: Optional[str] = None
+    membership_status: Optional[str] = None
+    membership_type: Optional[str] = None
+    membership_start_date: Optional[str] = None
+    membership_end_date: Optional[str] = None
+    sessions_attended: int = 0
+    created_at: Optional[datetime] = None
+
 class DashboardStats(BaseModel):
     total_members: int
     total_revenue: float
@@ -671,7 +731,7 @@ class DashboardStats(BaseModel):
     revenue_change_percent: float
     members_by_month: List[dict]
     members_by_country: List[dict]
-    recent_members: List[Member]
+    recent_members: List[DashboardMemberSummary]
 
 # Club Models
 class ClubStatus(str, Enum):
@@ -969,6 +1029,19 @@ async def update_user_photo(user_id: str, data: PhotoUploadRequest, current_user
     return {"photo_url": photo_url, "message": "Photo mise à jour"}
 
 # ==================== ADMIN USER MANAGEMENT ====================
+
+@api_router.get("/admin/admins")
+async def get_all_admins(current_user: dict = Depends(get_current_user)):
+    """Get list of all administrators (admin only)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    admins = await db.users.find(
+        {"role": "admin"},
+        {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1}
+    ).to_list(100)
+    
+    return admins
 
 @api_router.get("/admin/users")
 async def get_all_users(
@@ -1286,56 +1359,12 @@ async def admin_change_user_password(user_id: str, new_password: str, current_us
     
     return {"message": "Mot de passe mis à jour avec succès"}
 
-# Technical Directors Routes
-@api_router.post("/technical-directors", response_model=TechnicalDirector)
-async def create_technical_director(director_data: TechnicalDirectorCreate, current_user: dict = Depends(get_current_user)):
-    director = TechnicalDirector(**director_data.model_dump())
-    doc = director.model_dump()
-    doc['created_at'] = doc['created_at'].isoformat()
-    
-    await db.technical_directors.insert_one(doc)
-    return director
-
-@api_router.get("/technical-directors", response_model=List[TechnicalDirector])
-async def get_technical_directors(current_user: dict = Depends(get_current_user)):
-    directors = await db.technical_directors.find({}, {"_id": 0}).to_list(1000)
-    for director in directors:
-        if isinstance(director.get('created_at'), str):
-            director['created_at'] = datetime.fromisoformat(director['created_at'])
-        members_count = await db.members.count_documents({"technical_director_id": director['id']})
-        director['members_count'] = members_count
-    return directors
-
-@api_router.get("/technical-directors/{director_id}", response_model=TechnicalDirector)
-async def get_technical_director(director_id: str, current_user: dict = Depends(get_current_user)):
-    director = await db.technical_directors.find_one({"id": director_id}, {"_id": 0})
-    if not director:
-        raise HTTPException(status_code=404, detail="Director not found")
-    if isinstance(director.get('created_at'), str):
-        director['created_at'] = datetime.fromisoformat(director['created_at'])
-    members_count = await db.members.count_documents({"technical_director_id": director_id})
-    director['members_count'] = members_count
-    return director
-
-@api_router.put("/technical-directors/{director_id}", response_model=TechnicalDirector)
-async def update_technical_director(director_id: str, director_data: TechnicalDirectorCreate, current_user: dict = Depends(get_current_user)):
-    update_data = director_data.model_dump()
-    result = await db.technical_directors.update_one({"id": director_id}, {"$set": update_data})
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Director not found")
-    updated = await db.technical_directors.find_one({"id": director_id}, {"_id": 0})
-    if isinstance(updated.get('created_at'), str):
-        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
-    members_count = await db.members.count_documents({"technical_director_id": director_id})
-    updated['members_count'] = members_count
-    return updated
-
-@api_router.delete("/technical-directors/{director_id}")
-async def delete_technical_director(director_id: str, current_user: dict = Depends(get_current_user)):
-    result = await db.technical_directors.delete_one({"id": director_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Director not found")
-    return {"message": "Director deleted successfully"}
+# ==================== LEGACY ROUTES SUPPRIMÉES ====================
+# Les anciennes routes /technical-directors qui utilisaient la collection 'technical_directors'
+# ont été supprimées. Utiliser maintenant:
+# - GET /technical-directors → retourne les users avec role="directeur_technique"
+# - DELETE/PUT → utiliser /admin/users/{user_id}
+# ==================================================================
 
 # ==================== MEMBRES (ALIAS VERS USERS) ====================
 # Les membres sont des utilisateurs avec role="membre"
@@ -1531,14 +1560,39 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     members_by_country = [{"country": k, "count": v} for k, v in members_by_country_dict.items()]
 
     recent_members_list = await db.users.find(member_query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(5).to_list(5)
+    recent_members_formatted = []
     for member in recent_members_list:
         if isinstance(member.get('created_at'), str):
-            member['created_at'] = datetime.fromisoformat(member['created_at'])
+            try:
+                member['created_at'] = datetime.fromisoformat(member['created_at'].replace('Z', '+00:00'))
+            except:
+                member['created_at'] = None
         # Ajouter first_name/last_name pour compatibilité
         if member.get('full_name') and not member.get('first_name'):
             parts = member['full_name'].split(' ', 1)
             member['first_name'] = parts[0]
             member['last_name'] = parts[1] if len(parts) > 1 else ''
+        # Créer un DashboardMemberSummary avec des valeurs par défaut
+        recent_members_formatted.append(DashboardMemberSummary(
+            id=member.get('id', ''),
+            first_name=member.get('first_name', ''),
+            last_name=member.get('last_name', ''),
+            full_name=member.get('full_name'),
+            email=member.get('email'),
+            phone=member.get('phone'),
+            date_of_birth=member.get('date_of_birth'),
+            country=member.get('country'),
+            city=member.get('city'),
+            technical_director_id=member.get('technical_director_id'),
+            photo_url=member.get('photo_url'),
+            belt_grade=member.get('belt_grade'),
+            membership_status=member.get('membership_status'),
+            membership_type=member.get('membership_type'),
+            membership_start_date=member.get('membership_start_date'),
+            membership_end_date=member.get('membership_end_date'),
+            sessions_attended=member.get('sessions_attended', 0),
+            created_at=member.get('created_at')
+        ))
 
     return {
         "total_members": total_members,
@@ -1548,7 +1602,7 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
         "revenue_change_percent": 12.5,
         "members_by_month": members_by_month,
         "members_by_country": members_by_country,
-        "recent_members": recent_members_list
+        "recent_members": recent_members_formatted
     }
 
 # Leads Routes
@@ -1633,6 +1687,135 @@ async def delete_lead(lead_id: str, current_user: dict = Depends(get_current_use
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Lead not found")
     return {"message": "Lead deleted successfully"}
+
+# Task Management Routes
+@api_router.post("/tasks", response_model=Task)
+async def create_task(task_data: TaskCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new task (admin only)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Get assigned user name and photo if assigned_to is provided
+    assigned_to_name = None
+    assigned_to_photo = None
+    if task_data.assigned_to:
+        assigned_user = await db.users.find_one({"id": task_data.assigned_to, "role": "admin"}, {"_id": 0})
+        if assigned_user:
+            assigned_to_name = assigned_user.get('full_name')
+            assigned_to_photo = assigned_user.get('photo_url')
+    
+    task = Task(
+        **task_data.model_dump(),
+        created_by=current_user['id'],
+        created_by_name=current_user['full_name'],
+        assigned_to_name=assigned_to_name,
+        assigned_to_photo=assigned_to_photo
+    )
+    doc = task.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    doc['updated_at'] = doc['updated_at'].isoformat()
+    
+    await db.tasks.insert_one(doc)
+    return task
+
+@api_router.get("/tasks", response_model=List[Task])
+async def get_tasks(current_user: dict = Depends(get_current_user)):
+    """Get all tasks (admin only)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    tasks = await db.tasks.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    for task in tasks:
+        if isinstance(task.get('created_at'), str):
+            task['created_at'] = datetime.fromisoformat(task['created_at'])
+        if isinstance(task.get('updated_at'), str):
+            task['updated_at'] = datetime.fromisoformat(task['updated_at'])
+    return tasks
+
+@api_router.get("/tasks/{task_id}", response_model=Task)
+async def get_task(task_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a specific task (admin only)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    task = await db.tasks.find_one({"id": task_id}, {"_id": 0})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    if isinstance(task.get('created_at'), str):
+        task['created_at'] = datetime.fromisoformat(task['created_at'])
+    if isinstance(task.get('updated_at'), str):
+        task['updated_at'] = datetime.fromisoformat(task['updated_at'])
+    return task
+
+@api_router.put("/tasks/{task_id}", response_model=Task)
+async def update_task(
+    task_id: str,
+    task_data: TaskUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update a task (admin only)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = {k: v for k, v in task_data.model_dump().items() if v is not None}
+    
+    # Update assigned_to_name and photo if assigned_to is being changed
+    if 'assigned_to' in update_data and update_data['assigned_to']:
+        assigned_user = await db.users.find_one({"id": update_data['assigned_to'], "role": "admin"}, {"_id": 0})
+        if assigned_user:
+            update_data['assigned_to_name'] = assigned_user.get('full_name')
+            update_data['assigned_to_photo'] = assigned_user.get('photo_url')
+    elif 'assigned_to' in update_data and update_data['assigned_to'] is None:
+        update_data['assigned_to_name'] = None
+        update_data['assigned_to_photo'] = None
+    
+    if update_data:
+        update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+        result = await db.tasks.update_one({"id": task_id}, {"$set": update_data})
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Task not found")
+    
+    updated = await db.tasks.find_one({"id": task_id}, {"_id": 0})
+    if isinstance(updated.get('created_at'), str):
+        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
+    if isinstance(updated.get('updated_at'), str):
+        updated['updated_at'] = datetime.fromisoformat(updated['updated_at'])
+    return updated
+
+@api_router.patch("/tasks/{task_id}/toggle")
+async def toggle_task_status(task_id: str, current_user: dict = Depends(get_current_user)):
+    """Toggle task status between TODO and DONE (admin only)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    task = await db.tasks.find_one({"id": task_id}, {"_id": 0})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    new_status = TaskStatus.DONE if task['status'] == TaskStatus.TODO else TaskStatus.TODO
+    await db.tasks.update_one(
+        {"id": task_id},
+        {"$set": {"status": new_status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    updated = await db.tasks.find_one({"id": task_id}, {"_id": 0})
+    if isinstance(updated.get('created_at'), str):
+        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
+    if isinstance(updated.get('updated_at'), str):
+        updated['updated_at'] = datetime.fromisoformat(updated['updated_at'])
+    return updated
+
+@api_router.delete("/tasks/{task_id}")
+async def delete_task(task_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a task (admin only)"""
+    if current_user.get('role') != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.tasks.delete_one({"id": task_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return {"message": "Task deleted successfully"}
 
 # News Routes
 @api_router.post("/news", response_model=News)
@@ -2950,7 +3133,7 @@ async def create_topic(forum_id: str, data: TopicCreate, current_user: dict = De
         await db.forum_topics.insert_one(topic)
         return topic
     except Exception as e:
-        print(f"Error creating topic: {e}")
+        logger.error(f"Error creating topic: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.put("/forums/topics/{topic_id}")
