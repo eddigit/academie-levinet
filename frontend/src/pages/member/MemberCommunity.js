@@ -3,6 +3,7 @@ import MemberSidebar from '../../components/MemberSidebar';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
 import UserAvatar from '../../components/UserAvatar';
+import SponsorCard from '../../components/SponsorCard';
 import { Users, Newspaper, Calendar, Heart, MessageSquare, Share2, MapPin } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 
@@ -11,9 +12,13 @@ const MemberCommunity = () => {
   const [news, setNews] = useState([]);
   const [events, setEvents] = useState([]);
   const [activeTab, setActiveTab] = useState('news');
+  const [sponsors, setSponsors] = useState([]);
+  const [leftSponsors, setLeftSponsors] = useState([]);
+  const [rightSponsors, setRightSponsors] = useState([]);
 
   useEffect(() => {
     fetchData();
+    fetchSponsors();
   }, []);
 
   const fetchData = async () => {
@@ -25,6 +30,20 @@ const MemberCommunity = () => {
       setEvents(eventsRes.data);
     } catch (error) {
       console.error('Error:', error);
+    }
+  };
+
+  const fetchSponsors = async () => {
+    try {
+      const res = await api.get('/sponsors');
+      const allSponsors = res.data || [];
+      setSponsors(allSponsors);
+      
+      // Séparer les sponsors par position
+      setLeftSponsors(allSponsors.filter(s => s.position === 'left' || s.position === 'both'));
+      setRightSponsors(allSponsors.filter(s => s.position === 'right' || s.position === 'both'));
+    } catch (error) {
+      console.error('Error fetching sponsors:', error);
     }
   };
 
@@ -120,9 +139,16 @@ const MemberCommunity = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          {/* Left Sidebar - Sponsors */}
+          <div className="xl:col-span-2 space-y-4">
+            {leftSponsors.map((sponsor) => (
+              <SponsorCard key={sponsor.id} sponsor={sponsor} />
+            ))}
+          </div>
+
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-7">
             {activeTab === 'news' && (
               <div className="space-y-6">
                 {mockNews.map((item, idx) => (
@@ -216,8 +242,17 @@ const MemberCommunity = () => {
             )}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
+          {/* Right Sidebar */}
+          <div className="xl:col-span-3 space-y-6">
+            {/* Sponsors droite */}
+            {rightSponsors.length > 0 && (
+              <div className="space-y-4">
+                {rightSponsors.map((sponsor) => (
+                  <SponsorCard key={sponsor.id} sponsor={sponsor} />
+                ))}
+              </div>
+            )}
+            
             {/* Quick Stats */}
             <div className="bg-paper rounded-xl border border-white/5 p-6">
               <h3 className="font-oswald text-lg text-text-primary uppercase mb-4">Communauté</h3>

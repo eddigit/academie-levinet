@@ -504,6 +504,190 @@ class TaskUpdate(BaseModel):
     status: Optional[TaskStatus] = None
     assigned_to: Optional[str] = None
 
+# ========== TOKEN AJL - GAMIFICATION ==========
+class TokenActionType(str, Enum):
+    """Types d'actions qui génèrent ou consomment des tokens AJL"""
+    # Gains
+    SIGNUP_BONUS = "signup_bonus"           # Inscription: +100
+    DAILY_LOGIN = "daily_login"             # Connexion quotidienne: +5
+    STREAK_BONUS = "streak_bonus"           # Série de 7 jours: +50
+    PROFILE_COMPLETE = "profile_complete"   # Profil complet: +50
+    POST_CREATED = "post_created"           # Créer un post: +10
+    COMMENT_ADDED = "comment_added"         # Commenter: +3
+    REACTION_RECEIVED = "reaction_received" # Recevoir une réaction: +2
+    EVENT_PARTICIPATION = "event_participation"  # Participer événement: +50
+    GRADE_PASSED = "grade_passed"           # Passage de grade: +200
+    REFERRAL_BONUS = "referral_bonus"       # Inviter un ami: +100
+    FIRST_PURCHASE = "first_purchase"       # Premier achat: +50
+    FORUM_POST = "forum_post"               # Poster forum: +5
+    LICENSE_PAID = "license_paid"           # Payer licence: +100
+    ADMIN_GRANT = "admin_grant"             # Attribution admin: variable
+    # Dépenses
+    SHOP_REDEMPTION = "shop_redemption"     # Réduction boutique
+    BADGE_PURCHASE = "badge_purchase"       # Acheter badge
+    PREMIUM_UNLOCK = "premium_unlock"       # Débloquer contenu
+
+# Valeurs des récompenses token
+TOKEN_REWARDS = {
+    TokenActionType.SIGNUP_BONUS: 100,
+    TokenActionType.DAILY_LOGIN: 5,
+    TokenActionType.STREAK_BONUS: 50,
+    TokenActionType.PROFILE_COMPLETE: 50,
+    TokenActionType.POST_CREATED: 10,
+    TokenActionType.COMMENT_ADDED: 3,
+    TokenActionType.REACTION_RECEIVED: 2,
+    TokenActionType.EVENT_PARTICIPATION: 50,
+    TokenActionType.GRADE_PASSED: 200,
+    TokenActionType.REFERRAL_BONUS: 100,
+    TokenActionType.FIRST_PURCHASE: 50,
+    TokenActionType.FORUM_POST: 5,
+    TokenActionType.LICENSE_PAID: 100,
+}
+
+# Limites anti-abus (max gains par jour par type)
+TOKEN_DAILY_LIMITS = {
+    TokenActionType.POST_CREATED: 50,       # Max 5 posts récompensés/jour
+    TokenActionType.COMMENT_ADDED: 30,      # Max 10 commentaires/jour
+    TokenActionType.REACTION_RECEIVED: 20,  # Max 10 réactions/jour
+    TokenActionType.FORUM_POST: 25,         # Max 5 posts forum/jour
+}
+
+class TokenBalance(BaseModel):
+    """Solde de tokens AJL d'un utilisateur"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    balance: int = 0               # Solde actuel
+    total_earned: int = 0          # Total gagné (lifetime)
+    total_spent: int = 0           # Total dépensé (lifetime)
+    last_daily_claim: Optional[datetime] = None  # Dernière connexion quotidienne
+    streak_days: int = 0           # Jours consécutifs de connexion
+    longest_streak: int = 0        # Plus longue série
+    level: int = 1                 # Niveau du membre
+    xp: int = 0                    # Points d'expérience
+    # Future blockchain integration
+    wallet_address: Optional[str] = None  # Adresse wallet crypto (phase 2)
+    tokens_locked: int = 0         # Tokens verrouillés pour migration
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TokenTransaction(BaseModel):
+    """Transaction de tokens AJL (gain ou dépense)"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    amount: int                    # Positif = gain, négatif = dépense
+    action_type: str               # Type d'action (TokenActionType)
+    description: Optional[str] = None  # Description lisible
+    reference_id: Optional[str] = None  # ID du post, événement, etc.
+    balance_after: int = 0         # Solde après transaction
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class BadgeType(str, Enum):
+    """Types de badges disponibles"""
+    NEWCOMER = "newcomer"           # Nouveau membre
+    REGULAR = "regular"             # 7 jours consécutifs
+    DEDICATED = "dedicated"         # 30 jours consécutifs
+    CHAMPION = "champion"           # 100 jours consécutifs
+    SOCIAL = "social"               # 10 posts créés
+    INFLUENCER = "influencer"       # 50 réactions reçues
+    HELPER = "helper"               # 25 commentaires
+    WARRIOR = "warrior"             # Grade ceinture noire
+    COLLECTOR = "collector"         # 1000 tokens accumulés
+    WHALE = "whale"                 # 5000 tokens accumulés
+    PIONEER = "pioneer"             # Badge early adopter
+    VIP = "vip"                     # Membre premium
+    INSTRUCTOR_BADGE = "instructor" # Instructeur certifié
+
+class Badge(BaseModel):
+    """Définition d'un badge"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    badge_type: str
+    name: str
+    description: str
+    icon: str                      # Emoji ou URL icône
+    rarity: str = "common"         # common, rare, epic, legendary
+    token_cost: int = 0            # Coût en tokens (si achetable)
+    requirement: Optional[str] = None  # Condition pour débloquer
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserBadge(BaseModel):
+    """Badge obtenu par un utilisateur"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    badge_id: str
+    badge_type: str
+    earned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TokenRedeemRequest(BaseModel):
+    """Demande d'échange de tokens"""
+    amount: int
+    redemption_type: str           # "shop_discount", "badge", "premium"
+    reference_id: Optional[str] = None  # ID du produit/badge
+
+class TokenGrantRequest(BaseModel):
+    """Attribution de tokens par admin"""
+    user_id: str
+    amount: int
+    reason: str
+
+# ========== FIN TOKEN AJL ==========
+
+# ========== SPONSORS/PUBLICITÉS ==========
+
+class SponsorPosition(str, Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    BOTH = "both"
+
+class Sponsor(BaseModel):
+    """Sponsor/Partenaire avec espace publicitaire"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str                          # Nom du sponsor
+    logo_url: str                      # URL du logo/image publicitaire
+    website_url: str                   # URL du site du sponsor
+    position: str = "right"            # left, right, both
+    active: bool = True                # Actif ou non
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    priority: int = 0                  # Ordre d'affichage (plus élevé = plus haut)
+    # Statistiques
+    impressions: int = 0               # Nombre d'affichages
+    clicks: int = 0                    # Nombre de clics
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SponsorCreate(BaseModel):
+    """Création d'un sponsor"""
+    name: str
+    logo_url: str
+    website_url: str
+    position: str = "right"
+    active: bool = True
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    priority: int = 0
+
+class SponsorUpdate(BaseModel):
+    """Mise à jour d'un sponsor"""
+    name: Optional[str] = None
+    logo_url: Optional[str] = None
+    website_url: Optional[str] = None
+    position: Optional[str] = None
+    active: Optional[bool] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    priority: Optional[int] = None
+
+class SponsorClickRequest(BaseModel):
+    """Tracking d'un clic sur un sponsor"""
+    sponsor_id: str
+
+# ========== FIN SPONSORS ==========
+
 # Pending Member (existing members requesting access)
 class PendingMember(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -860,6 +1044,13 @@ async def register(user_data: UserCreate):
     # Create a clean copy without _id for insertion
     insert_doc = {k: v for k, v in doc.items()}
     await db.users.insert_one(insert_doc)
+    
+    # 🎯 Award signup bonus tokens
+    await award_tokens(
+        user.id,
+        TokenActionType.SIGNUP_BONUS.value,
+        description="Bonus de bienvenue - Inscription"
+    )
     
     # Send welcome email (non-blocking)
     asyncio.create_task(send_email(
@@ -2608,6 +2799,14 @@ async def create_post(
     }
     await db.posts.insert_one(post)
     
+    # 🎯 Award tokens for creating a post
+    await award_tokens(
+        current_user.get("id"),
+        TokenActionType.POST_CREATED.value,
+        description="Publication sur le mur",
+        reference_id=post["id"]
+    )
+    
     # Remove MongoDB _id for response
     post.pop("_id", None)
     
@@ -2691,6 +2890,14 @@ async def create_comment(
     }
     await db.post_comments.insert_one(comment)
     
+    # 🎯 Award tokens for commenting
+    await award_tokens(
+        current_user.get("id"),
+        TokenActionType.COMMENT_ADDED.value,
+        description="Commentaire sur un post",
+        reference_id=comment["id"]
+    )
+    
     # Remove MongoDB _id for response
     comment.pop("_id", None)
     
@@ -2758,6 +2965,16 @@ async def toggle_reaction(
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.post_reactions.insert_one(reaction)
+        
+        # 🎯 Award tokens to post author for receiving a reaction
+        if post.get("author_id") and post.get("author_id") != current_user.get("id"):
+            await award_tokens(
+                post.get("author_id"),
+                TokenActionType.REACTION_RECEIVED.value,
+                description="Réaction reçue sur un post",
+                reference_id=post_id
+            )
+        
         return {"action": "added", "reaction_type": reaction_data.reaction_type}
 
 @api_router.get("/wall/online-users")
@@ -5219,6 +5436,625 @@ async def get_onboarding_clubs(country: Optional[str] = None, city: Optional[str
     ).sort("name", 1).to_list(500)
     
     return {"clubs": clubs}
+
+# ========== TOKEN AJL - ENDPOINTS ==========
+
+async def get_or_create_token_balance(user_id: str) -> dict:
+    """Récupère ou crée le solde token d'un utilisateur"""
+    balance = await db.token_balances.find_one({"user_id": user_id})
+    if not balance:
+        balance = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "balance": 0,
+            "total_earned": 0,
+            "total_spent": 0,
+            "last_daily_claim": None,
+            "streak_days": 0,
+            "longest_streak": 0,
+            "level": 1,
+            "xp": 0,
+            "wallet_address": None,
+            "tokens_locked": 0,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.token_balances.insert_one(balance)
+    return balance
+
+async def check_daily_limit(user_id: str, action_type: str) -> bool:
+    """Vérifie si l'utilisateur a atteint la limite quotidienne pour une action"""
+    if action_type not in [at.value for at in TokenActionType]:
+        return True
+    
+    # Vérifier si ce type d'action a une limite
+    action_enum = TokenActionType(action_type)
+    if action_enum not in TOKEN_DAILY_LIMITS:
+        return True
+    
+    max_daily = TOKEN_DAILY_LIMITS[action_enum]
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    # Compter les tokens gagnés aujourd'hui pour cette action
+    pipeline = [
+        {"$match": {
+            "user_id": user_id,
+            "action_type": action_type,
+            "amount": {"$gt": 0},
+            "created_at": {"$gte": today_start.isoformat()}
+        }},
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]
+    result = await db.token_transactions.aggregate(pipeline).to_list(1)
+    current_total = result[0]["total"] if result else 0
+    
+    return current_total < max_daily
+
+async def award_tokens(user_id: str, action_type: str, amount: Optional[int] = None, 
+                       description: Optional[str] = None, reference_id: Optional[str] = None) -> Optional[dict]:
+    """Attribue des tokens à un utilisateur pour une action"""
+    # Vérifier limite quotidienne
+    if not await check_daily_limit(user_id, action_type):
+        return None
+    
+    # Déterminer le montant
+    if amount is None:
+        action_enum = TokenActionType(action_type) if action_type in [at.value for at in TokenActionType] else None
+        if action_enum and action_enum in TOKEN_REWARDS:
+            amount = TOKEN_REWARDS[action_enum]
+        else:
+            amount = 0
+    
+    if amount == 0:
+        return None
+    
+    # Récupérer ou créer le solde
+    balance_doc = await get_or_create_token_balance(user_id)
+    new_balance = balance_doc.get("balance", 0) + amount
+    new_total_earned = balance_doc.get("total_earned", 0) + (amount if amount > 0 else 0)
+    new_total_spent = balance_doc.get("total_spent", 0) + (abs(amount) if amount < 0 else 0)
+    
+    # Calculer le niveau (1 niveau tous les 500 tokens gagnés)
+    new_level = max(1, (new_total_earned // 500) + 1)
+    
+    # Mettre à jour le solde
+    await db.token_balances.update_one(
+        {"user_id": user_id},
+        {"$set": {
+            "balance": new_balance,
+            "total_earned": new_total_earned,
+            "total_spent": new_total_spent,
+            "level": new_level,
+            "xp": new_total_earned % 500,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Créer la transaction
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "amount": amount,
+        "action_type": action_type,
+        "description": description or f"Récompense: {action_type}",
+        "reference_id": reference_id,
+        "balance_after": new_balance,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.token_transactions.insert_one(transaction)
+    
+    return transaction
+
+@api_router.get("/tokens/balance")
+async def get_token_balance(current_user: dict = Depends(get_current_user)):
+    """Récupère le solde de tokens AJL de l'utilisateur"""
+    balance = await get_or_create_token_balance(current_user.get("id"))
+    balance.pop("_id", None)
+    
+    # Ajouter infos utilisateur
+    balance["user_name"] = current_user.get("full_name")
+    balance["next_level_xp"] = 500  # XP nécessaire pour le niveau suivant
+    
+    return balance
+
+@api_router.get("/tokens/rewards-config")
+async def get_rewards_config(current_user: dict = Depends(get_current_user)):
+    """Récupère la configuration des récompenses Token AJL"""
+    rewards = []
+    
+    # Convertir TOKEN_REWARDS en liste avec descriptions
+    action_descriptions = {
+        TokenActionType.SIGNUP_BONUS: {"name": "Bonus d'inscription", "description": "Offert à la création de compte", "icon": "🎁", "category": "unique"},
+        TokenActionType.DAILY_LOGIN: {"name": "Connexion quotidienne", "description": "Se connecter chaque jour", "icon": "📅", "category": "récurrent"},
+        TokenActionType.STREAK_BONUS: {"name": "Bonus de série", "description": "7 jours consécutifs de connexion", "icon": "🔥", "category": "récurrent"},
+        TokenActionType.PROFILE_COMPLETE: {"name": "Profil complété", "description": "Remplir toutes les informations du profil", "icon": "👤", "category": "unique"},
+        TokenActionType.POST_CREATED: {"name": "Publication sur le mur", "description": "Créer un post sur le mur communautaire", "icon": "📝", "category": "quotidien", "limit": TOKEN_DAILY_LIMITS.get(TokenActionType.POST_CREATED)},
+        TokenActionType.COMMENT_ADDED: {"name": "Commentaire", "description": "Commenter un post", "icon": "💬", "category": "quotidien", "limit": TOKEN_DAILY_LIMITS.get(TokenActionType.COMMENT_ADDED)},
+        TokenActionType.REACTION_RECEIVED: {"name": "Réaction reçue", "description": "Recevoir une réaction sur votre post", "icon": "❤️", "category": "quotidien", "limit": TOKEN_DAILY_LIMITS.get(TokenActionType.REACTION_RECEIVED)},
+        TokenActionType.EVENT_PARTICIPATION: {"name": "Participation à un événement", "description": "Participer à un événement de l'académie", "icon": "🎯", "category": "activité"},
+        TokenActionType.GRADE_PASSED: {"name": "Passage de grade", "description": "Obtenir un nouveau grade", "icon": "🥋", "category": "progression"},
+        TokenActionType.REFERRAL_BONUS: {"name": "Parrainage", "description": "Parrainer un nouveau membre", "icon": "🤝", "category": "unique"},
+        TokenActionType.FIRST_PURCHASE: {"name": "Premier achat", "description": "Effectuer un premier achat en boutique", "icon": "🛒", "category": "unique"},
+        TokenActionType.FORUM_POST: {"name": "Post sur le forum", "description": "Créer un sujet ou répondre sur le forum", "icon": "💭", "category": "quotidien", "limit": TOKEN_DAILY_LIMITS.get(TokenActionType.FORUM_POST)},
+        TokenActionType.LICENSE_PAID: {"name": "Licence payée", "description": "Payer sa licence annuelle", "icon": "📜", "category": "annuel"},
+    }
+    
+    for action_type, amount in TOKEN_REWARDS.items():
+        info = action_descriptions.get(action_type, {})
+        reward = {
+            "action_type": action_type.value,
+            "amount": amount,
+            "name": info.get("name", action_type.value),
+            "description": info.get("description", ""),
+            "icon": info.get("icon", "⭐"),
+            "category": info.get("category", "autre"),
+            "daily_limit": info.get("limit")
+        }
+        rewards.append(reward)
+    
+    return {
+        "rewards": rewards,
+        "currency_name": "Token AJL",
+        "currency_symbol": "AJL",
+        "description": "Le Token AJL est notre monnaie communautaire. Gagnez des tokens en participant activement à l'académie !"
+    }
+
+@api_router.get("/tokens/history")
+async def get_token_history(
+    limit: int = 50,
+    skip: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """Récupère l'historique des transactions de tokens"""
+    transactions = await db.token_transactions.find(
+        {"user_id": current_user.get("id")},
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    total = await db.token_transactions.count_documents({"user_id": current_user.get("id")})
+    
+    return {"transactions": transactions, "total": total}
+
+@api_router.post("/tokens/claim-daily")
+async def claim_daily_tokens(current_user: dict = Depends(get_current_user)):
+    """Réclame le bonus quotidien de tokens"""
+    user_id = current_user.get("id")
+    balance = await get_or_create_token_balance(user_id)
+    
+    now = datetime.now(timezone.utc)
+    last_claim = balance.get("last_daily_claim")
+    
+    if last_claim:
+        if isinstance(last_claim, str):
+            last_claim = datetime.fromisoformat(last_claim.replace("Z", "+00:00"))
+        
+        # Vérifier si déjà réclamé aujourd'hui
+        if last_claim.date() == now.date():
+            raise HTTPException(
+                status_code=400, 
+                detail="Bonus quotidien déjà réclamé aujourd'hui"
+            )
+        
+        # Calculer la série
+        yesterday = (now - timedelta(days=1)).date()
+        if last_claim.date() == yesterday:
+            new_streak = balance.get("streak_days", 0) + 1
+        else:
+            new_streak = 1
+    else:
+        new_streak = 1
+    
+    # Mettre à jour le streak
+    longest_streak = max(balance.get("longest_streak", 0), new_streak)
+    await db.token_balances.update_one(
+        {"user_id": user_id},
+        {"$set": {
+            "last_daily_claim": now.isoformat(),
+            "streak_days": new_streak,
+            "longest_streak": longest_streak
+        }}
+    )
+    
+    # Attribuer les tokens quotidiens
+    transaction = await award_tokens(
+        user_id, 
+        TokenActionType.DAILY_LOGIN.value,
+        description=f"Connexion quotidienne - Jour {new_streak}"
+    )
+    
+    # Bonus de série (tous les 7 jours)
+    streak_bonus = None
+    if new_streak > 0 and new_streak % 7 == 0:
+        streak_bonus = await award_tokens(
+            user_id,
+            TokenActionType.STREAK_BONUS.value,
+            description=f"Série de {new_streak} jours consécutifs!"
+        )
+    
+    return {
+        "success": True,
+        "daily_tokens": TOKEN_REWARDS[TokenActionType.DAILY_LOGIN],
+        "streak_days": new_streak,
+        "streak_bonus": streak_bonus.get("amount") if streak_bonus else 0,
+        "message": f"Bravo! {new_streak} jour(s) consécutif(s)"
+    }
+
+@api_router.get("/tokens/leaderboard")
+async def get_token_leaderboard(
+    limit: int = 20,
+    current_user: dict = Depends(get_current_user)
+):
+    """Récupère le classement des membres par tokens"""
+    pipeline = [
+        {"$sort": {"total_earned": -1}},
+        {"$limit": limit},
+        {"$lookup": {
+            "from": "users",
+            "localField": "user_id",
+            "foreignField": "id",
+            "as": "user"
+        }},
+        {"$unwind": {"path": "$user", "preserveNullAndEmptyArrays": True}},
+        {"$project": {
+            "_id": 0,
+            "user_id": 1,
+            "balance": 1,
+            "total_earned": 1,
+            "level": 1,
+            "streak_days": 1,
+            "user_name": "$user.full_name",
+            "user_photo": "$user.photo_url",
+            "user_role": "$user.role"
+        }}
+    ]
+    
+    leaderboard = await db.token_balances.aggregate(pipeline).to_list(limit)
+    
+    # Ajouter le rang
+    for i, entry in enumerate(leaderboard, 1):
+        entry["rank"] = i
+        entry["is_current_user"] = entry.get("user_id") == current_user.get("id")
+    
+    # Récupérer le rang de l'utilisateur actuel s'il n'est pas dans le top
+    current_user_in_top = any(e.get("is_current_user") for e in leaderboard)
+    current_user_rank = None
+    
+    if not current_user_in_top:
+        user_balance = await db.token_balances.find_one({"user_id": current_user.get("id")})
+        if user_balance:
+            higher_count = await db.token_balances.count_documents({
+                "total_earned": {"$gt": user_balance.get("total_earned", 0)}
+            })
+            current_user_rank = {
+                "rank": higher_count + 1,
+                "user_id": current_user.get("id"),
+                "user_name": current_user.get("full_name"),
+                "user_photo": current_user.get("photo_url"),
+                "balance": user_balance.get("balance", 0),
+                "total_earned": user_balance.get("total_earned", 0),
+                "level": user_balance.get("level", 1),
+                "is_current_user": True
+            }
+    
+    return {
+        "leaderboard": leaderboard,
+        "current_user_rank": current_user_rank
+    }
+
+@api_router.post("/tokens/redeem")
+async def redeem_tokens(
+    request: TokenRedeemRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Échange des tokens contre une récompense"""
+    user_id = current_user.get("id")
+    balance = await get_or_create_token_balance(user_id)
+    
+    if balance.get("balance", 0) < request.amount:
+        raise HTTPException(status_code=400, detail="Solde insuffisant")
+    
+    # Débiter les tokens
+    transaction = await award_tokens(
+        user_id,
+        request.redemption_type,
+        amount=-request.amount,
+        description=f"Échange: {request.redemption_type}",
+        reference_id=request.reference_id
+    )
+    
+    return {
+        "success": True,
+        "tokens_spent": request.amount,
+        "new_balance": balance.get("balance", 0) - request.amount,
+        "transaction": transaction
+    }
+
+@api_router.post("/admin/tokens/grant")
+async def admin_grant_tokens(
+    request: TokenGrantRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Attribution de tokens par un admin"""
+    if current_user.get("role") not in ["admin", "fondateur"]:
+        raise HTTPException(status_code=403, detail="Admin uniquement")
+    
+    # Vérifier que l'utilisateur cible existe
+    target_user = await db.users.find_one({"id": request.user_id})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    transaction = await award_tokens(
+        request.user_id,
+        TokenActionType.ADMIN_GRANT.value,
+        amount=request.amount,
+        description=f"Attribution admin: {request.reason}"
+    )
+    
+    return {
+        "success": True,
+        "user_id": request.user_id,
+        "user_name": target_user.get("full_name"),
+        "tokens_granted": request.amount,
+        "transaction": transaction
+    }
+
+@api_router.get("/admin/tokens/stats")
+async def admin_token_stats(current_user: dict = Depends(get_current_user)):
+    """Statistiques globales des tokens (admin)"""
+    if current_user.get("role") not in ["admin", "fondateur"]:
+        raise HTTPException(status_code=403, detail="Admin uniquement")
+    
+    # Stats globales
+    pipeline = [
+        {"$group": {
+            "_id": None,
+            "total_users": {"$sum": 1},
+            "total_tokens_in_circulation": {"$sum": "$balance"},
+            "total_tokens_earned": {"$sum": "$total_earned"},
+            "total_tokens_spent": {"$sum": "$total_spent"},
+            "avg_balance": {"$avg": "$balance"},
+            "max_balance": {"$max": "$balance"}
+        }}
+    ]
+    stats = await db.token_balances.aggregate(pipeline).to_list(1)
+    global_stats = stats[0] if stats else {}
+    global_stats.pop("_id", None)
+    
+    # Transactions récentes
+    recent_transactions = await db.token_transactions.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(20).to_list(20)
+    
+    # Enrichir avec noms utilisateurs
+    for tx in recent_transactions:
+        user = await db.users.find_one({"id": tx.get("user_id")}, {"_id": 0, "full_name": 1})
+        tx["user_name"] = user.get("full_name") if user else "Inconnu"
+    
+    return {
+        "stats": global_stats,
+        "recent_transactions": recent_transactions
+    }
+
+# Badges endpoints
+@api_router.get("/badges")
+async def get_all_badges(current_user: dict = Depends(get_current_user)):
+    """Liste tous les badges disponibles"""
+    badges = await db.badges.find({}, {"_id": 0}).to_list(100)
+    
+    # Si pas de badges, créer les badges par défaut
+    if not badges:
+        default_badges = [
+            {"badge_type": "newcomer", "name": "Nouveau Membre", "description": "Bienvenue dans l'Académie!", "icon": "🎉", "rarity": "common"},
+            {"badge_type": "regular", "name": "Habitué", "description": "7 jours de connexion consécutifs", "icon": "⭐", "rarity": "common"},
+            {"badge_type": "dedicated", "name": "Dévoué", "description": "30 jours de connexion consécutifs", "icon": "🌟", "rarity": "rare"},
+            {"badge_type": "champion", "name": "Champion", "description": "100 jours de connexion consécutifs", "icon": "🏆", "rarity": "legendary"},
+            {"badge_type": "social", "name": "Social", "description": "10 posts créés sur le mur", "icon": "💬", "rarity": "common"},
+            {"badge_type": "influencer", "name": "Influenceur", "description": "50 réactions reçues", "icon": "🔥", "rarity": "rare"},
+            {"badge_type": "helper", "name": "Entraide", "description": "25 commentaires postés", "icon": "🤝", "rarity": "common"},
+            {"badge_type": "warrior", "name": "Guerrier", "description": "Atteindre la ceinture noire", "icon": "🥋", "rarity": "epic"},
+            {"badge_type": "collector", "name": "Collectionneur", "description": "Accumuler 1000 tokens AJL", "icon": "💰", "rarity": "rare"},
+            {"badge_type": "whale", "name": "Baleine", "description": "Accumuler 5000 tokens AJL", "icon": "🐋", "rarity": "legendary"},
+            {"badge_type": "pioneer", "name": "Pionnier", "description": "Parmi les premiers membres", "icon": "🚀", "rarity": "epic"},
+            {"badge_type": "instructor", "name": "Instructeur", "description": "Instructeur certifié", "icon": "👨‍🏫", "rarity": "epic"},
+        ]
+        for badge in default_badges:
+            badge["id"] = str(uuid.uuid4())
+            badge["token_cost"] = 0
+            badge["created_at"] = datetime.now(timezone.utc).isoformat()
+            # Créer une copie pour l'insertion (MongoDB va ajouter _id)
+            insert_doc = badge.copy()
+            await db.badges.insert_one(insert_doc)
+        # Retourner les badges sans _id
+        badges = default_badges
+    
+    return {"badges": badges}
+
+@api_router.get("/badges/my")
+async def get_my_badges(current_user: dict = Depends(get_current_user)):
+    """Récupère les badges de l'utilisateur"""
+    user_badges = await db.user_badges.find(
+        {"user_id": current_user.get("id")},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrichir avec les détails des badges
+    for ub in user_badges:
+        badge = await db.badges.find_one({"id": ub.get("badge_id")}, {"_id": 0})
+        if badge:
+            ub["badge"] = badge
+    
+    return {"badges": user_badges}
+
+# ========== FIN TOKEN AJL ENDPOINTS ==========
+
+# ========== SPONSORS/PUBLICITÉS ENDPOINTS ==========
+
+@api_router.get("/sponsors")
+async def get_active_sponsors():
+    """Récupère les sponsors actifs pour affichage public"""
+    now = datetime.now(timezone.utc)
+    
+    # Trouver les sponsors actifs dans la période
+    sponsors = await db.sponsors.find({
+        "active": True,
+        "$or": [
+            {"end_date": None},
+            {"end_date": {"$gte": now.isoformat()}}
+        ]
+    }, {"_id": 0}).sort("priority", -1).to_list(100)
+    
+    # Incrémenter les impressions
+    for sponsor in sponsors:
+        await db.sponsors.update_one(
+            {"id": sponsor["id"]},
+            {"$inc": {"impressions": 1}}
+        )
+    
+    return {"sponsors": sponsors}
+
+@api_router.post("/sponsors/{sponsor_id}/click")
+async def track_sponsor_click(sponsor_id: str):
+    """Tracker un clic sur un sponsor"""
+    sponsor = await db.sponsors.find_one({"id": sponsor_id})
+    
+    if not sponsor:
+        raise HTTPException(status_code=404, detail="Sponsor introuvable")
+    
+    # Incrémenter les clics
+    await db.sponsors.update_one(
+        {"id": sponsor_id},
+        {"$inc": {"clicks": 1}}
+    )
+    
+    return {"success": True, "redirect_url": sponsor.get("website_url")}
+
+@api_router.get("/admin/sponsors")
+async def get_all_sponsors_admin(current_user: dict = Depends(get_current_user)):
+    """Liste tous les sponsors (admin)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    sponsors = await db.sponsors.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"sponsors": sponsors}
+
+@api_router.post("/admin/sponsors")
+async def create_sponsor(
+    sponsor_data: SponsorCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Créer un nouveau sponsor (admin)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    sponsor = Sponsor(**sponsor_data.model_dump())
+    sponsor_dict = sponsor.model_dump()
+    sponsor_dict["created_at"] = sponsor_dict["created_at"].isoformat()
+    sponsor_dict["updated_at"] = sponsor_dict["updated_at"].isoformat()
+    
+    # Convertir les dates optionnelles si elles existent et ne sont pas None
+    if sponsor_dict.get("start_date") and sponsor_dict["start_date"] is not None:
+        if isinstance(sponsor_dict["start_date"], datetime):
+            sponsor_dict["start_date"] = sponsor_dict["start_date"].isoformat()
+    else:
+        sponsor_dict["start_date"] = None
+        
+    if sponsor_dict.get("end_date") and sponsor_dict["end_date"] is not None:
+        if isinstance(sponsor_dict["end_date"], datetime):
+            sponsor_dict["end_date"] = sponsor_dict["end_date"].isoformat()
+    else:
+        sponsor_dict["end_date"] = None
+    
+    await db.sponsors.insert_one(sponsor_dict)
+    
+    sponsor_dict.pop("_id", None)
+    return {"sponsor": sponsor_dict}
+
+@api_router.put("/admin/sponsors/{sponsor_id}")
+async def update_sponsor(
+    sponsor_id: str,
+    sponsor_data: SponsorUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mettre à jour un sponsor (admin)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    existing = await db.sponsors.find_one({"id": sponsor_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Sponsor introuvable")
+    
+    update_data = {k: v for k, v in sponsor_data.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    # Convertir les dates optionnelles si elles existent
+    if "start_date" in update_data and update_data["start_date"]:
+        if isinstance(update_data["start_date"], datetime):
+            update_data["start_date"] = update_data["start_date"].isoformat()
+        elif update_data["start_date"] == "":
+            update_data["start_date"] = None
+            
+    if "end_date" in update_data and update_data["end_date"]:
+        if isinstance(update_data["end_date"], datetime):
+            update_data["end_date"] = update_data["end_date"].isoformat()
+        elif update_data["end_date"] == "":
+            update_data["end_date"] = None
+    
+    await db.sponsors.update_one(
+        {"id": sponsor_id},
+        {"$set": update_data}
+    )
+    
+    updated_sponsor = await db.sponsors.find_one({"id": sponsor_id}, {"_id": 0})
+    return {"sponsor": updated_sponsor}
+
+@api_router.delete("/admin/sponsors/{sponsor_id}")
+async def delete_sponsor(
+    sponsor_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Supprimer un sponsor (admin)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.sponsors.delete_one({"id": sponsor_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Sponsor introuvable")
+    
+    return {"success": True}
+
+@api_router.get("/admin/sponsors/stats")
+async def get_sponsors_stats(current_user: dict = Depends(get_current_user)):
+    """Statistiques globales des sponsors (admin)"""
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    sponsors = await db.sponsors.find({}, {"_id": 0}).to_list(100)
+    
+    total_impressions = sum(s.get("impressions", 0) for s in sponsors)
+    total_clicks = sum(s.get("clicks", 0) for s in sponsors)
+    
+    # Calcul du CTR (Click-Through Rate)
+    ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0
+    
+    # Sponsors par performance
+    sponsors_by_performance = sorted(
+        sponsors,
+        key=lambda s: s.get("clicks", 0),
+        reverse=True
+    )
+    
+    return {
+        "total_sponsors": len(sponsors),
+        "active_sponsors": len([s for s in sponsors if s.get("active")]),
+        "total_impressions": total_impressions,
+        "total_clicks": total_clicks,
+        "ctr_percentage": round(ctr, 2),
+        "top_performers": sponsors_by_performance[:5]
+    }
+
+# ========== FIN SPONSORS ENDPOINTS ==========
 
 app.include_router(api_router)
 

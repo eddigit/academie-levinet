@@ -38,6 +38,7 @@ import MemberCourses from './pages/member/MemberCourses';
 import MemberCommunity from './pages/member/MemberCommunity';
 import MemberGrades from './pages/member/MemberGrades';
 import MemberShopPage from './pages/member/MemberShopPage';
+import WalletPage from './pages/WalletPage';
 // Shop pages
 import ShopPage from './pages/ShopPage';
 import AdminProductsPage from './pages/AdminProductsPage';
@@ -53,6 +54,7 @@ import ClubsPage from './pages/ClubsPage';
 import AdminStatsPage from './pages/admin/AdminStatsPage';
 import AdminPartnersPage from './pages/admin/AdminPartnersPage';
 import AdminForumsPage from './pages/admin/AdminForumsPage';
+import AdminSponsorsPage from './pages/admin/AdminSponsorsPage';
 import ProfilePage from './pages/ProfilePage';
 // Payment pages
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
@@ -151,6 +153,7 @@ const AppContent = () => {
         <Route path="/admin/stats" element={<ProtectedRoute><AdminStatsPage /></ProtectedRoute>} />
         <Route path="/admin/partners" element={<ProtectedRoute><AdminPartnersPage /></ProtectedRoute>} />
         <Route path="/admin/forums" element={<ProtectedRoute><AdminForumsPage /></ProtectedRoute>} />
+        <Route path="/admin/sponsors" element={<ProtectedRoute><AdminSponsorsPage /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><MessagingPage /></ProtectedRoute>} />
         <Route path="/admin/messages" element={<ProtectedRoute><AdminMessagesPage /></ProtectedRoute>} />
         <Route path="/admin/pending-members" element={<ProtectedRoute><PendingMembersPage /></ProtectedRoute>} />
@@ -169,6 +172,7 @@ const AppContent = () => {
         <Route path="/member/community" element={<ProtectedRoute><MemberCommunity /></ProtectedRoute>} />
         <Route path="/member/grades" element={<ProtectedRoute><MemberGrades /></ProtectedRoute>} />
         <Route path="/member/boutique" element={<ProtectedRoute><MemberShopPage /></ProtectedRoute>} />
+        <Route path="/member/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
         
         {/* Payment pages */}
         <Route path="/payment/success" element={<PaymentSuccessPage />} />

@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { LogOut, UserCircle, Settings, ChevronDown, Bell, Plus } from 'lucide-react';
+import { LogOut, UserCircle, Settings, ChevronDown, Bell, Plus, Coins } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { formatFullName, getInitials } from '../lib/utils';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+
 const Header = () => {
-  const { logout, user } = useAuth();
+  const { logout, user, getToken } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [tokenBalance, setTokenBalance] = useState(null);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -22,9 +25,45 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Fetch token balance
+  useEffect(() => {
+    const fetchBalance = async () => {
+      const token = getToken();
+      if (!token) return;
+      try {
+        const res = await fetch(`${API_URL}/api/tokens/balance`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setTokenBalance(data.balance);
+        }
+      } catch (error) {
+        console.error('Error fetching token balance:', error);
+      }
+    };
+    fetchBalance();
+    // Refresh balance every minute
+    const interval = setInterval(fetchBalance, 60000);
+    return () => clearInterval(interval);
+  }, [getToken]);
+
   return (
     <header className="hidden lg:flex h-16 glassmorphism-header fixed top-0 right-0 left-64 z-40 items-center justify-end px-6 border-b border-white/5">
       <div className="flex items-center gap-4">
+        {/* Token Balance */}
+        {tokenBalance !== null && (
+          <Link
+            to="/member/wallet"
+            className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 border border-yellow-500/30 rounded-full transition-all"
+            title="Mon portefeuille Token AJL"
+          >
+            <Coins className="w-4 h-4 text-yellow-500" />
+            <span className="text-sm font-bold text-yellow-500">{tokenBalance}</span>
+            <span className="text-xs text-yellow-500/70">AJL</span>
+          </Link>
+        )}
+
         {/* Nouvelle Tâche button for admins */}
         {user?.role === 'admin' && (
           <button

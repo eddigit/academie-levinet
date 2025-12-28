@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, User, MessageSquare, BookOpen, Calendar, 
-  Users, Award, ShoppingBag, Bell, LogOut, Settings, Newspaper
+  Users, Award, ShoppingBag, Bell, LogOut, Settings, Newspaper, Coins
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
@@ -35,6 +35,7 @@ const MemberSidebar = () => {
     { path: '/member/courses', icon: Calendar, label: 'Mes Cours' },
     { path: '/member/community', icon: Users, label: 'Communauté' },
     { path: '/member/grades', icon: Award, label: 'Mes Grades' },
+    { path: '/member/wallet', icon: Coins, label: 'Token AJL', highlight: true },
     { path: '/member/boutique', icon: ShoppingBag, label: 'Boutique' },
   ];
 
@@ -84,7 +85,9 @@ const MemberSidebar = () => {
               className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm font-manrope transition-colors ${
                 isActive 
                   ? 'bg-primary/10 text-primary border-l-2 border-primary' 
-                  : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
+                  : item.highlight
+                    ? 'text-yellow-500 hover:text-yellow-400 hover:bg-yellow-500/10 border border-yellow-500/30'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
               }`}
             >
               <div className="flex items-center gap-3">
