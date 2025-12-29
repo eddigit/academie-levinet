@@ -1,0 +1,32 @@
+{
+  "_version": "1.0.0",
+  "_last_updated": "2025-12-28",
+  "_description": "Configuration officielle de l'Académie Jacques Levinet - NE PAS MODIFIER SANS RAISON",
+  
+  "contact": {
+    "email": "contact@academie-levinet.com",
+    "phone": "+33698070851",
+    "address": "Saint Jean de Védas"
+  },
+  
+  "social_links": {
+    "facebook": "https://www.facebook.com/capitainejacqueslevinet/",
+    "instagram": "",
+    "youtube": "https://www.youtube.com/@CapitaineJacquesLevinet",
+    "linkedin": "https://www.linkedin.com/in/jacqueslevinet/",
+    "twitter": "https://x.com/Jacques_LEVINET"
+  },
+  
+  "footer": {
+    "tagline": "Académie Jacques Levinet – World Krav Maga Organization – International Police Confederation",
+    "copyright": "© 2025 Académie Jacques Levinet. Tous droits réservés."
+  },
+  
+  "hero": {
+    "title": "ACADÉMIE JACQUES LEVINET",
+    "subtitle": "Self-Pro Krav (SPK)",
+    "description": "Méthode de self-défense réaliste et efficace, adaptée à tous",
+    "cta_text": "Rejoindre l'Académie",
+    "cta_link": "/onboarding"
+  }
+}

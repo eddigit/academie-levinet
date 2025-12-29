@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip show:*)",
+      "Bash(findstr:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pip install:*)",
+      "Bash(python -m uvicorn:*)",
+      "Bash(curl:*)",
+      "Bash(cd:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill /F /PID 4596)",
+      "Bash(timeout /t 3 /nobreak)",
+      "Bash(python migrate_to_unified_users.py:*)",
+      "Bash(powershell:*)",
+      "Bash(python create_test_users.py:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(python check_user_roles.py:*)",
+      "Bash(C:Python313python.exe check_user_roles.py)",
+      "Bash(python:*)"
+    ]
+  }
+}

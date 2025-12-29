@@ -1,0 +1,85 @@
+.App {
+  min-height: 100vh;
+  background-color: #0B1120;
+  color: #F3F4F6;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #0B1120 0%, #111827 100%);
+}
+
+.card-gradient {
+  background: linear-gradient(180deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.8) 100%);
+}
+
+.glow-effect {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.transition-smooth {
+  transition: all 0.3s ease;
+}
+
+.sidebar-link {
+  transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 3px solid #3B82F6;
+  transform: translateX(2px);
+}
+
+.sidebar-link.active {
+  background: rgba(59, 130, 246, 0.15);
+  border-left: 3px solid #3B82F6;
+  color: #3B82F6;
+}
+
+.stat-card {
+  backdrop-filter: blur(8px);
+  background: rgba(31, 41, 55, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.4);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #3B82F6;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #2563EB;
+}
+
+/* Animation for Mega Menu */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}

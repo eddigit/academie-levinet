@@ -1,0 +1,39 @@
+# ============================================================================
+# Render.com - Configuration Unifiée
+# Déploie FastAPI + React en un seul service
+# ============================================================================
+
+services:
+  - type: web
+    name: academie-levinet
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: frankfurt  # Proche de la France
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGO_URL
+        sync: false  # Définir manuellement dans le dashboard
+      - key: DB_NAME
+        value: academie_levinet_db
+      - key: JWT_SECRET
+        sync: false  # Définir manuellement dans le dashboard
+      - key: CORS_ORIGINS
+        value: "*"  # En mode unifié, pas besoin de CORS strict
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM_EMAIL
+        sync: false
+      - key: SMTP_FROM_NAME
+        value: "Académie Jacques Levinet"
+      - key: STRIPE_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
