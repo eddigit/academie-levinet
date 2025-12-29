@@ -95,7 +95,7 @@ const PublicFooter = () => {
             </div>
           </div>
           <p className="text-center text-xs text-text-muted/50 mt-4 font-manrope">
-            Site réalisé par <span className="text-primary">GILLES KORZEC</span>
+            Plateforme réalisée par <span className="text-primary">GILLES KORZEC</span>
           </p>
         </div>
       </div>
