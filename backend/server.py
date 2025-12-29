@@ -745,6 +745,9 @@ class SmtpSettingsUpdate(BaseModel):
     from_email: Optional[str] = None
     from_name: Optional[str] = None
 
+class SmtpTestRequest(BaseModel):
+    test_email: str
+
 class News(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -4824,28 +4827,80 @@ async def update_smtp_settings(data: SmtpSettingsUpdate, current_user: dict = De
     return {"message": "Paramètres SMTP mis à jour avec succès"}
 
 @api_router.post("/admin/settings/smtp/test")
-async def test_smtp_settings(current_user: dict = Depends(get_current_user)):
+async def test_smtp_settings(data: SmtpTestRequest, current_user: dict = Depends(get_current_user)):
     """Admin: Send test email to verify SMTP settings"""
     if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
+    # Get SMTP settings from database
+    settings = await db.settings.find_one({"id": "smtp_settings"})
+    if not settings:
+        raise HTTPException(status_code=400, detail="Aucune configuration SMTP trouvée. Veuillez d'abord enregistrer vos paramètres.")
+    
+    smtp_host = settings.get('smtp_host', 'smtp.gmail.com')
+    smtp_port = settings.get('smtp_port', 587)
+    smtp_user = settings.get('smtp_user')
+    smtp_password = settings.get('smtp_password')
+    from_email = settings.get('from_email')
+    from_name = settings.get('from_name', 'Académie Jacques Levinet')
+    
+    if not smtp_user or not smtp_password:
+        raise HTTPException(status_code=400, detail="Email SMTP et mot de passe requis. Veuillez compléter la configuration.")
+    
+    if not from_email:
+        from_email = smtp_user
+    
+    test_email = data.test_email
+    
     try:
-        success = await send_email(
-            to_email=current_user['email'],
-            subject="Test SMTP - Académie Jacques Levinet",
-            html_content="""
-            <h2>Test réussi !</h2>
-            <p>Si vous recevez cet email, la configuration SMTP fonctionne correctement.</p>
-            <p>L'équipe de l'Académie Jacques Levinet</p>
-            """,
-            text_content="Test SMTP réussi ! La configuration fonctionne correctement."
+        import aiosmtplib
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        
+        message = MIMEMultipart('alternative')
+        message['Subject'] = "✅ Test SMTP - Académie Jacques Levinet"
+        message['From'] = f"{from_name} <{from_email}>"
+        message['To'] = test_email
+        
+        html_content = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #111827; color: #F3F4F6; padding: 40px; border-radius: 10px;">
+            <h2 style="color: #3B82F6;">✅ Test SMTP Réussi !</h2>
+            <p>Si vous recevez cet email, la configuration SMTP de l'Académie Jacques Levinet fonctionne correctement.</p>
+            <hr style="border-color: #374151; margin: 20px 0;">
+            <p style="color: #9CA3AF; font-size: 14px;"><strong>Configuration utilisée :</strong></p>
+            <ul style="color: #9CA3AF; font-size: 14px;">
+                <li>Serveur : {smtp_host}</li>
+                <li>Port : {smtp_port}</li>
+                <li>Email : {smtp_user}</li>
+                <li>Expéditeur : {from_name}</li>
+            </ul>
+            <p style="margin-top: 30px; color: #6B7280; font-size: 12px;">— L'équipe Académie Jacques Levinet</p>
+        </div>
+        """
+        
+        text_content = f"Test SMTP réussi ! Configuration: {smtp_host}:{smtp_port}, Email: {smtp_user}"
+        
+        part1 = MIMEText(text_content, 'plain', 'utf-8')
+        part2 = MIMEText(html_content, 'html', 'utf-8')
+        message.attach(part1)
+        message.attach(part2)
+        
+        await aiosmtplib.send(
+            message,
+            hostname=smtp_host,
+            port=smtp_port,
+            username=smtp_user,
+            password=smtp_password,
+            start_tls=True,
         )
-        if success:
-            return {"message": f"Email de test envoyé à {current_user['email']}"}
-        else:
-            raise HTTPException(status_code=500, detail="Échec de l'envoi de l'email. Vérifiez vos paramètres SMTP.")
+        
+        return {"message": f"Email de test envoyé avec succès à {test_email}"}
+    except aiosmtplib.SMTPAuthenticationError as e:
+        raise HTTPException(status_code=400, detail=f"Échec d'authentification SMTP. Vérifiez votre email et mot de passe d'application. Erreur: {str(e)}")
+    except aiosmtplib.SMTPConnectError as e:
+        raise HTTPException(status_code=400, detail=f"Impossible de se connecter au serveur SMTP. Vérifiez l'adresse et le port. Erreur: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur lors de l'envoi: {str(e)}")
 
 # ==================== INSTRUCTORS LIST ENDPOINT ====================
 

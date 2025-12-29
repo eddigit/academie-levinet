@@ -13,6 +13,7 @@ const SettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [testEmail, setTestEmail] = useState('');
   const [smtpSettings, setSmtpSettings] = useState({
     smtp_host: 'smtp.gmail.com',
     smtp_port: 587,
@@ -69,10 +70,14 @@ const SettingsPage = () => {
   };
 
   const handleTestEmail = async () => {
+    if (!testEmail) {
+      toast.error('Veuillez saisir une adresse email pour le test');
+      return;
+    }
     setTesting(true);
     try {
-      await api.post('/admin/settings/smtp/test');
-      toast.success('Email de test envoyé ! Vérifiez votre boîte de réception.');
+      const response = await api.post('/admin/settings/smtp/test', { test_email: testEmail });
+      toast.success(response.data.message || 'Email de test envoyé !');
     } catch (error) {
       console.error('Error testing SMTP:', error);
       toast.error(getErrorMessage(error, 'Échec du test SMTP'));
@@ -216,31 +221,49 @@ const SettingsPage = () => {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/10">
+              <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
                 <Button
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-primary hover:bg-primary-dark"
+                  className="bg-primary hover:bg-primary-dark w-full sm:w-auto"
                 >
                   {saving ? (
                     <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Enregistrement...</>
                   ) : (
-                    <><Save className="w-4 h-4 mr-2" /> Enregistrer</>
+                    <><Save className="w-4 h-4 mr-2" /> Enregistrer les paramètres</>
                   )}
                 </Button>
                 
-                <Button
-                  onClick={handleTestEmail}
-                  disabled={testing || !smtpSettings.smtp_user}
-                  variant="outline"
-                  className="border-white/10"
-                >
-                  {testing ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Envoi en cours...</>
-                  ) : (
-                    <><TestTube className="w-4 h-4 mr-2" /> Tester la configuration</>
-                  )}
-                </Button>
+                {/* Test Email Section */}
+                <div className="bg-background/50 rounded-lg p-4 border border-white/5">
+                  <Label className="text-text-secondary flex items-center gap-2 mb-2">
+                    <TestTube className="w-4 h-4" /> Tester la configuration
+                  </Label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Input
+                      type="email"
+                      value={testEmail}
+                      onChange={(e) => setTestEmail(e.target.value)}
+                      placeholder="Email de destination pour le test"
+                      className="bg-background border-white/10 text-text-primary flex-1"
+                    />
+                    <Button
+                      onClick={handleTestEmail}
+                      disabled={testing || !testEmail}
+                      variant="outline"
+                      className="border-white/10 whitespace-nowrap"
+                    >
+                      {testing ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Envoi...</>
+                      ) : (
+                        <><Mail className="w-4 h-4 mr-2" /> Envoyer un test</>
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-text-muted text-xs mt-2">
+                    Un email de test sera envoyé à cette adresse pour vérifier la configuration SMTP.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
