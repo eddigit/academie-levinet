@@ -1,6 +1,7 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import DashboardFooter from './DashboardFooter';
 
 const DashboardLayout = ({ children }) => {
   return (
@@ -8,9 +9,10 @@ const DashboardLayout = ({ children }) => {
       <Sidebar />
       <Header />
       {/* Main content - no margin on mobile, ml-64 on large screens, mt-16 for header */}
-      <main className="flex-1 lg:ml-64 lg:mt-16 p-4 md:p-6 lg:p-8 pb-24 lg:pb-8" data-testid="main-content">
+      <main className="flex-1 lg:ml-64 lg:mt-16 p-4 md:p-6 lg:p-8 pb-16" data-testid="main-content">
         {children}
       </main>
+      <DashboardFooter />
     </div>
   );
 };
