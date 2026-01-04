@@ -115,7 +115,7 @@ def get_welcome_email_html(user_name: str, user_email: str) -> str:
                 </ul>
                 
                 <div style="text-align: center;">
-                    <a href="{os.environ.get('REACT_APP_BACKEND_URL', 'https://academielevinet.com')}" class="button">
+                    <a href="https://academielevinet.com" class="button">
                         Accéder à mon compte
                     </a>
                 </div>
@@ -216,7 +216,7 @@ def get_lead_notification_html(lead_data: dict) -> str:
             <div class="footer">
                 <p style="font-weight: bold;">Académie Jacques Levinet - Système de gestion des leads</p>
                 <p style="margin-top: 10px; font-size: 12px;">📞 +33 6 98 07 08 51 | 📍 Saint Jean de Védas, France</p>
-                <p style="font-size: 11px; margin-top: 10px;">🌐 <a href="https://academie-levinet.com" style="color: #3B82F6;">academie-levinet.com</a></p>
+                <p style="font-size: 11px; margin-top: 10px;">🌐 <a href="https://academielevinet.com" style="color: #3B82F6;">academielevinet.com</a></p>
             </div>
         </div>
     </body>
@@ -357,7 +357,7 @@ def get_new_message_notification_html(recipient_name: str, sender_name: str, mes
                     Vous recevez cet email car vous avez un compte sur notre plateforme.
                 </p>
                 <p style="font-size: 11px; margin-top: 10px;">
-                    <a href="https://academie-levinet.com" style="color: #3B82F6;">academie-levinet.com</a>
+                    <a href="https://academielevinet.com" style="color: #3B82F6;">academielevinet.com</a>
                 </p>
             </div>
         </div>
