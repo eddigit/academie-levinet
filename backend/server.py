@@ -293,6 +293,7 @@ class AdminUserUpdate(BaseModel):
     club_id: Optional[str] = None
     club_name: Optional[str] = None
     club_ids: Optional[List[str]] = None
+    instructor_id: Optional[str] = None
     instructor_name: Optional[str] = None
     technical_director_id: Optional[str] = None
     bio: Optional[str] = None
@@ -326,6 +327,7 @@ class AdminUserCreate(BaseModel):
     club_id: Optional[str] = None
     club_name: Optional[str] = None
     club_ids: List[str] = []
+    instructor_id: Optional[str] = None
     technical_director_id: Optional[str] = None
     photo_url: Optional[str] = None
     bio: Optional[str] = None

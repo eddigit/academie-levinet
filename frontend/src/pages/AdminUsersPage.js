@@ -873,19 +873,38 @@ const AdminUsersPage = () => {
                   <div>
                     <Label className="text-text-secondary">Rôle</Label>
                     <Select
-                      value={editingUser.role || 'membre'}
+                      value={editingUser.role || 'eleve'}
                       onValueChange={(value) => setEditingUser({ ...editingUser, role: value })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-paper border-white/10">
-                        <SelectItem value="admin" className="text-text-primary">Administrateur</SelectItem>
-                        <SelectItem value="fondateur" className="text-text-primary">Fondateur</SelectItem>
-                        <SelectItem value="directeur_national" className="text-text-primary">Directeur National</SelectItem>
-                        <SelectItem value="directeur_technique" className="text-text-primary">Directeur Technique</SelectItem>
-                        <SelectItem value="instructeur" className="text-text-primary">Instructeur</SelectItem>
-                        <SelectItem value="membre" className="text-text-primary">Membre</SelectItem>
+                        <SelectItem value="admin" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <Crown className="w-4 h-4 text-amber-500" /> Administrateur
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="directeur_technique" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-purple-500" /> Directeur Technique
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="instructeur" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <GraduationCap className="w-4 h-4 text-red-500" /> Instructeur
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="eleve" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-primary" /> Élève (avec club)
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="eleve_libre" className="text-text-primary">
+                          <div className="flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-green-500" /> Élève Libre (sans club)
+                          </div>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
