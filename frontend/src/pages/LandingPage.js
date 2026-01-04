@@ -129,7 +129,7 @@ const LandingPage = () => {
           <h2 className="font-oswald text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-text-primary uppercase mb-4 md:mb-6 tracking-wide drop-shadow-2xl leading-tight">
             {heroTitle}
           </h2>
-          <p className="font-oswald text-xs sm:text-sm md:text-base text-primary/90 uppercase tracking-widest mb-6 md:mb-8 drop-shadow-lg">
+          <p className="font-oswald text-xs sm:text-sm md:text-base text-primary/90 uppercase mb-6 md:mb-8 drop-shadow-lg" style={{ letterSpacing: '0.35em' }}>
             World Krav Maga Organization • International Police Confederation
           </p>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-text-secondary font-manrope mb-4 md:mb-8 leading-relaxed drop-shadow-lg">
