@@ -13,7 +13,7 @@ const FounderPage = () => {
   const founderGrade = content?.founder?.grade || '10ème Dan';
   const founderBio = content?.founder?.bio || "Ancien membre de la Police Nationale avec une forte expérience de terrain, expert en arts martiaux et visionnaire qui a révolutionné l'approche de la self-défense en créant une méthode adaptée aux réalités modernes.";
   const founderQuote = content?.founder?.quote || "J'ai parcouru le monde pour analyser les meilleures techniques de self-défense et d'entraînement policier. Mon objectif : créer des méthodes efficaces, réalistes et adaptées à la législation française.";
-  const founderPhoto = founderContent?.photo || 'https://images.unsplash.com/photo-1616005639387-9d59e4b1bdb9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxtYXJ0aWFsJTIwYXJ0cyUyMGdyYW5kbWFzdGVyJTIwcG9ydHJhaXQlMjBzZXJpb3VzfGVufDB8fHxibGFja19hbmRfd2hpdGV8MTc2NTgwMzY5N3ww&ixlib=rb-4.1.0&q=85';
+  const founderPhoto = content?.founder?.photo || 'https://images.unsplash.com/photo-1616005639387-9d59e4b1bdb9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwxfHxtYXJ0aWFsJTIwYXJ0cyUyMGdyYW5kbWFzdGVyJTIwcG9ydHJhaXQlMjBzZXJpb3VzfGVufDB8fHxibGFja19hbmRfd2hpdGV8MTc2NTgwMzY5N3ww&ixlib=rb-4.1.0&q=85';
 
   const achievements = [
     { icon: Award, title: '10ème Dan', description: 'Plus haut grade en Self-Pro Krav' },
