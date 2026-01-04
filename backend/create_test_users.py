@@ -35,7 +35,7 @@ async def create_test_users():
     test_users = [
         {
             "id": str(uuid.uuid4()),
-            "email": "membre.test@academie-levinet.com",
+            "email": "membre.test@academielevinet.com",
             "password_hash": hash_password("Test1234!"),
             "full_name": "Jean Dupont",
             "first_name": "Jean",
@@ -55,7 +55,7 @@ async def create_test_users():
         },
         {
             "id": str(uuid.uuid4()),
-            "email": "instructeur.test@academie-levinet.com",
+            "email": "instructeur.test@academielevinet.com",
             "password_hash": hash_password("Test1234!"),
             "full_name": "Marie Martin",
             "first_name": "Marie",
@@ -75,7 +75,7 @@ async def create_test_users():
         },
         {
             "id": str(uuid.uuid4()),
-            "email": "dt.test@academie-levinet.com",
+            "email": "dt.test@academielevinet.com",
             "password_hash": hash_password("Test1234!"),
             "full_name": "Pierre Durand",
             "first_name": "Pierre",
@@ -113,15 +113,15 @@ async def create_test_users():
     print("UTILISATEURS DE TEST CREES")
     print("=" * 60)
     print("\n1. MEMBRE:")
-    print("   Email: membre.test@academie-levinet.com")
+    print("   Email: membre.test@academielevinet.com")
     print("   Password: Test1234!")
     print("   Role: membre")
     print("\n2. INSTRUCTEUR:")
-    print("   Email: instructeur.test@academie-levinet.com")
+    print("   Email: instructeur.test@academielevinet.com")
     print("   Password: Test1234!")
     print("   Role: instructeur")
     print("\n3. DIRECTEUR TECHNIQUE:")
-    print("   Email: dt.test@academie-levinet.com")
+    print("   Email: dt.test@academielevinet.com")
     print("   Password: Test1234!")
     print("   Role: directeur_technique")
 

@@ -16,9 +16,9 @@ const PublicFooter = () => {
   };
 
   const contact = content?.contact || {
-    email: "contact@academie-levinet.com",
-    phone: "+33 1 23 45 67 89",
-    address: "France - Siège International"
+    email: "contact@academielevinet.com",
+    phone: "+33 6 98 07 08 51",
+    address: "Saint Jean de Védas, France"
   };
 
   const social = content?.social_links || {};

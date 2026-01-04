@@ -203,7 +203,7 @@ const SettingsPage = () => {
                     type="email"
                     value={smtpSettings.from_email}
                     onChange={(e) => setSmtpSettings({ ...smtpSettings, from_email: e.target.value })}
-                    placeholder="contact@academie-levinet.com"
+                    placeholder="contact@academielevinet.com"
                     className="bg-background border-white/10 text-text-primary"
                   />
                 </div>

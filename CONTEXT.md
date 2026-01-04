@@ -10,7 +10,8 @@
 
 ### Déploiement Production
 - **Backend + Frontend** : Render.com (déploiement auto sur push GitHub)
-- **URL** : https://academie-levinet.onrender.com
+- **URL** : https://academielevinet.com (domaine personnalisé)
+- **URL Render** : https://academie-levinet.onrender.com
 
 ---
 

@@ -47,7 +47,8 @@ cd ..
 - Twitter/X: https://x.com/Jacques_LEVINET
 
 ## Déploiement
-- Render.com (auto-deploy sur push GitHub)
+- **URL Production** : https://academielevinet.com
+- Hébergement : Render.com (auto-deploy sur push GitHub)
 - NE PAS reconfigurer Render
 - NE PAS changer les ports (8080 sur Render)
 

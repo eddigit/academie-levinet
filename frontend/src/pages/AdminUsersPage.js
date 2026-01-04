@@ -387,7 +387,7 @@ const AdminUsersPage = () => {
                       value={newUser.email}
                       onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
                       className="mt-1 bg-background border-white/10"
-                      placeholder="jean@academie-levinet.com"
+                      placeholder="jean@academielevinet.com"
                     />
                   </div>
                   <div className="md:col-span-2">
