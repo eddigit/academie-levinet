@@ -566,9 +566,19 @@ const SocialWall = ({ variant = 'full' }) => {
         {/* Upcoming Events Preview */}
         <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl border border-white/10 p-4">
           <h3 className="font-oswald text-sm font-bold text-text-primary uppercase mb-3">Prochain Événement</h3>
-          <div className="text-center py-4">
-            <p className="text-2xl font-bold text-primary mb-1">Stage SPK</p>
-            <p className="text-sm text-text-secondary">Paris - 15 Janvier 2025</p>
+          <div className="text-center py-3">
+            <p className="font-oswald text-xl font-bold text-primary mb-1">Stage Kravmaga SPK</p>
+            <p className="font-oswald text-lg text-secondary">Self Pro Krav</p>
+            <div className="my-3 py-2 border-y border-white/10">
+              <p className="text-3xl font-black text-white">18</p>
+              <p className="text-sm font-semibold text-primary uppercase">Janvier 2026</p>
+            </div>
+            <p className="text-sm text-text-secondary mb-2">Salle Omnisports</p>
+            <p className="text-xs text-text-muted">83200 - Le Revest les Eaux</p>
+            <div className="mt-3 pt-3 border-t border-white/10">
+              <p className="text-xs text-text-muted">Capitaine Jacques Levinet</p>
+              <p className="text-xs text-primary">Fondateur AJL WKMO IPC</p>
+            </div>
           </div>
         </div>
 
