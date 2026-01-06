@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import PublicHeader from '../components/PublicHeader';
-import PublicFooter from '../components/PublicFooter';
+import PublicLayout from '../components/PublicLayout';
 import { useCart } from '../context/CartContext';
 import api from '../utils/api';
 import { ShoppingBag, Filter, Search, Star, ChevronRight, Check } from 'lucide-react';
@@ -146,9 +145,7 @@ const ShopPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <PublicHeader />
-
+    <PublicLayout>
       {/* Hero Section */}
       <section className="pt-24 pb-12 px-6 bg-gradient-to-b from-paper to-background">
         <div className="container mx-auto max-w-6xl">
@@ -268,8 +265,7 @@ const ShopPage = () => {
         </div>
       </section>
 
-      <PublicFooter />
-    </div>
+    </PublicLayout>
   );
 };
 

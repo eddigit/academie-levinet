@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Users, Award, Globe, Video, CheckCircle, Target, Sparkles, Loader2, Facebook, Youtube, Linkedin, Twitter } from 'lucide-react';
-import MegaMenu from '../components/MegaMenu';
+import { Shield, Users, Award, Globe, Video, CheckCircle, Target, Sparkles, Loader2 } from 'lucide-react';
+import PublicLayout from '../components/PublicLayout';
 import { useSiteContent } from '../context/SiteContentContext';
-import BUILD_INFO from '../buildInfo';
 
 const LandingPage = () => {
   const { content, loading } = useSiteContent();
@@ -13,19 +12,6 @@ const LandingPage = () => {
   const heroSubtitle = content?.hero?.subtitle || "Validée par l'Expérience d'Élite du Capitaine Jacques Levinet";
   const heroDescription = content?.hero?.description || "Méthode brevetée par l'ex-capitaine de police et champion de France de karaté.";
   const heroImage = content?.hero?.background_image || 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=1920&q=80';
-  const logoUrl = content?.images?.logo || 'https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg';
-  const footerTagline = content?.footer?.tagline || 'Académie Jacques Levinet – World Krav Maga Organization – International Police Confederation';
-  const footerCopyright = content?.footer?.copyright || '© 2025 Académie Jacques Levinet. Tous droits réservés.';
-  
-  // Contact dynamique
-  const contactPhone = content?.contact?.phone || '+33698070851';
-  const contactAddress = content?.contact?.address || 'Saint Jean de Védas';
-  
-  // Réseaux sociaux dynamiques
-  const socialFacebook = content?.social_links?.facebook || 'https://www.facebook.com/capitainejacqueslevinet/';
-  const socialYoutube = content?.social_links?.youtube || 'https://www.youtube.com/@CapitaineJacquesLevinet';
-  const socialLinkedin = content?.social_links?.linkedin || 'https://www.linkedin.com/in/jacqueslevinet/';
-  const socialTwitter = content?.social_links?.twitter || 'https://x.com/Jacques_LEVINET';
 
   // Vidéo YouTube - utiliser l'URL du CMS hero.video_url ou la vidéo par défaut
   // L'URL doit être au format embed avec les paramètres autoplay
@@ -53,44 +39,16 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <PublicLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </PublicLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background" data-testid="landing-page">
-      {/* Header - Mobile First */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-white/5 safe-top">
-        <div className="container mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 md:gap-3">
-            <img 
-              src={logoUrl} 
-              alt="Logo Académie Jacques Levinet" 
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
-              data-testid="header-logo"
-            />
-            <div className="hidden sm:block">
-              <h1 className="font-oswald text-base md:text-xl font-bold text-text-primary uppercase tracking-wide">
-                Académie Jacques Levinet
-              </h1>
-              <p className="text-[10px] md:text-xs text-text-secondary font-manrope">École Internationale de Self-Défense</p>
-            </div>
-          </Link>
-          <div className="flex items-center gap-2 md:gap-4">
-            <MegaMenu />
-            <Link 
-              to="/login" 
-              data-testid="header-login-button"
-              className="flex items-center justify-center px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-primary hover:bg-primary-dark text-white font-oswald uppercase tracking-wider leading-none rounded-sm transition-all"
-            >
-              <span className="hidden sm:inline">Connexion</span>
-              <span className="sm:hidden">Login</span>
-            </Link>
-          </div>
-        </div>
-      </header>
+    <PublicLayout>
 
       {/* Hero Section */}
       <section 
@@ -524,115 +482,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer - Mobile First */}
-      <footer className="bg-paper py-10 md:py-16 px-4 md:px-6 border-t border-white/5" data-testid="footer">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8 mb-8 md:mb-12">
-            {/* Brand */}
-            <div className="col-span-2 md:col-span-3 lg:col-span-2">
-              <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
-                <img 
-                  src={logoUrl} 
-                  alt="Logo Académie Jacques Levinet" 
-                  className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
-                />
-                <div>
-                  <h3 className="font-oswald text-sm md:text-lg font-bold text-text-primary uppercase">Académie Jacques Levinet</h3>
-                  <p className="text-[10px] md:text-xs text-text-muted">Depuis 1998</p>
-                </div>
-              </div>
-              <p className="text-text-secondary font-manrope text-xs md:text-sm leading-relaxed hidden md:block">
-                L'Académie Jacques Levinet forme l'élite de la self-défense mondiale depuis plus de 25 ans.
-              </p>
-            </div>
-
-            {/* Navigation */}
-            <div>
-              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Navigation</h4>
-              <ul className="space-y-2 md:space-y-3">
-                <li><Link to="/founder" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Le Fondateur</Link></li>
-                <li><Link to="/about" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">À Propos</Link></li>
-                <li><Link to="/pedagogy" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Pédagogie</Link></li>
-              </ul>
-            </div>
-
-            {/* Disciplines */}
-            <div>
-              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Disciplines</h4>
-              <ul className="space-y-2 md:space-y-3">
-                <li><Link to="/disciplines/wkmo" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">WKMO</Link></li>
-                <li><Link to="/disciplines/ipc" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">IPC / ROS</Link></li>
-                <li><Link to="/disciplines/spk" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Self-Pro Krav</Link></li>
-                <li><Link to="/disciplines/canne" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Canne Défense</Link></li>
-                <li><Link to="/disciplines/sfjl" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Self Féminine</Link></li>
-              </ul>
-            </div>
-
-            {/* Média */}
-            <div>
-              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Média</h4>
-              <ul className="space-y-2 md:space-y-3">
-                <li><a href="https://kravmag-ajl.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Krav Mag AJL</a></li>
-                <li><a href="https://editions-ajl.com" target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Éditions AJL</a></li>
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Contact</h4>
-              <ul className="space-y-2 md:space-y-3">
-                <li><Link to="/international" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">Trouver un Club</Link></li>
-                <li><Link to="/onboarding" className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">S'inscrire</Link></li>
-                <li><a href={`tel:${contactPhone.replace(/\s/g, '')}`} className="text-text-secondary hover:text-primary transition-colors font-manrope text-xs md:text-sm">{contactPhone}</a></li>
-                <li><span className="text-text-secondary font-manrope text-xs md:text-sm">{contactAddress}</span></li>
-              </ul>
-            </div>
-
-            {/* Réseaux Sociaux - Icônes horizontales */}
-            <div>
-              <h4 className="font-oswald text-xs md:text-sm font-bold uppercase tracking-wider text-primary mb-3 md:mb-6">Suivez-nous</h4>
-              <div className="flex items-center gap-4">
-                {socialFacebook && (
-                  <a href={socialFacebook} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors" title="Facebook">
-                    <Facebook className="w-5 h-5 md:w-6 md:h-6" />
-                  </a>
-                )}
-                {socialYoutube && (
-                  <a href={socialYoutube} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors" title="YouTube">
-                    <Youtube className="w-5 h-5 md:w-6 md:h-6" />
-                  </a>
-                )}
-                {socialLinkedin && (
-                  <a href={socialLinkedin} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors" title="LinkedIn">
-                    <Linkedin className="w-5 h-5 md:w-6 md:h-6" />
-                  </a>
-                )}
-                {socialTwitter && (
-                  <a href={socialTwitter} target="_blank" rel="noopener noreferrer" className="text-text-secondary hover:text-primary transition-colors" title="X (Twitter)">
-                    <Twitter className="w-5 h-5 md:w-6 md:h-6" />
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-6 md:pt-8 border-t border-white/5 text-center">
-            <p className="text-text-secondary font-oswald text-sm md:text-base uppercase tracking-wide mb-2">
-              {footerTagline}
-            </p>
-            <p className="text-text-muted font-manrope text-xs md:text-sm">
-              {footerCopyright}
-            </p>
-            <p className="text-text-muted/50 font-mono text-[10px] mt-2" title={`Build ID: ${BUILD_INFO.buildId}`}>
-              v{BUILD_INFO.version} • Build: {BUILD_INFO.date} {BUILD_INFO.time}
-            </p>
-            <p className="text-text-muted/40 font-manrope text-[10px] mt-3">
-              Site réalisé par <a href="https://coachdigitalparis.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">GILLES KORZEC</a>
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </PublicLayout>
   );
 };
 
