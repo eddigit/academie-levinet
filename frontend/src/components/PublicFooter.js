@@ -118,7 +118,15 @@ const PublicFooter = () => {
             </div>
           </div>
           <p className="text-center text-xs text-text-muted/50 mt-4 font-manrope">
-            Plateforme réalisée par <span className="text-primary">{footer.developer}</span>
+            Créé et propulsé par{' '}
+            <a 
+              href="https://coachdigitalparis.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary-light transition-colors"
+            >
+              GILLES KORZEC
+            </a>
           </p>
         </div>
       </div>
