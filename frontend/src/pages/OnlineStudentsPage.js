@@ -22,7 +22,7 @@ const OnlineStudentsPage = () => {
 
   const fetchOnlineStudents = async () => {
     try {
-      const response = await api.get('/users');
+      const response = await api.get('/admin/users');
       const allUsers = response.data.users || response.data || [];
       // Filter only eleve_libre (online students)
       const onlineStudents = allUsers.filter(u => u.role === 'eleve_libre');

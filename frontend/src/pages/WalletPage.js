@@ -4,8 +4,7 @@ import MemberSidebar from '../components/MemberSidebar';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Coins, Gift, TrendingUp, Trophy, Calendar, Flame, Award, History } from 'lucide-react';
-
-const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+import api from '../utils/api';
 
 const WalletPage = () => {
   const { getToken } = useAuth();
@@ -29,49 +28,35 @@ const WalletPage = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const token = getToken();
     try {
       const [balanceRes, historyRes, leaderboardRes, badgesRes, myBadgesRes, rewardsRes] = await Promise.all([
-        fetch(`${API_URL}/api/tokens/balance`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/api/tokens/history?limit=20`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/api/tokens/leaderboard?limit=10`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/api/badges`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/api/badges/my`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/api/tokens/rewards-config`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        api.get('/tokens/balance').catch(() => null),
+        api.get('/tokens/history?limit=20').catch(() => null),
+        api.get('/tokens/leaderboard?limit=10').catch(() => null),
+        api.get('/badges').catch(() => null),
+        api.get('/badges/my').catch(() => null),
+        api.get('/tokens/rewards-config').catch(() => null)
       ]);
 
-      if (balanceRes.ok) setBalance(await balanceRes.json());
-      if (historyRes.ok) {
-        const historyData = await historyRes.json();
+      if (balanceRes?.data) setBalance(balanceRes.data);
+      if (historyRes?.data) {
+        const historyData = historyRes.data;
         setTransactions(historyData.transactions || historyData || []);
       }
-      if (leaderboardRes.ok) {
-        const leaderboardData = await leaderboardRes.json();
+      if (leaderboardRes?.data) {
+        const leaderboardData = leaderboardRes.data;
         setLeaderboard(Array.isArray(leaderboardData) ? leaderboardData : []);
       }
-      if (badgesRes.ok) {
-        const badgesData = await badgesRes.json();
+      if (badgesRes?.data) {
+        const badgesData = badgesRes.data;
         setBadges(badgesData.badges || []);
       }
-      if (myBadgesRes.ok) {
-        const myBadgesData = await myBadgesRes.json();
+      if (myBadgesRes?.data) {
+        const myBadgesData = myBadgesRes.data;
         setMyBadges(myBadgesData.badges || []);
       }
-      if (rewardsRes.ok) {
-        const rewardsData = await rewardsRes.json();
-        setRewardsConfig(rewardsData);
+      if (rewardsRes?.data) {
+        setRewardsConfig(rewardsRes.data);
       }
     } catch (error) {
       console.error('Error fetching wallet data:', error);
@@ -83,21 +68,14 @@ const WalletPage = () => {
   const claimDaily = async () => {
     setClaiming(true);
     setClaimMessage(null);
-    const token = getToken();
     try {
-      const res = await fetch(`${API_URL}/api/tokens/claim-daily`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setClaimMessage({ type: 'success', text: `+${data.amount} AJL ! Streak: ${data.streak_days} jours` });
-        fetchData();
-      } else {
-        setClaimMessage({ type: 'error', text: data.detail || 'Erreur lors de la réclamation' });
-      }
+      const response = await api.post('/tokens/claim-daily');
+      const data = response.data;
+      setClaimMessage({ type: 'success', text: `+${data.amount} AJL ! Streak: ${data.streak_days} jours` });
+      fetchData();
     } catch (error) {
-      setClaimMessage({ type: 'error', text: 'Erreur de connexion' });
+      const errorMessage = error.response?.data?.detail || 'Erreur lors de la réclamation';
+      setClaimMessage({ type: 'error', text: errorMessage });
     } finally {
       setClaiming(false);
     }

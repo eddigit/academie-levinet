@@ -40,6 +40,7 @@ const MegaMenu = () => {
         { name: 'IPC / ROS', href: '/disciplines/ipc', icon: Shield, description: 'Formation professionnelle' },
         { name: 'Self Pro Krav', href: '/disciplines/spk', icon: Target, description: 'Apprenez à vous défendre' },
         { name: 'Canne Défense', href: '/disciplines/canne', icon: Shield, description: 'Art de la canne' },
+        { name: 'Bâton Défense', href: '/disciplines/baton', icon: Shield, description: 'Art du bâton de défense' },
         { name: 'Self Féminine', href: '/disciplines/sfjl', icon: Shield, description: 'Pour vous, mesdames' },
         { name: 'Self Enfant', href: '/disciplines/enfant', icon: Users, description: 'Pour les plus jeunes' },
       ]

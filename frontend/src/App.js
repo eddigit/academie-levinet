@@ -42,6 +42,7 @@ import MemberPrograms from './pages/member/MemberPrograms';
 import MemberCourses from './pages/member/MemberCourses';
 import MemberCommunity from './pages/member/MemberCommunity';
 import MemberGrades from './pages/member/MemberGrades';
+import MemberSettingsPage from './pages/member/MemberSettingsPage';
 import MemberShopPage from './pages/member/MemberShopPage';
 import WalletPage from './pages/WalletPage';
 // Shop pages
@@ -184,6 +185,7 @@ const AppContent = () => {
         <Route path="/member/courses" element={<ProtectedRoute><MemberCourses /></ProtectedRoute>} />
         <Route path="/member/community" element={<ProtectedRoute><MemberCommunity /></ProtectedRoute>} />
         <Route path="/member/grades" element={<ProtectedRoute><MemberGrades /></ProtectedRoute>} />
+        <Route path="/member/settings" element={<ProtectedRoute><MemberSettingsPage /></ProtectedRoute>} />
         <Route path="/member/boutique" element={<ProtectedRoute><MemberShopPage /></ProtectedRoute>} />
         <Route path="/member/wallet" element={<ProtectedRoute><WalletPage /></ProtectedRoute>} />
         
