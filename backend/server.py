@@ -3978,6 +3978,14 @@ async def get_membership_status(current_user: dict = Depends(get_current_user)):
 
 # Default site content structure
 DEFAULT_SITE_CONTENT = {
+    "branding": {
+        "logo_url": "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg",
+        "name": "Académie Jacques Levinet",
+        "short_name": "AJL",
+        "tagline": "École Internationale de Self-Défense",
+        "foundation_year": "1998",
+        "description": "L'Académie Jacques Levinet forme l'élite de la self-défense mondiale depuis plus de 25 ans."
+    },
     "hero": {
         "title": "ACADÉMIE JACQUES LEVINET",
         "subtitle": "Self-Pro Krav (SPK)",
