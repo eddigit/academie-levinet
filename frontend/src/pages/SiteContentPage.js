@@ -32,47 +32,46 @@ const ImageUploader = ({ label, value, onChange, placeholder }) => {
       return;
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024;
+    // Validate file size (max 5MB for better performance)
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error(`L'image est trop volumineuse. Maximum: 10 Mo`);
+      toast.error(`L'image est trop volumineuse (${(file.size / 1024 / 1024).toFixed(1)} Mo). Maximum: 5 Mo`);
       return;
     }
 
     setUploading(true);
+    console.log(`📤 [ImageUploader] Début upload: ${label}`, { fileName: file.name, size: file.size, type: file.type });
+    
     try {
       const reader = new FileReader();
       reader.onloadend = async () => {
-        try {
-          const response = await api.post('/upload/image', { image_data: reader.result });
-          // Handle response - could be response.data.url or response.url
-          const url = response.data?.url || response.data?.photo_url || response.url || reader.result;
-          if (url) {
-            setPreview(url);
-            onChange(url);
-            toast.success('Image uploadée');
-          } else {
-            toast.error('Erreur: URL non reçue');
-          }
-        } catch (error) {
-          console.error('Upload error:', error);
-          // Fallback: use the data URL directly
-          const dataUrl = reader.result;
-          setPreview(dataUrl);
-          onChange(dataUrl);
-          toast.success('Image enregistrée localement');
-        }
+        const dataUrl = reader.result;
+        console.log(`📦 [ImageUploader] Fichier lu, taille data URL: ${dataUrl.length} caractères`);
+        
+        // Utiliser directement le data URL (plus fiable que l'API upload)
+        setPreview(dataUrl);
+        onChange(dataUrl);
+        console.log(`✅ [ImageUploader] Image appliquée pour: ${label}`);
+        toast.success(`Image "${label}" chargée ! Cliquez sur "Enregistrer tout" pour sauvegarder.`);
         setUploading(false);
       };
+      
+      reader.onerror = () => {
+        console.error('❌ [ImageUploader] Erreur lecture fichier');
+        toast.error('Impossible de lire le fichier');
+        setUploading(false);
+      };
+      
       reader.readAsDataURL(file);
     } catch (error) {
       setUploading(false);
-      console.error('File read error:', error);
-      toast.error('Erreur lors de la lecture du fichier');
+      console.error('❌ [ImageUploader] Erreur inattendue:', error);
+      toast.error('Erreur lors du traitement du fichier');
     }
   };
 
   const handleClear = () => {
+    console.log(`🗑️ [ImageUploader] Image effacée: ${label}`);
     setPreview('');
     onChange('');
   };
@@ -154,12 +153,45 @@ const SiteContentPage = () => {
 
   const handleSave = async () => {
     setSaving(true);
+    console.log('💾 [SiteContent] Début sauvegarde...');
+    console.log('💾 [SiteContent] Sections à sauvegarder:', Object.keys(content));
+    
+    // Log les images présentes
+    const imagesLog = {};
+    ['disciplines', 'pages', 'founder', 'hero', 'about'].forEach(section => {
+      if (content[section]) {
+        const sectionImages = {};
+        const scanForImages = (obj, prefix = '') => {
+          Object.entries(obj || {}).forEach(([key, val]) => {
+            if (typeof val === 'string' && (val.startsWith('data:image') || val.startsWith('http'))) {
+              sectionImages[prefix + key] = val.substring(0, 50) + '...';
+            } else if (typeof val === 'object' && val !== null) {
+              scanForImages(val, prefix + key + '.');
+            }
+          });
+        };
+        scanForImages(content[section]);
+        if (Object.keys(sectionImages).length > 0) {
+          imagesLog[section] = sectionImages;
+        }
+      }
+    });
+    console.log('🖼️ [SiteContent] Images détectées:', imagesLog);
+    
     try {
-      await api.put('/admin/site-content', content);
+      const response = await api.put('/admin/site-content', content);
+      console.log('✅ [SiteContent] Sauvegarde réussie:', response);
       toast.success('Contenu du site mis à jour !');
     } catch (error) {
-      console.error('Error saving content:', error);
-      toast.error('Erreur lors de la sauvegarde');
+      console.error('❌ [SiteContent] Erreur sauvegarde:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      // Message d'erreur plus détaillé
+      const errorDetail = error.response?.data?.detail || error.message || 'Erreur inconnue';
+      toast.error(`Erreur lors de la sauvegarde: ${errorDetail}`);
     }
     setSaving(false);
   };

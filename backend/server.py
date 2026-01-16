@@ -4207,15 +4207,30 @@ async def update_site_content(data: dict, current_user: dict = Depends(get_curre
     if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
+    # Log pour debug
+    import json
+    data_size = len(json.dumps(data))
+    logger.info(f"📥 Sauvegarde site-content: {data_size} octets, sections: {list(data.keys())}")
+    
+    # Vérifier la taille (MongoDB limite à 16MB)
+    if data_size > 15 * 1024 * 1024:  # 15MB pour marge de sécurité
+        logger.error(f"❌ Document trop volumineux: {data_size} octets")
+        raise HTTPException(status_code=413, detail=f"Document trop volumineux ({data_size / 1024 / 1024:.1f} Mo). Réduisez la taille des images.")
+    
     data["id"] = "site_content"
     data["updated_at"] = datetime.now(timezone.utc).isoformat()
     data["updated_by"] = current_user["id"]
     
-    await db.settings.update_one(
-        {"id": "site_content"},
-        {"$set": data},
-        upsert=True
-    )
+    try:
+        result = await db.settings.update_one(
+            {"id": "site_content"},
+            {"$set": data},
+            upsert=True
+        )
+        logger.info(f"✅ Site-content sauvegardé: matched={result.matched_count}, modified={result.modified_count}")
+    except Exception as e:
+        logger.error(f"❌ Erreur MongoDB: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur base de données: {str(e)}")
     
     return {"message": "Contenu du site mis à jour"}
 
