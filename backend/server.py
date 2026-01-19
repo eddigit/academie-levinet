@@ -4121,7 +4121,7 @@ DEFAULT_SITE_CONTENT = {
             "title": "WKMO",
             "subtitle": "Pour Toute la Famille",
             "description": "Méthode pour tous les âges",
-            "image": "",
+            "logo_image": "",
             "secondary_image": "",
             "hero_image": ""
         },
@@ -4129,7 +4129,7 @@ DEFAULT_SITE_CONTENT = {
             "title": "Krav Maga Self-Défense",
             "subtitle": "Apprenez à Vous Défendre",
             "description": "Techniques de self-défense efficaces",
-            "image": "",
+            "logo_image": "",
             "secondary_image": "",
             "hero_image": ""
         },
@@ -4137,7 +4137,7 @@ DEFAULT_SITE_CONTENT = {
             "title": "Self-Défense Féminine Jacques Levinet",
             "subtitle": "Spécifiquement pour les Femmes",
             "description": "Techniques adaptées pour la défense féminine",
-            "image": "",
+            "logo_image": "",
             "secondary_image": "",
             "hero_image": ""
         },
@@ -4145,7 +4145,7 @@ DEFAULT_SITE_CONTENT = {
             "title": "IPC / ROS",
             "subtitle": "Pour les Professionnels",
             "description": "Formation pour forces de l'ordre et sécurité",
-            "image": "",
+            "logo_image": "",
             "secondary_image": "",
             "hero_image": ""
         },
@@ -4153,7 +4153,7 @@ DEFAULT_SITE_CONTENT = {
             "title": "Canne Défense",
             "subtitle": "L'Art de la Canne de Défense",
             "description": "Méthode de défense avec canne",
-            "image": "",
+            "logo_image": "",
             "secondary_image": "",
             "hero_image": ""
         },
@@ -4161,7 +4161,7 @@ DEFAULT_SITE_CONTENT = {
             "title": "Self-Défense Enfants",
             "subtitle": "Pour les Jeunes Pratiquants",
             "description": "Méthode adaptée aux enfants",
-            "image": "",
+            "logo_image": "",
             "secondary_image": "",
             "hero_image": ""
         },
@@ -4169,7 +4169,7 @@ DEFAULT_SITE_CONTENT = {
             "title": "Bâton Défense",
             "subtitle": "Techniques de Bâton",
             "description": "Maîtrise du bâton de défense",
-            "image": "",
+            "logo_image": "",
             "secondary_image": "",
             "hero_image": ""
         }

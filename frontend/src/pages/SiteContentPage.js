@@ -41,27 +41,39 @@ const ImageUploader = ({ label, value, onChange, placeholder }) => {
 
     setUploading(true);
     console.log(`📤 [ImageUploader] Début upload: ${label}`, { fileName: file.name, size: file.size, type: file.type });
-    
+
     try {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const dataUrl = reader.result;
         console.log(`📦 [ImageUploader] Fichier lu, taille data URL: ${dataUrl.length} caractères`);
-        
-        // Utiliser directement le data URL (plus fiable que l'API upload)
-        setPreview(dataUrl);
-        onChange(dataUrl);
-        console.log(`✅ [ImageUploader] Image appliquée pour: ${label}`);
-        toast.success(`Image "${label}" chargée ! Cliquez sur "Enregistrer tout" pour sauvegarder.`);
-        setUploading(false);
+
+        try {
+          // Upload to Cloudinary via API
+          console.log(`☁️ [ImageUploader] Upload vers Cloudinary: ${label}`);
+          const response = await api.post('/upload/image', { image_data: dataUrl });
+
+          const cloudinaryUrl = response.data.url;
+          console.log(`✅ [ImageUploader] Image uploadée sur Cloudinary: ${cloudinaryUrl}`);
+
+          // Save Cloudinary URL instead of base64
+          setPreview(cloudinaryUrl);
+          onChange(cloudinaryUrl);
+          toast.success(`Image "${label}" uploadée sur Cloudinary ! Cliquez sur "Enregistrer tout" pour sauvegarder.`);
+        } catch (uploadError) {
+          console.error('❌ [ImageUploader] Erreur upload Cloudinary:', uploadError);
+          toast.error(`Erreur upload Cloudinary: ${uploadError.response?.data?.detail || uploadError.message}`);
+        } finally {
+          setUploading(false);
+        }
       };
-      
+
       reader.onerror = () => {
         console.error('❌ [ImageUploader] Erreur lecture fichier');
         toast.error('Impossible de lire le fichier');
         setUploading(false);
       };
-      
+
       reader.readAsDataURL(file);
     } catch (error) {
       setUploading(false);
