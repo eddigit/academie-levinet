@@ -1414,22 +1414,22 @@ const SiteContentPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ImageUploader
                 label="Logo principal"
-                value={content.images?.logo || ''}
+                value={content?.images?.logo || ''}
                 onChange={(url) => updateField('images', 'logo', url)}
               />
               <ImageUploader
                 label="Logo blanc (pour fonds sombres)"
-                value={content.images?.logo_white || ''}
+                value={content?.images?.logo_white || ''}
                 onChange={(url) => updateField('images', 'logo_white', url)}
               />
               <ImageUploader
                 label="Favicon"
-                value={content.images?.favicon || ''}
+                value={content?.images?.favicon || ''}
                 onChange={(url) => updateField('images', 'favicon', url)}
               />
               <ImageUploader
                 label="Image Open Graph (partage réseaux sociaux)"
-                value={content.images?.og_image || ''}
+                value={content?.images?.og_image || ''}
                 onChange={(url) => updateField('images', 'og_image', url)}
               />
             </div>
@@ -1442,19 +1442,19 @@ const SiteContentPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <ImageUploader
                   label="Logo WKMO"
-                  value={content.images?.logo_wkmo || ''}
+                  value={content?.images?.logo_wkmo || ''}
                   onChange={(url) => updateField('images', 'logo_wkmo', url)}
                   placeholder="World Krav Maga Organization"
                 />
                 <ImageUploader
                   label="Logo IPC"
-                  value={content.images?.logo_ipc || ''}
+                  value={content?.images?.logo_ipc || ''}
                   onChange={(url) => updateField('images', 'logo_ipc', url)}
                   placeholder="International Police Confederation"
                 />
                 <ImageUploader
                   label="Logo SPK"
-                  value={content.images?.logo_spk || ''}
+                  value={content?.images?.logo_spk || ''}
                   onChange={(url) => updateField('images', 'logo_spk', url)}
                   placeholder="Self Pro Krav"
                 />
@@ -1469,13 +1469,13 @@ const SiteContentPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ImageUploader
                   label="Globe AJL-WKMO-IPC"
-                  value={content.images?.globe_international || ''}
+                  value={content?.images?.globe_international || ''}
                   onChange={(url) => updateField('images', 'globe_international', url)}
                   placeholder="Globe avec logos AJL WKMO IPC"
                 />
                 <ImageUploader
                   label="Carte Mondiale"
-                  value={content.images?.world_map || ''}
+                  value={content?.images?.world_map || ''}
                   onChange={(url) => updateField('images', 'world_map', url)}
                   placeholder="Carte AJL-WKMO-IPC Worldwide"
                 />
