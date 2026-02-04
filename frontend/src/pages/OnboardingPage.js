@@ -297,9 +297,9 @@ const OnboardingPage = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-4">
-              <img 
-                src={content.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"} 
-                alt="Logo Académie Jacques Levinet" 
+              <img
+                src={content?.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"}
+                alt="Logo Académie Jacques Levinet"
                 className="w-16 h-16 mx-auto rounded-full object-cover"
               />
             </Link>
@@ -445,9 +445,9 @@ const OnboardingPage = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block mb-4">
-            <img 
-              src={content.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"} 
-              alt="Logo Académie Jacques Levinet" 
+            <img
+              src={content?.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"}
+              alt="Logo Académie Jacques Levinet"
               className="w-16 h-16 mx-auto rounded-full object-cover"
             />
           </Link>

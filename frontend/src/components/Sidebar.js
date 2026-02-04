@@ -126,8 +126,8 @@ const Sidebar = () => {
     <aside className="hidden lg:flex glassmorphism-sidebar w-64 h-screen fixed left-0 top-0 z-50 flex-col" data-testid="sidebar">
       <div className="p-6 border-b border-white/5 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <img 
-            src={content.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"} 
+          <img
+            src={content?.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"}
             alt="Académie Levinet Logo" 
             className="w-12 h-12 rounded-full object-cover"
             data-testid="sidebar-logo"
