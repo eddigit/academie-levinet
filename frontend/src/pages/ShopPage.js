@@ -155,10 +155,9 @@ const ShopPage = () => {
     : allProducts.filter(p => p.category === selectedCategory);
 
   // Filtrer les catégories pour n'afficher que celles ayant des produits
-  const categoriesWithProducts = CATEGORIES.filter(cat => 
+  const categoriesWithProducts = CATEGORIES.filter(cat =>
     cat.id === 'all' || allProducts.some(p => p.category === cat.id)
   );
-  };
 
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
