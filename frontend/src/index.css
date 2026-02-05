@@ -222,21 +222,6 @@ h1.font-oswald, h2.font-oswald, h3.font-oswald, h4.font-oswald {
     filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
   }
 }
-
-/* Hide Emergent badge */
-#emergent-badge,
-a#emergent-badge,
-[id="emergent-badge"],
-a[href*="emergent.sh"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  position: absolute !important;
-  left: -9999px !important;
 }
 
 /* Custom scrollbar for sidebar */

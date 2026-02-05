@@ -11,7 +11,7 @@ const KravMagAJLPage = () => {
   const pageTitle = content?.pages?.kravmag?.title || content?.kravmag?.title || 'Krav Mag AJL';
   const pageSubtitle = content?.pages?.kravmag?.subtitle || content?.kravmag?.subtitle || 'Magazine International Multilingue';
   const pageDescription = content?.pages?.kravmag?.description || content?.kravmag?.description || "KRAV MAG AJL est un magazine international, multilingue, disponible en ligne et sur papier, dédié aux arts martiaux et à la self-défense.";
-  const magazineCover = content?.pages?.kravmag?.hero_image || content?.kravmag?.image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/h5wnb8ya_KRAV%20MAG%20AJL.png';
+  const magazineCover = content?.pages?.kravmag?.hero_image || content?.kravmag?.image || '/images/page Krav Maga AJL.jpeg';
   const contentImage = content?.pages?.kravmag?.content_image || '';
   const secondaryImage = content?.pages?.kravmag?.secondary_image || '';
 

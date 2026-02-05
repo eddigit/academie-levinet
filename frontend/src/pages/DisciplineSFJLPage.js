@@ -11,9 +11,9 @@ const DisciplineSFJLPage = () => {
   const discTitle = content?.disciplines?.sfjl?.title || 'Self-Défense Féminine';
   const discSubtitle = content?.disciplines?.sfjl?.subtitle || 'Apprenez à Vous Protéger';
   const discDescription = content?.disciplines?.sfjl?.description || 'Vous avez le droit de vous sentir en sécurité. Nous sommes là pour vous apprendre des gestes simples et efficaces, dans un cadre bienveillant et rassurant.';
-  const discImage = content?.disciplines?.sfjl?.hero_image || content?.disciplines?.sfjl?.image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg';
-  const discSecondaryImage = content?.disciplines?.sfjl?.secondary_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg';
-  const discLogoImage = content?.disciplines?.sfjl?.logo_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg';
+  const discImage = content?.disciplines?.sfjl?.hero_image || content?.disciplines?.sfjl?.image || '/images/self-defense-feminine.jpeg';
+  const discSecondaryImage = content?.disciplines?.sfjl?.secondary_image || '/images/self-defense-feminine.jpeg';
+  const discLogoImage = content?.disciplines?.sfjl?.logo_image || '/images/self-defense-feminine.jpeg';
 
   const pillars = [
     { icon: Sparkles, title: 'Reprendre Confiance', description: 'Apprenez à vous faire confiance. Vous êtes plus forte que vous ne le pensez.' },

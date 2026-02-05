@@ -11,9 +11,9 @@ const DisciplineWKMOPage = () => {
   const discTitle = content?.disciplines?.wkmo?.title || 'WKMO';
   const discSubtitle = content?.disciplines?.wkmo?.subtitle || 'World Krav Maga Organization';
   const discDescription = content?.disciplines?.wkmo?.description || 'La self-défense pour tous. Krav Maga, KAPAP et Self Pro Krav accessibles au grand public dans un esprit familial et bienveillant.';
-  const discImage = content?.disciplines?.wkmo?.hero_image || content?.disciplines?.wkmo?.image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/m50t9hgn_Grand%20Public%20Card.jpeg';
+  const discImage = content?.disciplines?.wkmo?.hero_image || content?.disciplines?.wkmo?.image || '/images/grand-public.jpeg';
   const discSecondaryImage = content?.disciplines?.wkmo?.secondary_image || 'https://images.unsplash.com/photo-1595554919503-b806f0f8f106?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwyfHxkaXZlcnNlJTIwZ3JvdXAlMjBtYXJ0aWFsJTIwYXJ0cyUyMGNsYXNzJTIwbW9kZXJuJTIwZ3ltfGVufDB8fHx8MTc2NTgwMzcwMnww&ixlib=rb-4.1.0&q=85';
-  const discLogoImage = content?.disciplines?.wkmo?.logo_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/g1a8dhnp_WKMO.jpg';
+  const discLogoImage = content?.disciplines?.wkmo?.logo_image || '/images/logo-levinet.jpeg';
 
   const benefits = [
     { icon: Shield, title: 'Sécurité Personnelle', description: 'Apprenez à vous protéger et à protéger vos proches au quotidien.' },

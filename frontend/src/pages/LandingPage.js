@@ -187,7 +187,7 @@ const LandingPage = () => {
             >
               <div 
                 className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
-                style={{ backgroundImage: `url(${content?.hero?.audience_cards?.public_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/m50t9hgn_Grand%20Public%20Card.jpeg'})` }}
+                style={{ backgroundImage: `url(${content?.hero?.audience_cards?.public_image || '/images/grand-public.jpeg'})` }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
@@ -216,7 +216,7 @@ const LandingPage = () => {
             >
               <div 
                 className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
-                style={{ backgroundImage: `url(${content?.hero?.audience_cards?.women_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg'})` }}
+                style={{ backgroundImage: `url(${content?.hero?.audience_cards?.women_image || '/images/self-defense-feminine.jpeg'})` }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               
@@ -245,7 +245,7 @@ const LandingPage = () => {
             >
               <div 
                 className="absolute inset-0 h-full w-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
-                style={{ backgroundImage: `url(${content?.hero?.audience_cards?.pro_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/vjnvljgu_Professionnels%20Card.jpeg'})` }}
+                style={{ backgroundImage: `url(${content?.hero?.audience_cards?.pro_image || '/images/professionnels.jpeg'})` }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
               

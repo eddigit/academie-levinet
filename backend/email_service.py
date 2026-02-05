@@ -107,7 +107,7 @@ def get_welcome_email_html(user_name: str, user_email: str) -> str:
         <div class="container">
             <div class="header">
                 <div class="logo-container">
-                    <img src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" alt="Logo AJL" class="logo-img">
+                    <img src="https://academielevinet.com/images/logo-levinet.jpeg" alt="Logo AJL" class="logo-img">
                     <div class="logo-text">AJL</div>
                 </div>
                 <p style="color: rgba(255,255,255,0.9); font-size: 14px;">ACADÉMIE JACQUES LEVINET</p>
@@ -197,7 +197,7 @@ def get_lead_notification_html(lead_data: dict) -> str:
         <div class="container">
             <div class="header">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px;">
-                    <img src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" alt="Logo AJL" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid white;">
+                    <img src="https://academielevinet.com/images/logo-levinet.jpeg" alt="Logo AJL" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid white;">
                     <div class="title">🎯 Nouveau Lead Reçu</div>
                 </div>
                 <p style="color: rgba(255,255,255,0.9); font-size: 13px; margin-top: 5px;">ACADÉMIE JACQUES LEVINET</p>
@@ -275,7 +275,7 @@ def get_lead_confirmation_html(lead_name: str) -> str:
         <div class="container">
             <div class="header">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px;">
-                    <img src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" alt="Logo AJL" style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid white;">
+                    <img src="https://academielevinet.com/images/logo-levinet.jpeg" alt="Logo AJL" style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid white;">
                     <div style="font-size: 28px; font-weight: bold; color: white; text-transform: uppercase; letter-spacing: 2px;">AJL</div>
                 </div>
                 <p style="color: rgba(255,255,255,0.9); font-size: 14px;">ACADÉMIE JACQUES LEVINET</p>
@@ -349,7 +349,7 @@ def get_new_message_notification_html(recipient_name: str, sender_name: str, mes
         <div class="container">
             <div class="header">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px;">
-                    <img src="https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg" alt="Logo AJL" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid white;">
+                    <img src="https://academielevinet.com/images/logo-levinet.jpeg" alt="Logo AJL" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid white;">
                     <div class="title">💬 Nouveau Message</div>
                 </div>
                 <p style="color: rgba(255,255,255,0.9); font-size: 13px; margin-top: 5px;">ACADÉMIE JACQUES LEVINET</p>

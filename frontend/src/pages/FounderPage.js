@@ -18,11 +18,11 @@ const FounderPage = () => {
   // Images de la timeline depuis le CMS avec fallbacks
   const timelineImages = {
     1: content?.founder?.timeline_image_1 || null,
-    2: content?.founder?.timeline_image_2 || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/xjxsyj4v_LE%20FONDATEUR%204.jpg',
-    3: content?.founder?.timeline_image_3 || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/qr9mjvp4_LE%20FONDATEUR%203.jpg',
-    4: content?.founder?.timeline_image_4 || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mjvdg2m5_LE%20FONDATEUR%205.jpg',
-    5: content?.founder?.timeline_image_5 || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/uykyfr27_LE%20FONDATEUR%202.jpg',
-    6: content?.founder?.timeline_image_6 || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/yuwqhkg5_LE%20FONDATEUR.png',
+    2: content?.founder?.timeline_image_2 || '/images/PAGE LE FONDATEUR - Rubrique Champion de Karate.jpeg',
+    3: content?.founder?.timeline_image_3 || '/images/PAGE LE FONDATEUR - Rubrique Carriere policiere.jpeg',
+    4: content?.founder?.timeline_image_4 || '/images/PAGE LE FONDATEUR - Rubrique expansion mondiale.jpeg',
+    5: content?.founder?.timeline_image_5 || '/images/PAGE LE FONDATEUR Rubrique Héritage vivant.jpeg',
+    6: content?.founder?.timeline_image_6 || '/images/logo-levinet.jpeg',
   };
 
   const achievements = [

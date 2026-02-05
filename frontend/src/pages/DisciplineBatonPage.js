@@ -11,9 +11,9 @@ const DisciplineBatonPage = () => {
   const discTitle = content?.disciplines?.baton?.title || 'Bâton Défense';
   const discSubtitle = content?.disciplines?.baton?.subtitle || 'Méthode Jacques Levinet';
   const discDescription = content?.disciplines?.baton?.description || "Le Bâton Défense Jacques Levinet (BDJL) est une méthode moderne de self-défense conçue à partir de la Canne Défense JL, adaptée cette fois à l'usage d'un bâton court à moyen, sans crosse.";
-  const discImage = content?.disciplines?.baton?.hero_image || content?.disciplines?.baton?.image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/gvwn5c24_Baton%20Defense.jpg';
-  const discLogoImage = content?.disciplines?.baton?.logo_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/gvwn5c24_Baton%20Defense.jpg';
-  const discSecondaryImage = content?.disciplines?.baton?.secondary_image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/gvwn5c24_Baton%20Defense.jpg';
+  const discImage = content?.disciplines?.baton?.hero_image || content?.disciplines?.baton?.image || '/images/logo-levinet.jpeg';
+  const discLogoImage = content?.disciplines?.baton?.logo_image || '/images/logo-levinet.jpeg';
+  const discSecondaryImage = content?.disciplines?.baton?.secondary_image || '/images/logo-levinet.jpeg';
 
   const benefits = [
     { icon: Shield, title: 'Protection Adaptée', description: 'Réponses concrètes et proportionnées face aux agressions ou menaces.' },

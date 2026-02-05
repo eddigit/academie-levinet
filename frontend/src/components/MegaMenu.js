@@ -87,7 +87,7 @@ const MegaMenu = () => {
       <div className="container mx-auto px-4 md:px-6 pt-4 md:pt-8 relative" style={{ zIndex: 10000 }}>
         <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2 md:gap-3">
           <img
-            src={content?.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"}
+            src={content?.images?.logo || "/images/logo-levinet.jpeg"}
             alt="Logo" 
             className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
           />

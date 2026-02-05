@@ -11,7 +11,7 @@ const EditionsAJLPage = () => {
   const pageTitle = content?.pages?.editions?.title || content?.editions?.title || 'Éditions AJL';
   const pageSubtitle = content?.pages?.editions?.subtitle || content?.editions?.subtitle || 'Plateforme Ouverte de Diffusion de Travaux';
   const pageDescription = content?.pages?.editions?.description || content?.editions?.description || "Les Éditions AJL sont une plateforme ouverte dédiée à la diffusion de travaux de recherche, d'études techniques et de réflexions sur les arts martiaux et la self-défense.";
-  const heroImage = content?.pages?.editions?.hero_image || content?.editions?.image || 'https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/z8k1mvfy_EDITIONS%20AJL.png';
+  const heroImage = content?.pages?.editions?.hero_image || content?.editions?.image || '/images/logo-levinet.jpeg';
   const featuredBookImage = content?.pages?.editions?.featured_book_image || '';
 
   const features = [

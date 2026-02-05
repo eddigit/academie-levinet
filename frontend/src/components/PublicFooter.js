@@ -9,7 +9,7 @@ const PublicFooter = () => {
 
   // Default values in case content is not loaded
   const branding = content?.branding || {
-    logo_url: "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg",
+    logo_url: "/images/logo-levinet.jpeg",
     short_name: "AJL",
     foundation_year: "1998",
     description: "L'Académie Jacques Levinet forme l'élite de la self-défense mondiale depuis plus de 25 ans."

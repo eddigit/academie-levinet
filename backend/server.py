@@ -1496,7 +1496,7 @@ async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(
         }
         role_label = role_labels.get(normalized_role, normalized_role)
         
-        login_url = os.environ.get('FRONTEND_URL', 'https://martial-defense-app.preview.emergentagent.com')
+        login_url = os.environ.get('FRONTEND_URL', 'https://academielevinet.com')
         
         asyncio.create_task(send_email(
             to_email=data.email,
@@ -4119,7 +4119,7 @@ async def get_membership_status(current_user: dict = Depends(get_current_user)):
 # Default site content structure
 DEFAULT_SITE_CONTENT = {
     "branding": {
-        "logo_url": "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg",
+        "logo_url": "/images/logo-levinet.jpeg",
         "name": "Académie Jacques Levinet",
         "short_name": "AJL",
         "tagline": "École Internationale de Self-Défense",
@@ -5027,7 +5027,7 @@ async def approve_pending_member(pending_id: str, current_user: dict = Depends(g
     )
     
     # Send email with temporary password
-    login_url = os.environ.get('FRONTEND_URL', 'https://martial-defense-app.preview.emergentagent.com')
+    login_url = os.environ.get('FRONTEND_URL', 'https://academielevinet.com')
     asyncio.create_task(send_email(
         to_email=pending['email'],
         subject="🎉 Votre compte est activé - Académie Jacques Levinet",

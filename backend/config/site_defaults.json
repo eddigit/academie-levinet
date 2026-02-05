@@ -4,7 +4,7 @@
   "_description": "Configuration officielle de l'Académie Jacques Levinet - NE PAS MODIFIER SANS RAISON",
   
   "branding": {
-    "logo_url": "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg",
+    "logo_url": "/images/logo-levinet.jpeg",
     "name": "Académie Jacques Levinet",
     "short_name": "AJL",
     "tagline": "École Internationale de Self-Défense",
@@ -85,7 +85,7 @@
       {
         "title": "Pour Tout Public",
         "description": "Apprenez à vous défendre avec notre méthode Self-Pro Krav, adaptée à tous",
-        "image": "https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/m50t9hgn_Grand%20Public%20Card.jpeg",
+        "image": "/images/grand-public.jpeg",
         "cta": "Je veux apprendre",
         "link": "/disciplines/wkmo",
         "color": "accent"
@@ -93,7 +93,7 @@
       {
         "title": "Pour les Femmes",
         "description": "Apprenez à vous défendre avec des gestes simples et efficaces. On est là pour vous aider.",
-        "image": "https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/mbtzqqpj_Self-D%C3%A9fense%20F%C3%A9minine.jpeg",
+        "image": "/images/self-defense-feminine.jpeg",
         "cta": "Je veux apprendre",
         "link": "/disciplines/sfjl",
         "color": "secondary"
@@ -101,7 +101,7 @@
       {
         "title": "Forces de Sécurité",
         "description": "Formation opérationnelle pour les forces de l'ordre et les agents de sécurité",
-        "image": "https://customer-assets.emergentagent.com/job_defense-academy-3/artifacts/vjnvljgu_Professionnels%20Card.jpeg",
+        "image": "/images/professionnels.jpeg",
         "cta": "Formation Pro",
         "link": "/disciplines/ipc",
         "color": "primary"

@@ -9,7 +9,7 @@ const PublicHeader = () => {
   const { content } = useSiteContent();
 
   const branding = {
-    logo_url: content?.branding?.logo_url || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg",
+    logo_url: content?.branding?.logo_url || "/images/logo-levinet.jpeg",
     name: content?.branding?.name || "Académie Jacques Levinet",
     tagline: content?.branding?.tagline || "École Internationale de Self-Défense"
   };

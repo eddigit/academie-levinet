@@ -106,7 +106,7 @@ const LoginPage = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <img 
-              src={siteContent?.images?.logo || "https://customer-assets.emergentagent.com/job_spk-academy/artifacts/rz31ua12_WhatsApp%20Image%202025-12-18%20at%2013.59.58.jpeg"} 
+              src={siteContent?.images?.logo || "/images/logo-levinet.jpeg"} 
               alt="Logo Académie Jacques Levinet" 
               className="w-20 h-20 mx-auto mb-4 rounded-full object-cover"
               data-testid="login-logo"
