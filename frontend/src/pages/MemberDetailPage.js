@@ -947,14 +947,14 @@ const MemberDetailPage = () => {
                   <div className="space-y-2">
                     <Label className="text-text-secondary">Contexte d'obtention</Label>
                     <Select
-                      value={editForm.grade_context_type || ''}
-                      onValueChange={(value) => setEditForm({ ...editForm, grade_context_type: value })}
+                      value={editForm.grade_context_type || '__none__'}
+                      onValueChange={(value) => setEditForm({ ...editForm, grade_context_type: value === '__none__' ? '' : value })}
                     >
                       <SelectTrigger className="bg-white/5 border-white/10">
                         <SelectValue placeholder="Sélectionner le contexte..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Non spécifié</SelectItem>
+                        <SelectItem value="__none__">Non spécifié</SelectItem>
                         <SelectItem value="stage">Stage</SelectItem>
                         <SelectItem value="club">Club</SelectItem>
                         <SelectItem value="online">En ligne</SelectItem>
