@@ -456,14 +456,14 @@ const AdminUsersPage = () => {
                     <div className="md:col-span-2">
                       <Label className="text-text-secondary">Club</Label>
                       <Select
-                        value={newUser.club_id}
-                        onValueChange={(value) => setNewUser({ ...newUser, club_id: value })}
+                        value={newUser.club_id || '__none__'}
+                        onValueChange={(value) => setNewUser({ ...newUser, club_id: value === '__none__' ? '' : value })}
                       >
                         <SelectTrigger className="mt-1 bg-background border-white/10">
                           <SelectValue placeholder="Sélectionner un club" />
                         </SelectTrigger>
                         <SelectContent className="bg-paper border-white/10 max-h-60">
-                          <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                          <SelectItem value="__none__" className="text-text-muted">Aucun</SelectItem>
                           {clubs.map((club) => (
                             <SelectItem key={club.id || club._id} value={club.id || club._id} className="text-text-primary">
                               {club.name} {club.city && `(${club.city})`}
@@ -478,14 +478,14 @@ const AdminUsersPage = () => {
                     <div className="md:col-span-2">
                       <Label className="text-text-secondary">Instructeur référent</Label>
                       <Select
-                        value={newUser.instructor_id}
-                        onValueChange={(value) => setNewUser({ ...newUser, instructor_id: value })}
+                        value={newUser.instructor_id || '__none__'}
+                        onValueChange={(value) => setNewUser({ ...newUser, instructor_id: value === '__none__' ? '' : value })}
                       >
                         <SelectTrigger className="mt-1 bg-background border-white/10">
                           <SelectValue placeholder="Sélectionner un instructeur" />
                         </SelectTrigger>
                         <SelectContent className="bg-paper border-white/10 max-h-60">
-                          <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                          <SelectItem value="__none__" className="text-text-muted">Aucun</SelectItem>
                           {instructors.map((instr) => (
                             <SelectItem key={instr.id || instr._id} value={instr.id || instr._id} className="text-text-primary">
                               {formatFullName(instr.full_name)}
@@ -500,14 +500,14 @@ const AdminUsersPage = () => {
                     <div className="md:col-span-2">
                       <Label className="text-text-secondary">Directeur Technique référent</Label>
                       <Select
-                        value={newUser.technical_director_id}
-                        onValueChange={(value) => setNewUser({ ...newUser, technical_director_id: value })}
+                        value={newUser.technical_director_id || '__none__'}
+                        onValueChange={(value) => setNewUser({ ...newUser, technical_director_id: value === '__none__' ? '' : value })}
                       >
                         <SelectTrigger className="mt-1 bg-background border-white/10">
                           <SelectValue placeholder="Sélectionner un DT" />
                         </SelectTrigger>
                         <SelectContent className="bg-paper border-white/10 max-h-60">
-                          <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                          <SelectItem value="__none__" className="text-text-muted">Aucun</SelectItem>
                           {technicalDirectors.map((dt) => (
                             <SelectItem key={dt.id || dt._id} value={dt.id || dt._id} className="text-text-primary">
                               {formatFullName(dt.full_name)}
@@ -566,14 +566,14 @@ const AdminUsersPage = () => {
                 <div>
                   <Label className="text-text-secondary">Discipline principale</Label>
                   <Select
-                    value={newUser.discipline || ''}
-                    onValueChange={(value) => setNewUser({ ...newUser, discipline: value })}
+                    value={newUser.discipline || '__none__'}
+                    onValueChange={(value) => setNewUser({ ...newUser, discipline: value === '__none__' ? '' : value })}
                   >
                     <SelectTrigger className="mt-1 bg-background border-white/10">
                       <SelectValue placeholder="Sélectionner une discipline" />
                     </SelectTrigger>
                     <SelectContent className="bg-paper border-white/10 max-h-60">
-                      <SelectItem value="" className="text-text-muted">Aucune</SelectItem>
+                      <SelectItem value="__none__" className="text-text-muted">Aucune</SelectItem>
                       {disciplinesList.map((disc) => (
                         <SelectItem key={disc.code} value={disc.code} className="text-text-primary">{disc.label}</SelectItem>
                       ))}
@@ -961,14 +961,14 @@ const AdminUsersPage = () => {
                 <div className="mt-4">
                   <Label className="text-text-secondary">Discipline principale</Label>
                   <Select
-                    value={editingUser.discipline || ''}
-                    onValueChange={(value) => setEditingUser({ ...editingUser, discipline: value })}
+                    value={editingUser.discipline || '__none__'}
+                    onValueChange={(value) => setEditingUser({ ...editingUser, discipline: value === '__none__' ? '' : value })}
                   >
                     <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                       <SelectValue placeholder="Sélectionner une discipline" />
                     </SelectTrigger>
                     <SelectContent className="bg-paper border-white/10 max-h-60">
-                      <SelectItem value="" className="text-text-muted">Aucune</SelectItem>
+                      <SelectItem value="__none__" className="text-text-muted">Aucune</SelectItem>
                       {disciplinesList.map((disc) => (
                         <SelectItem key={disc.code} value={disc.code} className="text-text-primary">{disc.label}</SelectItem>
                       ))}
@@ -981,14 +981,14 @@ const AdminUsersPage = () => {
                   <div className="mt-4">
                     <Label className="text-text-secondary">Club</Label>
                     <Select
-                      value={editingUser.club_id || ''}
-                      onValueChange={(value) => setEditingUser({ ...editingUser, club_id: value })}
+                      value={editingUser.club_id || '__none__'}
+                      onValueChange={(value) => setEditingUser({ ...editingUser, club_id: value === '__none__' ? '' : value })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                         <SelectValue placeholder="Sélectionner un club" />
                       </SelectTrigger>
                       <SelectContent className="bg-paper border-white/10 max-h-60">
-                        <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                        <SelectItem value="__none__" className="text-text-muted">Aucun</SelectItem>
                         {clubs.map((club) => (
                           <SelectItem key={club.id || club._id} value={club.id || club._id} className="text-text-primary">
                             {club.name} {club.city && `(${club.city})`}
@@ -1003,14 +1003,14 @@ const AdminUsersPage = () => {
                   <div className="mt-4">
                     <Label className="text-text-secondary">Instructeur référent</Label>
                     <Select
-                      value={editingUser.instructor_id || ''}
-                      onValueChange={(value) => setEditingUser({ ...editingUser, instructor_id: value })}
+                      value={editingUser.instructor_id || '__none__'}
+                      onValueChange={(value) => setEditingUser({ ...editingUser, instructor_id: value === '__none__' ? '' : value })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                         <SelectValue placeholder="Sélectionner un instructeur" />
                       </SelectTrigger>
                       <SelectContent className="bg-paper border-white/10 max-h-60">
-                        <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                        <SelectItem value="__none__" className="text-text-muted">Aucun</SelectItem>
                         {instructors.map((instr) => (
                           <SelectItem key={instr.id || instr._id} value={instr.id || instr._id} className="text-text-primary">
                             {instr.full_name}
@@ -1025,14 +1025,14 @@ const AdminUsersPage = () => {
                   <div className="mt-4">
                     <Label className="text-text-secondary">Directeur Technique référent</Label>
                     <Select
-                      value={editingUser.technical_director_id || ''}
-                      onValueChange={(value) => setEditingUser({ ...editingUser, technical_director_id: value })}
+                      value={editingUser.technical_director_id || '__none__'}
+                      onValueChange={(value) => setEditingUser({ ...editingUser, technical_director_id: value === '__none__' ? '' : value })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                         <SelectValue placeholder="Sélectionner un DT" />
                       </SelectTrigger>
                       <SelectContent className="bg-paper border-white/10 max-h-60">
-                        <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                        <SelectItem value="__none__" className="text-text-muted">Aucun</SelectItem>
                         {technicalDirectors.map((dt) => (
                           <SelectItem key={dt.id || dt._id} value={dt.id || dt._id} className="text-text-primary">
                             {formatFullName(dt.full_name)}

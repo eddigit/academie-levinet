@@ -222,7 +222,6 @@ h1.font-oswald, h2.font-oswald, h3.font-oswald, h4.font-oswald {
     filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.4));
   }
 }
-}
 
 /* Custom scrollbar for sidebar */
 .scrollbar-thin {
