@@ -179,17 +179,14 @@ const EditionsAJLPage = () => {
           
           <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
             <div className="aspect-video rounded-lg overflow-hidden border border-white/10 mb-6">
-              <div 
-                className="w-full h-full bg-cover bg-center bg-gray-800"
-                data-placeholder="publications-catalog"
-              >
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                  <span className="text-text-muted font-manrope text-sm text-center px-4">Catalogue des publications à ajouter</span>
-                </div>
-              </div>
+              <img 
+                src="/images/catalogue-editions-ajl.jpg"
+                alt="Catalogue Éditions AJL"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <p className="text-text-muted font-manrope">
-              Catalogue complet des publications disponibles prochainement.
+            <p className="text-text-secondary font-manrope">
+              Catalogue des Éditions AJL - Publications et ouvrages disponibles.
             </p>
           </div>
         </div>
