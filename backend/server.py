@@ -4254,7 +4254,8 @@ DEFAULT_SITE_CONTENT = {
             "description": "Livres et supports pédagogiques",
             "hero_image": "",
             "books_cover": [],
-            "featured_book_image": ""
+            "featured_book_image": "",
+            "catalog_image": ""
         },
         "join": {
             "title": "Nous Rejoindre",

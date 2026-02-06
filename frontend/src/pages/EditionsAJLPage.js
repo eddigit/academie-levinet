@@ -13,6 +13,7 @@ const EditionsAJLPage = () => {
   const pageDescription = content?.pages?.editions?.description || content?.editions?.description || "Les Éditions AJL sont une plateforme ouverte dédiée à la diffusion de travaux de recherche, d'études techniques et de réflexions sur les arts martiaux et la self-défense.";
   const heroImage = content?.pages?.editions?.hero_image || content?.editions?.image || '/images/logo-levinet.jpeg';
   const featuredBookImage = content?.pages?.editions?.featured_book_image || '';
+  const catalogImage = content?.pages?.editions?.catalog_image || '';
 
   const features = [
     { icon: BookOpen, title: 'Publications Ouvertes', description: 'Espace de libre diffusion de travaux académiques et techniques.' },
@@ -179,9 +180,9 @@ const EditionsAJLPage = () => {
           
           <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
             <div className="aspect-video rounded-lg overflow-hidden border border-white/10 mb-6">
-              {featuredBookImage ? (
+              {catalogImage ? (
                 <img 
-                  src={featuredBookImage}
+                  src={catalogImage}
                   alt="Catalogue Éditions AJL"
                   className="w-full h-full object-cover"
                 />

@@ -1144,6 +1144,11 @@ const SiteContentPage = () => {
                   value={content.pages?.editions?.featured_book_image || ''}
                   onChange={(url) => updateNestedField('pages', 'editions', 'featured_book_image', url)}
                 />
+                <ImageUploader
+                  label="Image Catalogue Publications"
+                  value={content.pages?.editions?.catalog_image || ''}
+                  onChange={(url) => updateNestedField('pages', 'editions', 'catalog_image', url)}
+                />
               </div>
             </div>
           </div>
