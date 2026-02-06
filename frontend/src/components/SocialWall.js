@@ -379,20 +379,21 @@ const SocialWall = ({ variant = 'full' }) => {
     try {
       const response = await api.get('/events');
       const events = response.data || [];
-      
+
       // Obtenir la date du jour à minuit pour une comparaison correcte
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       // Filtrer uniquement les événements dont la date de début est >= aujourd'hui
+      // et trier par date de création (le plus récent en premier)
       const upcomingEvents = events
         .filter(e => {
           const eventDate = new Date(e.start_date);
           eventDate.setHours(0, 0, 0, 0);
           return eventDate >= today;
         })
-        .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-      
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
       if (upcomingEvents.length > 0) {
         setNextEvent(upcomingEvents[0]);
       } else {
