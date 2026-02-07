@@ -5308,24 +5308,21 @@ async def create_club(club_data: ClubCreate, current_user: dict = Depends(get_cu
     """Create a new club (admin only)"""
     if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
-    
-    # Verify technical director exists
-    dt = await db.users.find_one({"id": club_data.technical_director_id}, {"_id": 0})
-    if not dt:
-        raise HTTPException(status_code=400, detail="Directeur technique non trouvé")
-    
+
     club_id = str(uuid.uuid4())
     club = {
         "id": club_id,
         "name": club_data.name,
         "address": club_data.address,
         "city": club_data.city,
+        "postal_code": club_data.postal_code,
         "country": club_data.country,
+        "country_code": club_data.country_code,
         "phone": club_data.phone,
         "email": club_data.email,
         "logo_url": club_data.logo_url,
-        "technical_director_id": club_data.technical_director_id,
-        "technical_director_name": dt.get("full_name"),
+        "national_director_ids": club_data.national_director_ids,
+        "technical_director_ids": club_data.technical_director_ids,
         "instructor_ids": club_data.instructor_ids,
         "disciplines": club_data.disciplines,
         "schedule": club_data.schedule,
@@ -5333,15 +5330,15 @@ async def create_club(club_data: ClubCreate, current_user: dict = Depends(get_cu
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": None
     }
-    
+
     await db.clubs.insert_one(club)
-    
-    # Update the technical director's club assignment
-    await db.users.update_one(
-        {"id": club_data.technical_director_id},
-        {"$set": {"club_id": club_id, "role": "technical_director" if dt.get("role") != "admin" else dt.get("role")}}
-    )
-    
+
+    # Update technical directors' club assignments
+    for td_id in club_data.technical_director_ids:
+        td = await db.users.find_one({"id": td_id})
+        if td and td.get("role") != "admin":
+            await db.users.update_one({"id": td_id}, {"$set": {"club_id": club_id}})
+
     return {"message": "Club créé avec succès", "club": {k: v for k, v in club.items() if k != "_id"}}
 
 @api_router.put("/admin/clubs/{club_id}")
@@ -5355,20 +5352,14 @@ async def update_club(club_id: str, club_data: ClubUpdate, current_user: dict = 
         raise HTTPException(status_code=404, detail="Club non trouvé")
     
     update_data = {k: v for k, v in club_data.model_dump().items() if v is not None}
-    
-    # If changing technical director, verify and update names
-    if "technical_director_id" in update_data:
-        new_dt = await db.users.find_one({"id": update_data["technical_director_id"]}, {"_id": 0})
-        if not new_dt:
-            raise HTTPException(status_code=400, detail="Nouveau directeur technique non trouvé")
-        update_data["technical_director_name"] = new_dt.get("full_name")
-        
-        # Update user assignments
-        await db.users.update_one(
-            {"id": update_data["technical_director_id"]},
-            {"$set": {"club_id": club_id}}
-        )
-    
+
+    # If changing technical directors, update their club assignments
+    if "technical_director_ids" in update_data:
+        for td_id in update_data["technical_director_ids"]:
+            td = await db.users.find_one({"id": td_id})
+            if td and td.get("role") != "admin":
+                await db.users.update_one({"id": td_id}, {"$set": {"club_id": club_id}})
+
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.clubs.update_one({"id": club_id}, {"$set": update_data})
@@ -5619,7 +5610,8 @@ async def get_technical_directors_list():
         {"$or": [
             {"role": "directeur_technique"},
             {"role": "technical_director"},
-            {"roles": "directeur_technique"}
+            {"roles": "directeur_technique"},
+            {"belt_grade": "Directeur Technique"}
         ]},
         {"_id": 0, "id": 1, "full_name": 1, "email": 1, "city": 1, "country": 1, "photo_url": 1, "club_id": 1, "dan_grade": 1}
     ).to_list(1000)
@@ -5632,7 +5624,8 @@ async def get_national_directors_list():
         {"$or": [
             {"role": "directeur_national"},
             {"role": "national_director"},
-            {"roles": "directeur_national"}
+            {"roles": "directeur_national"},
+            {"belt_grade": "Directeur National"}
         ]},
         {"_id": 0, "id": 1, "full_name": 1, "email": 1, "city": 1, "country": 1, "photo_url": 1, "dan_grade": 1}
     ).to_list(1000)
@@ -5645,7 +5638,8 @@ async def get_instructors_list():
         {"$or": [
             {"role": "instructeur"},
             {"role": "instructor"},
-            {"roles": "instructeur"}
+            {"roles": "instructeur"},
+            {"belt_grade": "Instructeur"}
         ]},
         {"_id": 0, "id": 1, "full_name": 1, "email": 1, "city": 1, "country": 1, "photo_url": 1, "club_id": 1, "dan_grade": 1}
     ).to_list(1000)
