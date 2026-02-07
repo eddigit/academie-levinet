@@ -469,7 +469,7 @@ const ClubsPage = () => {
                     </span>
                   )}
                 </Label>
-                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-3 bg-background rounded-lg border border-white/10">
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto p-3 bg-background rounded-lg border border-white/10">
                   {nationalDirectors.length === 0 ? (
                     <p className="text-text-muted text-sm col-span-2 py-2">Aucun directeur national disponible</p>
                   ) : nationalDirectors.map(d => (
@@ -499,7 +499,7 @@ const ClubsPage = () => {
                     </span>
                   )}
                 </Label>
-                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-3 bg-background rounded-lg border border-white/10">
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto p-3 bg-background rounded-lg border border-white/10">
                   {technicalDirectors.length === 0 ? (
                     <p className="text-text-muted text-sm col-span-2 py-2">Aucun directeur technique disponible</p>
                   ) : technicalDirectors.map(d => (
@@ -529,7 +529,7 @@ const ClubsPage = () => {
                     </span>
                   )}
                 </Label>
-                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto p-3 bg-background rounded-lg border border-white/10">
+                <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto p-3 bg-background rounded-lg border border-white/10">
                   {instructorsList.length === 0 ? (
                     <p className="text-text-muted text-sm col-span-2 py-2">Aucun instructeur disponible</p>
                   ) : instructorsList.map(i => (

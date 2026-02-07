@@ -404,7 +404,7 @@ const MemberDetailPage = () => {
                   ) : (
                     <div className="w-full h-full bg-gray-700 flex items-center justify-center">
                       <span className="text-6xl font-oswald font-bold text-white">
-                        {member.first_name[0]}{member.last_name[0]}
+                        {(member.first_name || '?')[0]}{(member.last_name || '?')[0]}
                       </span>
                     </div>
                   )}
