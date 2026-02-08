@@ -1321,7 +1321,7 @@ async def upload_photo(data: PhotoUploadRequest, current_user: dict = Depends(ge
 @api_router.post("/admin/users/{user_id}/photo")
 async def update_user_photo(user_id: str, data: PhotoUploadRequest, current_user: dict = Depends(get_current_user)):
     """Admin: Update a user's photo"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Check user exists
@@ -1347,7 +1347,7 @@ async def update_user_photo(user_id: str, data: PhotoUploadRequest, current_user
 @api_router.get("/admin/admins")
 async def get_all_admins(current_user: dict = Depends(get_current_user)):
     """Get list of all administrators (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     admins = await db.users.find(
@@ -1379,7 +1379,7 @@ async def get_all_users(
     - belt_grade: Grade/Ceinture
     """
     # Seuls les admins peuvent voir tous les utilisateurs
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
 
     query = {}
@@ -1412,7 +1412,7 @@ async def get_all_users(
 @api_router.post("/admin/users")
 async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(get_current_user)):
     """Admin: Create a new user (admin, member, instructor, technical_director)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Check if email exists
@@ -1553,7 +1553,7 @@ async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(
 @api_router.put("/admin/users/{user_id}/role")
 async def update_user_role(user_id: str, role: str, current_user: dict = Depends(get_current_user)):
     """Admin: Update user role"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
 
     valid_roles = ['admin', 'directeur_technique', 'instructeur', 'eleve', 'eleve_libre']
@@ -1573,7 +1573,7 @@ async def update_user_role(user_id: str, role: str, current_user: dict = Depends
 @api_router.delete("/admin/users/{user_id}")
 async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
     """Admin: Delete a user"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Prevent self-deletion
@@ -1590,7 +1590,7 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
 @api_router.get("/admin/users/{user_id}")
 async def get_user_details(user_id: str, current_user: dict = Depends(get_current_user)):
     """Admin: Get full user details"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
@@ -1602,7 +1602,7 @@ async def get_user_details(user_id: str, current_user: dict = Depends(get_curren
 @api_router.put("/admin/users/{user_id}")
 async def update_user(user_id: str, data: AdminUserUpdate, current_user: dict = Depends(get_current_user)):
     """Admin: Update any user's profile (unified model)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
 
     # Get current user data to check role changes
@@ -1682,7 +1682,7 @@ async def update_user(user_id: str, data: AdminUserUpdate, current_user: dict = 
 @api_router.put("/admin/users/{user_id}/password")
 async def admin_change_user_password(user_id: str, new_password: str, current_user: dict = Depends(get_current_user)):
     """Admin: Change any user's password"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     if len(new_password) < 6:
@@ -2031,7 +2031,7 @@ async def delete_lead(lead_id: str, current_user: dict = Depends(get_current_use
 @api_router.post("/tasks", response_model=Task)
 async def create_task(task_data: TaskCreate, current_user: dict = Depends(get_current_user)):
     """Create a new task (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Get assigned user name and photo if assigned_to is provided
@@ -2060,7 +2060,7 @@ async def create_task(task_data: TaskCreate, current_user: dict = Depends(get_cu
 @api_router.get("/tasks", response_model=List[Task])
 async def get_tasks(current_user: dict = Depends(get_current_user)):
     """Get all tasks (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     tasks = await db.tasks.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
@@ -2074,7 +2074,7 @@ async def get_tasks(current_user: dict = Depends(get_current_user)):
 @api_router.get("/tasks/{task_id}", response_model=Task)
 async def get_task(task_id: str, current_user: dict = Depends(get_current_user)):
     """Get a specific task (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     task = await db.tasks.find_one({"id": task_id}, {"_id": 0})
@@ -2094,7 +2094,7 @@ async def update_task(
     current_user: dict = Depends(get_current_user)
 ):
     """Update a task (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     update_data = {k: v for k, v in task_data.model_dump().items() if v is not None}
@@ -2125,7 +2125,7 @@ async def update_task(
 @api_router.patch("/tasks/{task_id}/toggle")
 async def toggle_task_status(task_id: str, current_user: dict = Depends(get_current_user)):
     """Toggle task status between TODO and DONE (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     task = await db.tasks.find_one({"id": task_id}, {"_id": 0})
@@ -2148,7 +2148,7 @@ async def toggle_task_status(task_id: str, current_user: dict = Depends(get_curr
 @api_router.delete("/tasks/{task_id}")
 async def delete_task(task_id: str, current_user: dict = Depends(get_current_user)):
     """Delete a task (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     result = await db.tasks.delete_one({"id": task_id})
@@ -2296,7 +2296,7 @@ async def delete_news_comment(news_id: str, comment_id: str, current_user: dict 
         raise HTTPException(status_code=404, detail="Comment not found")
     
     # Only author or admin can delete
-    if comment["author_id"] != current_user["id"] and not is_admin(current_user):
+    if comment["author_id"] != current_user["id"] and current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Not authorized")
     
     await db.news_comments.delete_one({"id": comment_id})
@@ -2832,7 +2832,7 @@ async def admin_get_all_messages(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Get all messages for moderation"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     messages = await db.messages.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
@@ -2848,7 +2848,7 @@ async def admin_get_all_messages(
 @api_router.delete("/admin/messages/{message_id}")
 async def admin_delete_message(message_id: str, current_user: dict = Depends(get_current_user)):
     """Admin: Delete a message (moderation)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     result = await db.messages.delete_one({"id": message_id})
@@ -2864,7 +2864,7 @@ async def admin_get_all_conversations(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Get all conversations for moderation"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     conversations = await db.conversations.find({}, {"_id": 0}).sort("updated_at", -1).skip(skip).limit(limit).to_list(limit)
@@ -2999,7 +2999,7 @@ async def delete_post(
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
     
-    if post.get("author_id") != current_user.get("id") and not is_admin(current_user):
+    if post.get("author_id") != current_user.get("id") and current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Not authorized to delete this post")
     
     await db.posts.delete_one({"id": post_id})
@@ -3085,7 +3085,7 @@ async def delete_comment(
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
     
-    if comment.get("author_id") != current_user.get("id") and not is_admin(current_user):
+    if comment.get("author_id") != current_user.get("id") and current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Not authorized to delete this comment")
     
     await db.post_comments.delete_one({"id": comment_id})
@@ -3633,7 +3633,7 @@ async def create_product(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Create a new product"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     product = {
@@ -3660,7 +3660,7 @@ async def update_product(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Update a product"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     product = await db.products.find_one({"id": product_id})
@@ -3681,7 +3681,7 @@ async def delete_product(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Delete a product"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     result = await db.products.delete_one({"id": product_id})
@@ -3695,7 +3695,7 @@ async def admin_get_products(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Get all products including inactive ones"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     products = await db.products.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
@@ -3707,7 +3707,7 @@ async def admin_get_orders(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Get all orders"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     query = {}
@@ -3724,7 +3724,7 @@ async def update_order_status(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Update order status"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     result = await db.orders.update_one(
@@ -3739,7 +3739,7 @@ async def update_order_status(
 @api_router.get("/shop/stats")
 async def get_shop_stats(current_user: dict = Depends(get_current_user)):
     """Get shop statistics"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     total_products = await db.products.count_documents({})
@@ -4344,7 +4344,7 @@ async def get_founder_message():
 @api_router.get("/admin/site-content")
 async def get_site_content(current_user: dict = Depends(get_current_user)):
     """Admin: Get site content for editing"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     content = await db.settings.find_one({"id": "site_content"}, {"_id": 0})
@@ -4358,7 +4358,7 @@ async def get_site_content(current_user: dict = Depends(get_current_user)):
 @api_router.put("/admin/site-content")
 async def update_site_content(data: dict, current_user: dict = Depends(get_current_user)):
     """Admin: Update site content"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Log pour debug
@@ -4391,7 +4391,7 @@ async def update_site_content(data: dict, current_user: dict = Depends(get_curre
 @api_router.put("/admin/site-content/{section}")
 async def update_site_section(section: str, data: dict, current_user: dict = Depends(get_current_user)):
     """Admin: Update a specific section of site content"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     valid_sections = ['hero', 'about', 'features', 'testimonials', 'contact', 'social_links', 'footer']
@@ -4671,7 +4671,7 @@ async def get_chat_history(current_user: dict = Depends(get_current_user)):
 @api_router.get("/admin/ai-config")
 async def get_ai_configuration(current_user: dict = Depends(get_current_user)):
     """Admin: Get AI assistant configuration"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     config = await db.settings.find_one({"id": "ai_config"}, {"_id": 0})
@@ -4691,7 +4691,7 @@ async def get_ai_configuration(current_user: dict = Depends(get_current_user)):
 @api_router.put("/admin/ai-config")
 async def update_ai_configuration(data: dict, current_user: dict = Depends(get_current_user)):
     """Admin: Update AI assistant configuration"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     allowed_fields = ["visitor_extra_instructions", "member_extra_instructions", "ai_enabled"]
@@ -4716,7 +4716,7 @@ async def update_ai_configuration(data: dict, current_user: dict = Depends(get_c
 @api_router.get("/admin/members/subscriptions")
 async def get_members_subscriptions(current_user: dict = Depends(get_current_user)):
     """Admin: Get all members with their subscription status"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     members = await db.users.find(
@@ -4762,7 +4762,7 @@ async def update_member_subscription(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Manually update a member's subscription status"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     update_data = {"has_paid_license": has_paid_license}
@@ -4815,7 +4815,7 @@ async def download_invoice_pdf(invoice_id: str, current_user: dict = Depends(get
         raise HTTPException(status_code=404, detail="Facture non trouvée")
     
     # Check access (user's own invoice or admin)
-    if invoice["user_id"] != current_user["id"] and not is_admin(current_user):
+    if invoice["user_id"] != current_user["id"] and current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Accès non autorisé")
     
     # Get user info
@@ -4908,7 +4908,7 @@ async def generate_invoice_for_member(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Generate an invoice for a member"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     user = await db.users.find_one({"id": user_id}, {"_id": 0})
@@ -4975,7 +4975,7 @@ async def get_pending_members(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Get all pending member requests"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     query = {}
@@ -4993,7 +4993,7 @@ async def get_pending_members(
 @api_router.post("/admin/pending-members/{pending_id}/approve")
 async def approve_pending_member(pending_id: str, current_user: dict = Depends(get_current_user)):
     """Admin: Approve a pending member and create their account"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     pending = await db.pending_members.find_one({"id": pending_id}, {"_id": 0})
@@ -5072,7 +5072,7 @@ async def reject_pending_member(
     current_user: dict = Depends(get_current_user)
 ):
     """Admin: Reject a pending member request"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     pending = await db.pending_members.find_one({"id": pending_id}, {"_id": 0})
@@ -5111,7 +5111,7 @@ async def reject_pending_member(
 @api_router.get("/admin/settings/smtp")
 async def get_smtp_settings(current_user: dict = Depends(get_current_user)):
     """Admin: Get SMTP settings (password masked)"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     settings = await db.settings.find_one({"id": "smtp_settings"}, {"_id": 0})
@@ -5134,7 +5134,7 @@ async def get_smtp_settings(current_user: dict = Depends(get_current_user)):
 @api_router.put("/admin/settings/smtp")
 async def update_smtp_settings(data: SmtpSettingsUpdate, current_user: dict = Depends(get_current_user)):
     """Admin: Update SMTP settings"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     update_data = {k: v for k, v in data.model_dump().items() if v is not None}
@@ -5160,7 +5160,7 @@ async def update_smtp_settings(data: SmtpSettingsUpdate, current_user: dict = De
 @api_router.post("/admin/settings/smtp/test")
 async def test_smtp_settings(data: SmtpTestRequest, current_user: dict = Depends(get_current_user)):
     """Admin: Send test email to verify SMTP settings"""
-    if not is_admin(current_user):
+    if current_user.get('role') != 'admin':
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Get SMTP settings from database
@@ -5320,7 +5320,7 @@ async def get_club(club_id: str):
 @api_router.post("/admin/clubs")
 async def create_club(club_data: ClubCreate, current_user: dict = Depends(get_current_user)):
     """Create a new club (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
 
     club_id = str(uuid.uuid4())
@@ -5358,7 +5358,7 @@ async def create_club(club_data: ClubCreate, current_user: dict = Depends(get_cu
 @api_router.put("/admin/clubs/{club_id}")
 async def update_club(club_id: str, club_data: ClubUpdate, current_user: dict = Depends(get_current_user)):
     """Update a club (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
     
     club = await db.clubs.find_one({"id": club_id})
@@ -5384,7 +5384,7 @@ async def update_club(club_id: str, club_data: ClubUpdate, current_user: dict = 
 @api_router.delete("/admin/clubs/{club_id}")
 async def delete_club(club_id: str, current_user: dict = Depends(get_current_user)):
     """Delete a club (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
     
     club = await db.clubs.find_one({"id": club_id})
@@ -5404,7 +5404,7 @@ async def delete_club(club_id: str, current_user: dict = Depends(get_current_use
 @api_router.post("/admin/clubs/{club_id}/members/{user_id}")
 async def assign_member_to_club(club_id: str, user_id: str, current_user: dict = Depends(get_current_user)):
     """Assign a member to a club (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
     
     club = await db.clubs.find_one({"id": club_id})
@@ -5422,7 +5422,7 @@ async def assign_member_to_club(club_id: str, user_id: str, current_user: dict =
 @api_router.delete("/admin/clubs/{club_id}/members/{user_id}")
 async def remove_member_from_club(club_id: str, user_id: str, current_user: dict = Depends(get_current_user)):
     """Remove a member from a club (admin only)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Accès réservé aux administrateurs")
     
     await db.users.update_one({"id": user_id}, {"$unset": {"club_id": ""}})
@@ -5474,7 +5474,7 @@ async def get_visit_requests(
     """Get visit requests (for admins/DTs or member's own requests)"""
     query = {}
     
-    if is_admin(current_user):
+    if current_user.get("role") == "admin":
         # Admins see all
         if club_id:
             query["$or"] = [{"home_club_id": club_id}, {"target_club_id": club_id}]
@@ -5551,13 +5551,13 @@ async def approve_visit_request(request_id: str, current_user: dict = Depends(ge
         raise HTTPException(status_code=404, detail="Demande non trouvée")
     
     # Check permissions
-    user_is_admin = is_admin(current_user)
+    is_admin = current_user.get("role") == "admin"
     is_club_dt = (
         current_user.get("role") == "directeur_technique" and
         current_user.get("club_id") == visit_request.get("target_club_id")
     )
 
-    if not user_is_admin and not is_club_dt:
+    if not is_admin and not is_club_dt:
         raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à approuver cette demande")
     
     await db.visit_requests.update_one(
@@ -5579,13 +5579,13 @@ async def reject_visit_request(request_id: str, current_user: dict = Depends(get
     if not visit_request:
         raise HTTPException(status_code=404, detail="Demande non trouvée")
     
-    user_is_admin = is_admin(current_user)
+    is_admin = current_user.get("role") == "admin"
     is_club_dt = (
         current_user.get("role") == "directeur_technique" and
         current_user.get("club_id") == visit_request.get("target_club_id")
     )
 
-    if not user_is_admin and not is_club_dt:
+    if not is_admin and not is_club_dt:
         raise HTTPException(status_code=403, detail="Vous n'êtes pas autorisé à refuser cette demande")
     
     await db.visit_requests.update_one(
@@ -5607,7 +5607,7 @@ async def cancel_visit_request(request_id: str, current_user: dict = Depends(get
     if not visit_request:
         raise HTTPException(status_code=404, detail="Demande non trouvée")
     
-    if visit_request.get("member_id") != current_user["id"] and not is_admin(current_user):
+    if visit_request.get("member_id") != current_user["id"] and current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Vous ne pouvez annuler que vos propres demandes")
     
     if visit_request.get("status") != "En attente":
@@ -6182,7 +6182,7 @@ async def admin_grant_tokens(
     current_user: dict = Depends(get_current_user)
 ):
     """Attribution de tokens par un admin"""
-    if not is_admin(current_user):
+    if current_user.get("role") not in ["admin", "fondateur"]:
         raise HTTPException(status_code=403, detail="Admin uniquement")
     
     # Vérifier que l'utilisateur cible existe
@@ -6208,7 +6208,7 @@ async def admin_grant_tokens(
 @api_router.get("/admin/tokens/stats")
 async def admin_token_stats(current_user: dict = Depends(get_current_user)):
     """Statistiques globales des tokens (admin)"""
-    if not is_admin(current_user):
+    if current_user.get("role") not in ["admin", "fondateur"]:
         raise HTTPException(status_code=403, detail="Admin uniquement")
     
     # Stats globales
@@ -6339,7 +6339,7 @@ async def track_sponsor_click(sponsor_id: str):
 @api_router.get("/admin/sponsors")
 async def get_all_sponsors_admin(current_user: dict = Depends(get_current_user)):
     """Liste tous les sponsors (admin)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
     sponsors = await db.sponsors.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
@@ -6351,7 +6351,7 @@ async def create_sponsor(
     current_user: dict = Depends(get_current_user)
 ):
     """Créer un nouveau sponsor (admin)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
     sponsor = Sponsor(**sponsor_data.model_dump())
@@ -6384,7 +6384,7 @@ async def update_sponsor(
     current_user: dict = Depends(get_current_user)
 ):
     """Mettre à jour un sponsor (admin)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
     existing = await db.sponsors.find_one({"id": sponsor_id})
@@ -6421,7 +6421,7 @@ async def delete_sponsor(
     current_user: dict = Depends(get_current_user)
 ):
     """Supprimer un sponsor (admin)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
     result = await db.sponsors.delete_one({"id": sponsor_id})
@@ -6434,7 +6434,7 @@ async def delete_sponsor(
 @api_router.get("/admin/sponsors/stats")
 async def get_sponsors_stats(current_user: dict = Depends(get_current_user)):
     """Statistiques globales des sponsors (admin)"""
-    if not is_admin(current_user):
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
     sponsors = await db.sponsors.find({}, {"_id": 0}).to_list(100)
