@@ -281,7 +281,9 @@ const MemberDetailPage = () => {
         full_name: `${editForm.first_name} ${editForm.last_name}`.trim()
       };
       await api.put(`/admin/users/${memberId}`, updateData);
-      setMember({ ...member, ...editForm });
+      // Recharger les données complètes depuis le serveur au lieu de mettre à jour l'état local
+      await fetchMember();
+      await fetchAffectations();
       setIsEditOpen(false);
       toast.success('Membre mis à jour avec succès');
     } catch (error) {

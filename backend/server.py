@@ -5272,25 +5272,46 @@ async def get_club(club_id: str):
     club = await db.clubs.find_one({"id": club_id}, {"_id": 0})
     if not club:
         raise HTTPException(status_code=404, detail="Club non trouvé")
-    
-    # Get technical director
+
+    # Get technical director (old single field for backward compatibility)
     if club.get("technical_director_id"):
         dt = await db.users.find_one({"id": club["technical_director_id"]}, {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1})
         club["technical_director"] = dt
-    
-    # Get instructors
-    if club.get("instructor_ids"):
+
+    # Get technical directors (new multiple field)
+    if club.get("technical_director_ids"):
+        technical_directors = await db.users.find(
+            {"id": {"$in": club["technical_director_ids"]}},
+            {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "belt_grade": 1, "role": 1}
+        ).to_list(100)
+        club["technical_directors"] = technical_directors
+    else:
+        club["technical_directors"] = []
+
+    # Get instructors - include ALL users with instructor role in this club
+    instructor_ids = club.get("instructor_ids", [])
+    # Also find instructors who have this club_id assigned
+    instructors_by_club = await db.users.find(
+        {"club_id": club_id, "role": "instructeur"},
+        {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "belt_grade": 1, "role": 1}
+    ).to_list(100)
+
+    # Combine instructors from instructor_ids and those with club_id
+    all_instructor_ids = set(instructor_ids)
+    all_instructor_ids.update([i["id"] for i in instructors_by_club])
+
+    if all_instructor_ids:
         instructors = await db.users.find(
-            {"id": {"$in": club["instructor_ids"]}},
-            {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "belt_grade": 1}
+            {"id": {"$in": list(all_instructor_ids)}},
+            {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "belt_grade": 1, "role": 1}
         ).to_list(100)
         club["instructors"] = instructors
     else:
         club["instructors"] = []
-    
-    # Get members
+
+    # Get members - include regular members (eleve role)
     members = await db.users.find(
-        {"club_id": club_id},
+        {"club_id": club_id, "role": {"$in": ["eleve", "membre"]}},
         {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "belt_grade": 1, "role": 1}
     ).to_list(1000)
     club["members"] = members
