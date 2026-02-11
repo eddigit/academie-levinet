@@ -7,6 +7,10 @@ import { formatFullName, getInitials } from '../lib/utils';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
+// Rôles ayant accès à l'administration
+const ADMIN_ROLES = ['admin', 'fondateur', 'directeur_national'];
+const MANAGEMENT_ROLES = [...ADMIN_ROLES, 'directeur_technique'];
+
 const Header = () => {
   const { logout, user, getToken } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -72,8 +76,8 @@ const Header = () => {
           </Link>
         )}
 
-        {/* Nouvelle Tâche button for admins and testers */}
-        {(user?.role === 'admin' || user?.is_tester === true) && (
+        {/* Nouvelle Tâche button for admins, management and testers */}
+        {(MANAGEMENT_ROLES.includes(user?.role) || user?.is_tester === true) && (
           <button
             onClick={() => setShowTaskModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg transition-all font-medium text-sm"
@@ -97,7 +101,7 @@ const Header = () => {
                 {formatFullName(user?.full_name || user?.name) || 'Utilisateur'}
               </p>
               <p className="text-xs text-text-muted capitalize">
-                {user?.role === 'admin' ? 'Administrateur' :
+                {ADMIN_ROLES.includes(user?.role) ? 'Administrateur' :
                  user?.role === 'directeur_technique' ? 'Directeur Technique' :
                  user?.role === 'instructeur' ? 'Instructeur' :
                  user?.role === 'eleve_libre' ? 'Élève Libre' :
@@ -144,7 +148,7 @@ const Header = () => {
                   <span>Mon Profil</span>
                 </Link>
                 
-                {user?.role === 'admin' && (
+                {MANAGEMENT_ROLES.includes(user?.role) && (
                   <Link
                     to="/admin/settings"
                     onClick={() => setIsDropdownOpen(false)}

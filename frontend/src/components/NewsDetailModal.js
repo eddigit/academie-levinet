@@ -416,7 +416,7 @@ const NewsDetailModal = ({ news, isOpen, onClose, onUpdate }) => {
                       <div className="bg-background rounded-xl p-3">
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <p className="font-medium text-text-primary text-sm">{comment.author_name}</p>
-                          {(comment.author_id === user?.id || user?.role === 'admin') && (
+                          {(comment.author_id === user?.id || ['admin', 'fondateur', 'directeur_national'].includes(user?.role)) && (
                             <button
                               onClick={() => handleDeleteComment(comment.id)}
                               className="text-text-muted hover:text-red-500 transition-colors"

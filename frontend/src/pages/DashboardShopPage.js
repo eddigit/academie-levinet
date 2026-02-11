@@ -141,7 +141,7 @@ const DashboardShopPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const isPremium = user?.is_premium || false;
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = ['admin', 'fondateur', 'directeur_national', 'directeur_technique'].includes(user?.role);
 
   useEffect(() => {
     fetchProducts();

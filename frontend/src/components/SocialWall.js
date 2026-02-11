@@ -78,7 +78,7 @@ const PostCard = ({ post, onReact, onComment, onDelete, currentUserId }) => {
   };
 
   const totalReactions = post.reactions_count || 0;
-  const canDelete = post.author_id === currentUserId || post.author?.role === 'admin';
+  const canDelete = post.author_id === currentUserId || ['admin', 'fondateur', 'directeur_national'].includes(post.author?.role);
 
   return (
     <div className="bg-paper rounded-xl border border-white/10 overflow-hidden">

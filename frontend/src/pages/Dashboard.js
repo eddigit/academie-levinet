@@ -6,12 +6,15 @@ import { api } from '../utils/api';
 import { Users, DollarSign, TrendingUp, UserCheck, ArrowUp, ArrowDown, BarChart3, MessageCircle, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+// Rôles ayant accès aux stats admin
+const MANAGEMENT_ROLES = ['admin', 'fondateur', 'directeur_national', 'directeur_technique'];
+
 const Dashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [forums, setForums] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = MANAGEMENT_ROLES.includes(user?.role);
 
   useEffect(() => {
     const fetchData = async () => {

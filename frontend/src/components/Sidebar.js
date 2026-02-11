@@ -11,6 +11,10 @@ import { useSiteContent } from '../context/SiteContentContext';
 import api from '../utils/api';
 import { formatFullName, getInitials } from '../lib/utils';
 
+// Rôles ayant accès à l'administration
+const ADMIN_ROLES = ['admin', 'fondateur', 'directeur_national'];
+const MANAGEMENT_ROLES = [...ADMIN_ROLES, 'directeur_technique'];
+
 const Sidebar = () => {
   const location = useLocation();
   const { logout, user } = useAuth();
@@ -155,7 +159,7 @@ const Sidebar = () => {
           <NavLink key={item.path} item={item} />
         ))}
 
-        {user?.role === 'admin' && (
+        {MANAGEMENT_ROLES.includes(user?.role) && (
           <>
             <div className="pt-4 mt-4 border-t border-white/5">
               <p className="px-4 text-xs font-oswald text-text-muted uppercase tracking-wider mb-2">Administration</p>
@@ -286,7 +290,7 @@ const Sidebar = () => {
             <NavLink key={item.path} item={item} onClick={() => setIsMobileMenuOpen(false)} />
           ))}
 
-          {user?.role === 'admin' && (
+          {MANAGEMENT_ROLES.includes(user?.role) && (
             <>
               <div className="pt-4 mt-4 border-t border-white/10">
                 <p className="px-4 text-xs font-oswald text-text-muted uppercase tracking-wider mb-2">Administration</p>
@@ -298,7 +302,7 @@ const Sidebar = () => {
           )}
 
           {/* Section Tâches pour les testeurs (non-admin) */}
-          {user?.is_tester === true && user?.role !== 'admin' && (
+          {user?.is_tester === true && !MANAGEMENT_ROLES.includes(user?.role) && (
             <>
               <div className="pt-4 mt-4 border-t border-white/10">
                 <p className="px-4 text-xs font-oswald text-text-muted uppercase tracking-wider mb-2">Testeur</p>

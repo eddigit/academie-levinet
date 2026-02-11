@@ -299,8 +299,8 @@ const AdminUsersPage = () => {
     return club ? club.name : null;
   };
 
-  // Vérifier si l'utilisateur courant est admin (tous les rôles admin)
-  const isAdmin = ['admin', 'fondateur', 'directeur_national'].includes(currentUser?.role);
+  // Vérifier si l'utilisateur courant a un rôle de gestion (admin + directeur_technique)
+  const isAdmin = ['admin', 'fondateur', 'directeur_national', 'directeur_technique'].includes(currentUser?.role);
 
   const getCounts = () => {
     return {
