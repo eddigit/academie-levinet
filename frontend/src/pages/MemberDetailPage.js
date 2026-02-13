@@ -185,8 +185,8 @@ const MemberDetailPage = () => {
         country: member.country || 'France',
         date_of_birth: member.date_of_birth || '',
         belt_grade: member.belt_grade || 'Ceinture Blanche',
-        grade_context_type: '',  // Contexte d'obtention du grade (stage/club/online)
-        grade_context_name: '',  // Nom du stage ou club
+        grade_context_type: member.grade_context_type || '_none',  // Contexte d'obtention du grade (stage/club/online)
+        grade_context_name: member.grade_context_name || '',  // Nom du stage ou club
         membership_type: member.membership_type || 'Standard',
         membership_status: member.membership_status || 'Actif',
         membership_start_date: member.membership_start_date || '',
@@ -973,14 +973,14 @@ const MemberDetailPage = () => {
                         <SelectValue placeholder="Sélectionner le contexte..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Non spécifié</SelectItem>
+                        <SelectItem value="_none">Non spécifié</SelectItem>
                         <SelectItem value="stage">Stage</SelectItem>
                         <SelectItem value="club">Club</SelectItem>
                         <SelectItem value="online">En ligne</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  {editForm.grade_context_type && editForm.grade_context_type !== 'online' && (
+                  {editForm.grade_context_type && editForm.grade_context_type !== 'online' && editForm.grade_context_type !== '_none' && (
                     <div className="space-y-2 md:col-span-2">
                       <Label className="text-text-secondary">
                         {editForm.grade_context_type === 'stage' ? 'Nom du stage' : 'Nom du club'}
