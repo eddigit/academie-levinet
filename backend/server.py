@@ -20,6 +20,13 @@ from enum import Enum
 from email_service import send_email, get_welcome_email_html, get_lead_notification_html, get_lead_confirmation_html, get_new_message_notification_html
 import asyncio
 
+# Configure logging early
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Mock emergentintegrations pour le deploiement (module non disponible sur PyPI)
 try:
     from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
@@ -1095,11 +1102,14 @@ def require_management(current_user: dict):
 @api_router.post("/auth/register", response_model=TokenResponse)
 async def register(user_data: UserCreate):
     email = user_data.email.strip().lower()
+    logger.info(f"[REGISTER] Tentative d'inscription pour: {email}")
+
     existing = await db.users.find_one(
         {"email": {"$regex": f"^{re.escape(email)}$", "$options": "i"}},
         {"_id": 0}
     )
     if existing:
+        logger.warning(f"[REGISTER] Email deja existant: {email}")
         raise HTTPException(status_code=400, detail="Email déjà enregistré")
 
     user_dict = user_data.model_dump()
@@ -1110,18 +1120,26 @@ async def register(user_data: UserCreate):
     user = User(**user_dict)
     doc = user.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
-    
+
     # Create a clean copy without _id for insertion
     insert_doc = {k: v for k, v in doc.items()}
     await db.users.insert_one(insert_doc)
-    
-    # 🎯 Award signup bonus tokens
-    await award_tokens(
-        user.id,
-        TokenActionType.SIGNUP_BONUS.value,
-        description="Bonus de bienvenue - Inscription"
-    )
-    
+    logger.info(f"[REGISTER] Utilisateur insere en DB: {email} (id: {user.id})")
+
+    # Verification immediate du hash (safety check)
+    if not verify_password(user_data.password, doc['password_hash']):
+        logger.error(f"[REGISTER] CRITIQUE: Verification du hash echouee immediatement apres creation pour {email}")
+
+    # Award signup bonus tokens (non-blocking - ne doit PAS crasher l'inscription)
+    try:
+        await award_tokens(
+            user.id,
+            TokenActionType.SIGNUP_BONUS.value,
+            description="Bonus de bienvenue - Inscription"
+        )
+    except Exception as e:
+        logger.error(f"[REGISTER] award_tokens echoue pour {email}: {e}")
+
     # Send welcome email (non-blocking)
     asyncio.create_task(send_email(
         to_email=user.email,
@@ -1129,34 +1147,170 @@ async def register(user_data: UserCreate):
         html_content=get_welcome_email_html(user.full_name, user.email),
         text_content=f"Bienvenue {user.full_name}! Votre compte a été créé avec succès."
     ))
-    
+
     token = create_token(user.id, user.email)
     user_response = {k: v for k, v in doc.items() if k != 'password_hash' and k != '_id'}
-    
+
+    logger.info(f"[REGISTER] Inscription terminee avec succes pour {email}")
     return {"token": token, "user": user_response}
 
 @api_router.post("/auth/login", response_model=TokenResponse)
 async def login(credentials: UserLogin):
     email = credentials.email.strip().lower()
-    # Recherche case-insensitive: essayer d'abord exact, puis en minuscules
+    logger.info(f"[LOGIN] Tentative de connexion pour: {email}")
+
+    # Recherche case-insensitive: essayer d'abord exact, puis regex
     user = await db.users.find_one({"email": email}, {"_id": 0})
     if not user:
-        # Fallback: recherche insensible à la casse avec regex
+        logger.info(f"[LOGIN] Correspondance exacte echouee pour {email}, essai case-insensitive")
         user = await db.users.find_one(
             {"email": {"$regex": f"^{re.escape(email)}$", "$options": "i"}},
             {"_id": 0}
         )
-    if not user or not verify_password(credentials.password, user['password_hash']):
+        if user:
+            logger.warning(f"[LOGIN] Utilisateur trouve avec casse differente: stocke='{user['email']}' vs saisi='{email}'. Normalisation en cours.")
+            # Corriger la casse de l'email en DB pour les futurs logins
+            await db.users.update_one(
+                {"id": user['id']},
+                {"$set": {"email": email}}
+            )
+
+    if not user:
+        logger.warning(f"[LOGIN] Utilisateur non trouve: {email}")
         raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
-    
+
+    # Verifier que password_hash existe
+    if 'password_hash' not in user or not user['password_hash']:
+        logger.error(f"[LOGIN] Utilisateur {email} n'a pas de champ password_hash!")
+        raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
+
+    # Verifier le mot de passe
+    try:
+        password_valid = verify_password(credentials.password, user['password_hash'])
+    except Exception as e:
+        logger.error(f"[LOGIN] Erreur verification mot de passe pour {email}: {e} (hash prefix: {user['password_hash'][:10]}...)")
+        raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
+
+    if not password_valid:
+        logger.warning(f"[LOGIN] Mot de passe incorrect pour {email} (hash prefix: {user['password_hash'][:10]}...)")
+        raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
+
     token = create_token(user['id'], user['email'])
     user_response = {k: v for k, v in user.items() if k != 'password_hash' and k != '_id'}
-    
+
+    logger.info(f"[LOGIN] Connexion reussie pour {email} (id: {user['id']})")
     return {"token": token, "user": user_response}
 
 @api_router.get("/auth/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
     return {k: v for k, v in current_user.items() if k != 'password_hash' and k != '_id'}
+
+# ==================== DEBUG / DIAGNOSTIC ENDPOINTS (ADMIN) ====================
+
+@api_router.get("/admin/debug/user/{email_or_id}")
+async def debug_user_account(email_or_id: str, current_user: dict = Depends(get_current_user)):
+    """Admin: Diagnostiquer un compte utilisateur - verifie email, format du hash, etc."""
+    require_admin(current_user)
+
+    # Chercher par email d'abord (case-insensitive), puis par id
+    user = await db.users.find_one(
+        {"email": {"$regex": f"^{re.escape(email_or_id.strip())}$", "$options": "i"}},
+        {"_id": 0}
+    )
+    if not user:
+        user = await db.users.find_one({"id": email_or_id.strip()}, {"_id": 0})
+
+    if not user:
+        return {"found": False, "message": f"Aucun utilisateur trouve pour: {email_or_id}"}
+
+    # Analyser le compte
+    password_hash = user.get('password_hash', '')
+    has_hash = bool(password_hash)
+    hash_prefix = password_hash[:7] if has_hash else 'NONE'
+    hash_length = len(password_hash) if has_hash else 0
+
+    # Detecter l'algorithme de hash
+    hash_algorithm = "unknown"
+    if password_hash.startswith("$2b$"):
+        hash_algorithm = "bcrypt_2b (standard)"
+    elif password_hash.startswith("$2a$"):
+        hash_algorithm = "bcrypt_2a (legacy)"
+    elif password_hash.startswith("$2y$"):
+        hash_algorithm = "bcrypt_2y (php)"
+    elif password_hash.startswith("$argon2"):
+        hash_algorithm = "argon2 (INCOMPATIBLE)"
+    elif password_hash.startswith("$pbkdf2"):
+        hash_algorithm = "pbkdf2 (INCOMPATIBLE)"
+
+    # Verifier la normalisation de l'email
+    email = user.get('email', '')
+    email_is_lowercase = email == email.lower()
+    email_has_whitespace = email != email.strip()
+
+    return {
+        "found": True,
+        "user_id": user.get('id'),
+        "email_stored": email,
+        "email_is_lowercase": email_is_lowercase,
+        "email_has_whitespace": email_has_whitespace,
+        "has_password_hash": has_hash,
+        "hash_prefix": hash_prefix,
+        "hash_length": hash_length,
+        "hash_algorithm": hash_algorithm,
+        "role": user.get('role'),
+        "created_at": user.get('created_at'),
+        "full_name": user.get('full_name'),
+        "membership_status": user.get('membership_status'),
+        "has_paid_license": user.get('has_paid_license'),
+    }
+
+@api_router.post("/admin/debug/normalize-emails")
+async def normalize_all_emails(current_user: dict = Depends(get_current_user)):
+    """Admin: Normaliser tous les emails en minuscules. Rapporte les changements."""
+    require_admin(current_user)
+
+    fixed = []
+    async for user in db.users.find({}, {"_id": 0, "id": 1, "email": 1}):
+        email = user.get('email', '')
+        normalized = email.strip().lower()
+        if email != normalized:
+            await db.users.update_one(
+                {"id": user['id']},
+                {"$set": {"email": normalized}}
+            )
+            fixed.append({"id": user['id'], "old": email, "new": normalized})
+            logger.info(f"[NORMALIZE] Email corrige: '{email}' -> '{normalized}'")
+
+    logger.info(f"[NORMALIZE] {len(fixed)} emails normalises au total")
+    return {"fixed_count": len(fixed), "fixed_emails": fixed}
+
+@api_router.post("/admin/debug/test-password")
+async def test_password_for_user(email: str, password: str, current_user: dict = Depends(get_current_user)):
+    """Admin: Tester si un mot de passe correspond pour un email donne (debug uniquement)."""
+    require_admin(current_user)
+
+    user = await db.users.find_one(
+        {"email": {"$regex": f"^{re.escape(email.strip())}$", "$options": "i"}},
+        {"_id": 0, "password_hash": 1, "email": 1, "id": 1}
+    )
+    if not user:
+        return {"found": False}
+
+    try:
+        result = verify_password(password, user['password_hash'])
+        return {
+            "found": True,
+            "password_matches": result,
+            "hash_prefix": user['password_hash'][:10],
+            "stored_email": user['email']
+        }
+    except Exception as e:
+        return {
+            "found": True,
+            "password_matches": False,
+            "error": str(e),
+            "hash_prefix": user.get('password_hash', '')[:10]
+        }
 
 # ==================== USER PROFILE ENDPOINTS ====================
 
@@ -1832,8 +1986,14 @@ async def create_member_alias(data: AdminUserCreate, current_user: dict = Depend
     user_dict = data.model_dump()
     user_dict['role'] = 'membre'
 
-    # Check if email exists
-    existing = await db.users.find_one({"email": data.email})
+    # Normaliser l'email en minuscules
+    email = data.email.strip().lower()
+    user_dict['email'] = email
+
+    # Check if email exists (case-insensitive)
+    existing = await db.users.find_one(
+        {"email": {"$regex": f"^{re.escape(email)}$", "$options": "i"}}
+    )
     if existing:
         raise HTTPException(status_code=400, detail="Email already exists")
 
@@ -1848,9 +2008,11 @@ async def create_member_alias(data: AdminUserCreate, current_user: dict = Depend
     user_dict['membership_status'] = user_dict.get('membership_status') or 'Actif'
 
     await db.users.insert_one(user_dict)
+    logger.info(f"[MEMBER_CREATE] Membre cree: {email}")
 
-    # Return without password_hash
+    # Return without password_hash and _id
     user_dict.pop('password_hash', None)
+    user_dict.pop('_id', None)
     return {"message": "Member created", "user": user_dict}
 
 @api_router.delete("/members/{member_id}")
@@ -5000,16 +5162,17 @@ async def approve_pending_member(pending_id: str, current_user: dict = Depends(g
     import string
     temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
     
-    # Create user account
+    # Create user account - normaliser l'email en minuscules
+    normalized_email = pending['email'].strip().lower()
     user = User(
-        email=pending['email'],
+        email=normalized_email,
         password_hash=hash_password(temp_password),
         full_name=pending['full_name'],
         role="membre",  # Rôle unifié français
         has_paid_license=True,  # Existing members already paid
         is_premium=False
     )
-    
+
     user_doc = user.model_dump()
     user_doc['created_at'] = user_doc['created_at'].isoformat()
     user_doc['belt_grade'] = pending.get('belt_grade', 'Ceinture Blanche')
@@ -5020,8 +5183,9 @@ async def approve_pending_member(pending_id: str, current_user: dict = Depends(g
     user_doc['motivations'] = pending.get('motivations', [])
     user_doc['person_type'] = pending.get('person_type', '')
     user_doc['training_mode'] = pending.get('training_mode', '')
-    
+
     await db.users.insert_one(user_doc)
+    logger.info(f"[APPROVE_MEMBER] Compte cree depuis demande en attente: {normalized_email} (id: {user.id})")
     
     # Update pending member status
     await db.pending_members.update_one(
@@ -6481,12 +6645,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # ============================================================================
 # STATIC FILES - Serve React Frontend (Unified Deployment)

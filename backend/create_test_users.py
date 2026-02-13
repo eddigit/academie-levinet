@@ -6,7 +6,7 @@ Script de création des utilisateurs de test
 import asyncio
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
-from passlib.context import CryptContext
+import bcrypt
 from datetime import datetime, timezone
 import uuid
 
@@ -17,10 +17,9 @@ load_dotenv()
 MONGODB_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 DATABASE_NAME = os.getenv("DB_NAME", "academie_levinet_db")
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    """Hash identique a server.py - utilise bcrypt brut"""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 async def create_test_users():
     print("=" * 60)
