@@ -67,7 +67,7 @@ const AdminUsersPage = () => {
   const [creating, setCreating] = useState(false);
   const [newUser, setNewUser] = useState({
     email: '', password: '', full_name: '', role: 'eleve', phone: '', city: '',
-    country: 'France', belt_grade: '', discipline: '', send_email: true, club_id: '', instructor_id: '', technical_director_id: ''
+    country: 'France', belt_grade: '', discipline: 'none', send_email: true, club_id: 'none', instructor_id: 'none', technical_director_id: 'none'
   });
   const [newUserPhoto, setNewUserPhoto] = useState(null);
   const [newUserPhotoPreview, setNewUserPhotoPreview] = useState(null);
@@ -178,12 +178,15 @@ const AdminUsersPage = () => {
     });
   };
 
+  // Convert "none" sentinel value to null/empty for API calls
+  const cleanValue = (val) => (val === 'none' ? '' : val);
+
   const handleCreateUser = async () => {
     if (!newUser.email || !newUser.full_name) {
       toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
-    
+
     setCreating(true);
     try {
       // Upload photo if selected
@@ -191,15 +194,19 @@ const AdminUsersPage = () => {
       if (newUserPhoto) {
         photoUrl = await uploadPhoto(newUserPhoto);
       }
-      
+
       await api.post('/admin/users', {
         ...newUser,
+        club_id: cleanValue(newUser.club_id),
+        instructor_id: cleanValue(newUser.instructor_id),
+        technical_director_id: cleanValue(newUser.technical_director_id),
+        discipline: cleanValue(newUser.discipline),
         photo_url: photoUrl
       });
       
       toast.success(`${roleLabels[newUser.role]?.label || 'Utilisateur'} créé avec succès`);
       setIsCreateOpen(false);
-      setNewUser({ email: '', password: '', full_name: '', role: 'eleve', phone: '', city: '', country: 'France', belt_grade: '', discipline: '', send_email: true, club_id: '', instructor_id: '', technical_director_id: '' });
+      setNewUser({ email: '', password: '', full_name: '', role: 'eleve', phone: '', city: '', country: 'France', belt_grade: '', discipline: 'none', send_email: true, club_id: 'none', instructor_id: 'none', technical_director_id: 'none' });
       setNewUserPhoto(null);
       setNewUserPhotoPreview(null);
       fetchUsers();
@@ -211,7 +218,13 @@ const AdminUsersPage = () => {
   };
 
   const handleEditUser = (user) => {
-    setEditingUser({ ...user });
+    setEditingUser({
+      ...user,
+      club_id: user.club_id || 'none',
+      instructor_id: user.instructor_id || 'none',
+      technical_director_id: user.technical_director_id || 'none',
+      discipline: user.discipline || 'none',
+    });
     setEditPhotoFile(null);
     setEditPhotoPreview(user.photo_url || null);
     setIsEditOpen(true);
@@ -230,6 +243,10 @@ const AdminUsersPage = () => {
       
       await api.put(`/admin/users/${editingUser.id}`, {
         ...editingUser,
+        club_id: cleanValue(editingUser.club_id),
+        instructor_id: cleanValue(editingUser.instructor_id),
+        technical_director_id: cleanValue(editingUser.technical_director_id),
+        discipline: cleanValue(editingUser.discipline),
         photo_url: photoUrl
       });
       
@@ -416,7 +433,7 @@ const AdminUsersPage = () => {
                     <Label className="text-text-secondary">Type de compte *</Label>
                     <Select
                       value={newUser.role}
-                      onValueChange={(value) => setNewUser({ ...newUser, role: value, club_id: '', instructor_id: '', technical_director_id: '' })}
+                      onValueChange={(value) => setNewUser({ ...newUser, role: value, club_id: 'none', instructor_id: 'none', technical_director_id: 'none' })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10">
                         <SelectValue />
@@ -463,7 +480,7 @@ const AdminUsersPage = () => {
                           <SelectValue placeholder="Sélectionner un club" />
                         </SelectTrigger>
                         <SelectContent className="bg-paper border-white/10 max-h-60">
-                          <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                          <SelectItem value="none" className="text-text-muted">Aucun</SelectItem>
                           {clubs.map((club) => (
                             <SelectItem key={club.id || club._id} value={club.id || club._id} className="text-text-primary">
                               {club.name} {club.city && `(${club.city})`}
@@ -485,7 +502,7 @@ const AdminUsersPage = () => {
                           <SelectValue placeholder="Sélectionner un instructeur" />
                         </SelectTrigger>
                         <SelectContent className="bg-paper border-white/10 max-h-60">
-                          <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                          <SelectItem value="none" className="text-text-muted">Aucun</SelectItem>
                           {instructors.map((instr) => (
                             <SelectItem key={instr.id || instr._id} value={instr.id || instr._id} className="text-text-primary">
                               {formatFullName(instr.full_name)}
@@ -507,7 +524,7 @@ const AdminUsersPage = () => {
                           <SelectValue placeholder="Sélectionner un DT" />
                         </SelectTrigger>
                         <SelectContent className="bg-paper border-white/10 max-h-60">
-                          <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                          <SelectItem value="none" className="text-text-muted">Aucun</SelectItem>
                           {technicalDirectors.map((dt) => (
                             <SelectItem key={dt.id || dt._id} value={dt.id || dt._id} className="text-text-primary">
                               {formatFullName(dt.full_name)}
@@ -566,14 +583,14 @@ const AdminUsersPage = () => {
                 <div>
                   <Label className="text-text-secondary">Discipline principale</Label>
                   <Select
-                    value={newUser.discipline || ''}
+                    value={newUser.discipline || 'none'}
                     onValueChange={(value) => setNewUser({ ...newUser, discipline: value })}
                   >
                     <SelectTrigger className="mt-1 bg-background border-white/10">
                       <SelectValue placeholder="Sélectionner une discipline" />
                     </SelectTrigger>
                     <SelectContent className="bg-paper border-white/10 max-h-60">
-                      <SelectItem value="" className="text-text-muted">Aucune</SelectItem>
+                      <SelectItem value="none" className="text-text-muted">Aucune</SelectItem>
                       {disciplinesList.map((disc) => (
                         <SelectItem key={disc.code} value={disc.code} className="text-text-primary">{disc.label}</SelectItem>
                       ))}
@@ -961,14 +978,14 @@ const AdminUsersPage = () => {
                 <div className="mt-4">
                   <Label className="text-text-secondary">Discipline principale</Label>
                   <Select
-                    value={editingUser.discipline || ''}
+                    value={editingUser.discipline || 'none'}
                     onValueChange={(value) => setEditingUser({ ...editingUser, discipline: value })}
                   >
                     <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                       <SelectValue placeholder="Sélectionner une discipline" />
                     </SelectTrigger>
                     <SelectContent className="bg-paper border-white/10 max-h-60">
-                      <SelectItem value="" className="text-text-muted">Aucune</SelectItem>
+                      <SelectItem value="none" className="text-text-muted">Aucune</SelectItem>
                       {disciplinesList.map((disc) => (
                         <SelectItem key={disc.code} value={disc.code} className="text-text-primary">{disc.label}</SelectItem>
                       ))}
@@ -981,14 +998,14 @@ const AdminUsersPage = () => {
                   <div className="mt-4">
                     <Label className="text-text-secondary">Club</Label>
                     <Select
-                      value={editingUser.club_id || ''}
+                      value={editingUser.club_id || 'none'}
                       onValueChange={(value) => setEditingUser({ ...editingUser, club_id: value })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                         <SelectValue placeholder="Sélectionner un club" />
                       </SelectTrigger>
                       <SelectContent className="bg-paper border-white/10 max-h-60">
-                        <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                        <SelectItem value="none" className="text-text-muted">Aucun</SelectItem>
                         {clubs.map((club) => (
                           <SelectItem key={club.id || club._id} value={club.id || club._id} className="text-text-primary">
                             {club.name} {club.city && `(${club.city})`}
@@ -1003,14 +1020,14 @@ const AdminUsersPage = () => {
                   <div className="mt-4">
                     <Label className="text-text-secondary">Instructeur référent</Label>
                     <Select
-                      value={editingUser.instructor_id || ''}
+                      value={editingUser.instructor_id || 'none'}
                       onValueChange={(value) => setEditingUser({ ...editingUser, instructor_id: value })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                         <SelectValue placeholder="Sélectionner un instructeur" />
                       </SelectTrigger>
                       <SelectContent className="bg-paper border-white/10 max-h-60">
-                        <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                        <SelectItem value="none" className="text-text-muted">Aucun</SelectItem>
                         {instructors.map((instr) => (
                           <SelectItem key={instr.id || instr._id} value={instr.id || instr._id} className="text-text-primary">
                             {instr.full_name}
@@ -1025,14 +1042,14 @@ const AdminUsersPage = () => {
                   <div className="mt-4">
                     <Label className="text-text-secondary">Directeur Technique référent</Label>
                     <Select
-                      value={editingUser.technical_director_id || ''}
+                      value={editingUser.technical_director_id || 'none'}
                       onValueChange={(value) => setEditingUser({ ...editingUser, technical_director_id: value })}
                     >
                       <SelectTrigger className="mt-1 bg-background border-white/10 text-text-primary">
                         <SelectValue placeholder="Sélectionner un DT" />
                       </SelectTrigger>
                       <SelectContent className="bg-paper border-white/10 max-h-60">
-                        <SelectItem value="" className="text-text-muted">Aucun</SelectItem>
+                        <SelectItem value="none" className="text-text-muted">Aucun</SelectItem>
                         {technicalDirectors.map((dt) => (
                           <SelectItem key={dt.id || dt._id} value={dt.id || dt._id} className="text-text-primary">
                             {formatFullName(dt.full_name)}
