@@ -220,6 +220,7 @@ const AdminUsersPage = () => {
   const handleEditUser = (user) => {
     setEditingUser({
       ...user,
+      role: user.role === 'membre' ? 'eleve' : user.role,
       club_id: user.club_id || 'none',
       instructor_id: user.instructor_id || 'none',
       technical_director_id: user.technical_director_id || 'none',
@@ -677,7 +678,7 @@ const AdminUsersPage = () => {
               className={`${roleFilter === 'membre' ? 'bg-primary' : 'border-white/10'} text-xs md:text-sm`}
               size="sm"
             >
-              <User className="w-3 h-3 mr-1" /> Membres ({counts.membre})
+              <User className="w-3 h-3 mr-1" /> Membres ({counts.eleve})
             </Button>
           </div>
         </div>

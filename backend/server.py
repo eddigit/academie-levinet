@@ -1559,7 +1559,11 @@ async def get_all_users(
 
     query = {}
     if role:
-        query["role"] = role
+        # Treat 'membre' and 'eleve' as equivalent (legacy compatibility)
+        if role in ('membre', 'eleve'):
+            query["role"] = {"$in": ["membre", "eleve"]}
+        else:
+            query["role"] = role
     if country:
         query["country"] = country
     if city:
@@ -1889,8 +1893,8 @@ async def get_members_alias(
     status: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """Alias: Récupère les utilisateurs avec role=membre"""
-    query = {"role": "membre"}
+    """Alias: Récupère les utilisateurs avec role=membre/eleve"""
+    query = {"role": {"$in": ["membre", "eleve"]}}
     if country:
         query['country'] = country
     if city:
@@ -2045,8 +2049,8 @@ async def get_subscriptions(member_id: Optional[str] = None, current_user: dict 
 # Dashboard Routes
 @api_router.get("/dashboard/stats", response_model=DashboardStats)
 async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
-    # Membres = users avec role="membre"
-    member_query = {"role": "membre"}
+    # Membres = users avec role="membre" ou "eleve" (legacy compatibility)
+    member_query = {"role": {"$in": ["membre", "eleve"]}}
     total_members = await db.users.count_documents(member_query)
     active_memberships = await db.users.count_documents({**member_query, "membership_status": "Actif"})
 
