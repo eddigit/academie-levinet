@@ -97,16 +97,19 @@ const MemberDetailPage = () => {
     // Seulement pour les admins (pour l'édition)
     if (!isAdmin) return;
     try {
+      console.log('[DEBUG] Fetching affectations for edit modal...');
       const [clubsRes, instructorsRes, dtRes] = await Promise.all([
-        api.get('/clubs'),
-        api.get('/admin/users?role=instructeur'),
-        api.get('/admin/users?role=directeur_technique')
+        api.get('/clubs').catch(e => { console.error('[DEBUG] Clubs error:', e); return { data: { clubs: [] } }; }),
+        api.get('/admin/users?role=instructeur').catch(e => { console.error('[DEBUG] Instructors error:', e); return { data: { users: [] } }; }),
+        api.get('/admin/users?role=directeur_technique').catch(e => { console.error('[DEBUG] DTs error:', e); return { data: { users: [] } }; })
       ]);
+      console.log('[DEBUG] Affectations loaded - Clubs:', clubsRes.data?.clubs?.length, 'Instructors:', instructorsRes.data?.users?.length, 'DTs:', dtRes.data?.users?.length);
       setClubs(clubsRes.data?.clubs || []);
       setInstructors(instructorsRes.data?.users || []);
       setTechnicalDirectors(dtRes.data?.users || []);
     } catch (error) {
       console.error('Error fetching affectations:', error);
+      toast.error('Erreur de chargement des données - vérifiez la console');
     }
   };
 
@@ -165,28 +168,42 @@ const MemberDetailPage = () => {
   };
 
   const handleEditMember = () => {
-    setEditForm({
-      first_name: member.first_name || '',
-      last_name: member.last_name || '',
-      email: member.email || '',
-      phone: member.phone || '',
-      city: member.city || '',
-      country: member.country || 'France',
-      date_of_birth: member.date_of_birth || '',
-      belt_grade: member.belt_grade || 'Ceinture Blanche',
-      grade_context_type: '',  // Contexte d'obtention du grade (stage/club/online)
-      grade_context_name: '',  // Nom du stage ou club
-      membership_type: member.membership_type || 'Standard',
-      membership_status: member.membership_status || 'Actif',
-      membership_start_date: member.membership_start_date || '',
-      membership_end_date: member.membership_end_date || '',
-      photo_url: member.photo_url || '',
-      role: member.role || 'membre',
-      club_id: member.club_id || '',
-      instructor_id: member.instructor_id || '',
-      technical_director_id: member.technical_director_id || '',
-    });
-    setIsEditOpen(true);
+    console.log('[DEBUG] handleEditMember called');
+    console.log('[DEBUG] Current member:', member);
+    console.log('[DEBUG] isAdmin:', isAdmin);
+    console.log('[DEBUG] Clubs available:', clubs?.length);
+    console.log('[DEBUG] Instructors available:', instructors?.length);
+    console.log('[DEBUG] TDs available:', technicalDirectors?.length);
+    
+    try {
+      setEditForm({
+        first_name: member.first_name || '',
+        last_name: member.last_name || '',
+        email: member.email || '',
+        phone: member.phone || '',
+        city: member.city || '',
+        country: member.country || 'France',
+        date_of_birth: member.date_of_birth || '',
+        belt_grade: member.belt_grade || 'Ceinture Blanche',
+        grade_context_type: '',  // Contexte d'obtention du grade (stage/club/online)
+        grade_context_name: '',  // Nom du stage ou club
+        membership_type: member.membership_type || 'Standard',
+        membership_status: member.membership_status || 'Actif',
+        membership_start_date: member.membership_start_date || '',
+        membership_end_date: member.membership_end_date || '',
+        photo_url: member.photo_url || '',
+        role: member.role || 'membre',
+        club_id: member.club_id || '',
+        instructor_id: member.instructor_id || '',
+        technical_director_id: member.technical_director_id || '',
+      });
+      console.log('[DEBUG] Form populated, opening modal');
+      setIsEditOpen(true);
+      console.log('[DEBUG] Modal state set to true');
+    } catch (error) {
+      console.error('[DEBUG] Error in handleEditMember:', error);
+      toast.error('Erreur lors de l\'ouverture du formulaire d\'édition');
+    }
   };
 
   // Helper pour obtenir le nom d'un club par son ID
