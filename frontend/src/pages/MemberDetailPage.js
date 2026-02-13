@@ -192,7 +192,7 @@ const MemberDetailPage = () => {
         membership_start_date: member.membership_start_date || '',
         membership_end_date: member.membership_end_date || '',
         photo_url: member.photo_url || '',
-        role: member.role || 'membre',
+        role: member.role === 'membre' ? 'eleve' : (member.role || 'eleve'),
         club_id: member.club_id || '',
         instructor_id: member.instructor_id || '',
         technical_director_id: member.technical_director_id || '',
@@ -857,7 +857,7 @@ const MemberDetailPage = () => {
                   <div className="space-y-2">
                     <Label className="text-text-secondary">Rôle</Label>
                     <Select
-                      value={editForm.role || 'membre'}
+                      value={editForm.role === 'membre' ? 'eleve' : (editForm.role || 'eleve')}
                       onValueChange={(value) => setEditForm({ ...editForm, role: value })}
                     >
                       <SelectTrigger className="bg-white/5 border-white/10">
