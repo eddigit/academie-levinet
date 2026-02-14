@@ -4,12 +4,12 @@
 // ============================================
 
 const BUILD_INFO = {
-  timestamp: "2026-01-24T15:08:09.335Z",
-  date: "24/01/2026",
-  time: "16:08:09",
-  buildId: "1769267289335",
+  timestamp: "2026-02-14T08:50:02.087Z",
+  date: "14/02/2026",
+  time: "09:50:02",
+  buildId: "1771059002087",
   version: "2.4.0",
-  commitHash: "54b3a1f"
+  commitHash: "6c5e833"
 };
 
 export default BUILD_INFO;
