@@ -5968,6 +5968,7 @@ async def get_onboarding_countries():
         {"code": "AU", "name": "Australie"},
         {"code": "NZ", "name": "Nouvelle-Zélande"},
         {"code": "ZA", "name": "Afrique du Sud"},
+        {"code": "MU", "name": "Île Maurice"},
         {"code": "OTHER", "name": "Autre pays"}
     ]
     return {"countries": countries}
