@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import MegaMenu from './MegaMenu';
+import PublicationsDropdown from './PublicationsDropdown';
 import { useAuth } from '../context/AuthContext';
 import { useSiteContent } from '../context/SiteContentContext';
 
@@ -36,6 +37,7 @@ const PublicHeader = () => {
         {/* Navigation */}
         <div className="flex items-center gap-2 lg:gap-4">
           <MegaMenu />
+          <PublicationsDropdown />
           <Link
             to="/boutique"
             className="hidden sm:block px-3 lg:px-4 py-2 text-sm lg:text-base text-text-secondary hover:text-primary font-oswald uppercase leading-none tracking-wider transition-colors"
