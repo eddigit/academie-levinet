@@ -31,6 +31,7 @@ export const countries = [
   { code: 'SN', name: 'Sénégal', flag: '🇸🇳' },
   { code: 'CI', name: 'Côte d\'Ivoire', flag: '🇨🇮' },
   { code: 'ZA', name: 'Afrique du Sud', flag: '🇿🇦' },
+  { code: 'MU', name: 'Île Maurice', flag: '🇲🇺' },
   { code: 'PL', name: 'Pologne', flag: '🇵🇱' },
   { code: 'NL', name: 'Pays-Bas', flag: '🇳🇱' },
   { code: 'SE', name: 'Suède', flag: '🇸🇪' },
