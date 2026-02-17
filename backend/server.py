@@ -1923,21 +1923,25 @@ async def get_instructors(
     current_user: dict = Depends(get_current_user)
 ):
     """Get all instructors - accessible to all authenticated users"""
-    query = {"role": "instructeur"}
-    if country:
-        query["country"] = country
-    if city:
-        query["city"] = city
-    if club_id:
-        query["club_id"] = club_id
-    
-    instructors = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("full_name", 1).to_list(500)
-    for user in instructors:
-        if user.get('full_name') and not user.get('first_name'):
-            parts = user['full_name'].split(' ', 1)
-            user['first_name'] = parts[0]
-            user['last_name'] = parts[1] if len(parts) > 1 else ''
-    return instructors
+    try:
+        query = {"role": "instructeur"}
+        if country:
+            query["country"] = country
+        if city:
+            query["city"] = city
+        if club_id:
+            query["club_id"] = club_id
+
+        instructors = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("full_name", 1).to_list(500)
+        for user in instructors:
+            if user.get('full_name') and not user.get('first_name'):
+                parts = user['full_name'].split(' ', 1)
+                user['first_name'] = parts[0]
+                user['last_name'] = parts[1] if len(parts) > 1 else ''
+        return instructors
+    except Exception as e:
+        logger.error(f"Error in get_instructors: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Erreur lors du chargement des instructeurs: {str(e)}")
 
 @api_router.get("/technical-directors")
 async def get_technical_directors(
@@ -5470,63 +5474,67 @@ async def get_clubs(
     technical_director_id: Optional[str] = None
 ):
     """Get all clubs with optional filters"""
-    query = {}
-    if city:
-        query["city"] = {"$regex": city, "$options": "i"}
-    if country:
-        query["country"] = {"$regex": country, "$options": "i"}
-    if status:
-        query["status"] = status
-    if technical_director_id:
-        query["technical_director_id"] = technical_director_id
-    
-    clubs = await db.clubs.find(query, {"_id": 0}).sort("name", 1).to_list(1000)
+    try:
+        query = {}
+        if city:
+            query["city"] = {"$regex": city, "$options": "i"}
+        if country:
+            query["country"] = {"$regex": country, "$options": "i"}
+        if status:
+            query["status"] = status
+        if technical_director_id:
+            query["technical_director_id"] = technical_director_id
 
-    # Collect all user IDs referenced by clubs to resolve in a single batch
-    all_user_ids = set()
-    for club in clubs:
-        if club.get("technical_director_id"):
-            all_user_ids.add(club["technical_director_id"])
-        for uid in club.get("technical_director_ids", []):
-            all_user_ids.add(uid)
-        for uid in club.get("national_director_ids", []):
-            all_user_ids.add(uid)
-        for uid in club.get("instructor_ids", []):
-            all_user_ids.add(uid)
+        clubs = await db.clubs.find(query, {"_id": 0}).sort("name", 1).to_list(1000)
 
-    # Batch-fetch all referenced users at once
-    user_map = {}
-    if all_user_ids:
-        users = await db.users.find(
-            {"id": {"$in": list(all_user_ids)}},
-            {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "city": 1, "country": 1, "dan_grade": 1, "club_id": 1}
-        ).to_list(len(all_user_ids))
-        user_map = {u["id"]: u for u in users}
+        # Collect all user IDs referenced by clubs to resolve in a single batch
+        all_user_ids = set()
+        for club in clubs:
+            if club.get("technical_director_id"):
+                all_user_ids.add(club["technical_director_id"])
+            for uid in (club.get("technical_director_ids") or []):
+                all_user_ids.add(uid)
+            for uid in (club.get("national_director_ids") or []):
+                all_user_ids.add(uid)
+            for uid in (club.get("instructor_ids") or []):
+                all_user_ids.add(uid)
 
-    # Enrich clubs with resolved profiles and member counts
-    for club in clubs:
-        member_count = await db.users.count_documents({"club_id": club["id"]})
-        club["member_count"] = member_count
+        # Batch-fetch all referenced users at once
+        user_map = {}
+        if all_user_ids:
+            users = await db.users.find(
+                {"id": {"$in": list(all_user_ids)}},
+                {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "city": 1, "country": 1, "dan_grade": 1, "club_id": 1}
+            ).to_list(len(all_user_ids))
+            user_map = {u["id"]: u for u in users}
 
-        # Resolve technical director (old single field)
-        if club.get("technical_director_id"):
-            dt = user_map.get(club["technical_director_id"])
-            club["technical_director_name"] = dt.get("full_name") if dt else "Non assigné"
+        # Enrich clubs with resolved profiles and member counts
+        for club in clubs:
+            member_count = await db.users.count_documents({"club_id": club["id"]})
+            club["member_count"] = member_count
 
-        # Resolve technical directors (multiple)
-        club["technical_directors_resolved"] = [
-            user_map[uid] for uid in club.get("technical_director_ids", []) if uid in user_map
-        ]
-        # Resolve national directors
-        club["national_directors_resolved"] = [
-            user_map[uid] for uid in club.get("national_director_ids", []) if uid in user_map
-        ]
-        # Resolve instructors
-        club["instructors_resolved"] = [
-            user_map[uid] for uid in club.get("instructor_ids", []) if uid in user_map
-        ]
+            # Resolve technical director (old single field)
+            if club.get("technical_director_id"):
+                dt = user_map.get(club["technical_director_id"])
+                club["technical_director_name"] = dt.get("full_name") if dt else "Non assigné"
 
-    return {"clubs": clubs, "total": len(clubs)}
+            # Resolve technical directors (multiple)
+            club["technical_directors_resolved"] = [
+                user_map[uid] for uid in (club.get("technical_director_ids") or []) if uid in user_map
+            ]
+            # Resolve national directors
+            club["national_directors_resolved"] = [
+                user_map[uid] for uid in (club.get("national_director_ids") or []) if uid in user_map
+            ]
+            # Resolve instructors
+            club["instructors_resolved"] = [
+                user_map[uid] for uid in (club.get("instructor_ids") or []) if uid in user_map
+            ]
+
+        return {"clubs": clubs, "total": len(clubs)}
+    except Exception as e:
+        logger.error(f"Error in get_clubs: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Erreur lors du chargement des clubs: {str(e)}")
 
 @api_router.get("/clubs/{club_id}")
 async def get_club(club_id: str):
@@ -5551,7 +5559,7 @@ async def get_club(club_id: str):
         club["technical_directors"] = []
 
     # Get instructors - include ALL users with instructor role in this club
-    instructor_ids = club.get("instructor_ids", [])
+    instructor_ids = club.get("instructor_ids") or []
     # Also find instructors who have this club_id assigned
     instructors_by_club = await db.users.find(
         {"club_id": club_id, "role": "instructeur"},
