@@ -4,6 +4,19 @@ import { Shield, Users, Award, Globe, Video, CheckCircle, Target, Sparkles, Load
 import PublicLayout from '../components/PublicLayout';
 import { useSiteContent } from '../context/SiteContentContext';
 
+const HeroSkeleton = () => (
+  <div className="pt-24 md:pt-32 pb-12 md:pb-20 px-4 md:px-6 relative overflow-hidden min-h-[80vh] md:min-h-[90vh] flex items-center bg-gray-900">
+    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+    <div className="container mx-auto text-center max-w-4xl relative z-30 px-4 animate-pulse">
+      <div className="h-10 md:h-14 bg-white/10 rounded-lg w-3/4 mx-auto mb-6" />
+      <div className="h-8 md:h-10 bg-white/10 rounded-lg w-1/2 mx-auto mb-8" />
+      <div className="h-5 md:h-6 bg-white/10 rounded w-2/3 mx-auto mb-4" />
+      <div className="h-5 md:h-6 bg-white/10 rounded w-1/2 mx-auto mb-12" />
+      <div className="h-12 bg-primary/30 rounded w-48 mx-auto" />
+    </div>
+  </div>
+);
+
 const LandingPage = () => {
   const { content, loading } = useSiteContent();
   const [showMap, setShowMap] = useState(false);
@@ -12,9 +25,30 @@ const LandingPage = () => {
 
   // Lazy load de la vidéo YouTube après le rendu initial
   useEffect(() => {
-    const timer = setTimeout(() => setShowVideo(true), 1500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!loading) {
+      const timer = setTimeout(() => setShowVideo(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
+  // Show skeleton while loading
+  if (loading) {
+    return (
+      <PublicLayout>
+        <HeroSkeleton />
+        <div className="py-12 md:py-20 px-4 md:px-6 bg-paper">
+          <div className="container mx-auto animate-pulse">
+            <div className="h-8 bg-white/10 rounded w-1/3 mx-auto mb-8" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-white/5 rounded-lg p-6 h-48" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </PublicLayout>
+    );
+  }
 
   // Valeurs dynamiques avec fallbacks
   const heroTitle = content?.hero?.title || "La Self-Défense Efficace, Réaliste et Sécurisée";
