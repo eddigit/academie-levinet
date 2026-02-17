@@ -1934,7 +1934,10 @@ async def get_members_alias(
     current_user: dict = Depends(get_current_user)
 ):
     """Alias: Récupère les utilisateurs avec role=membre/eleve"""
-    query = {"role": {"$in": ["membre", "eleve"]}}
+    query = {"$or": [
+        {"role": {"$in": ["membre", "eleve", "member", "student"]}},
+        {"roles": {"$in": ["membre", "eleve", "member", "student"]}}
+    ]}
     if country:
         query['country'] = country
     if city:
@@ -1978,7 +1981,11 @@ async def get_instructors(
 ):
     """Get all instructors - accessible to all authenticated users"""
     try:
-        query = {"role": "instructeur"}
+        query = {"$or": [
+            {"role": {"$in": ["instructeur", "instructor"]}},
+            {"roles": {"$in": ["instructeur", "instructor"]}},
+            {"belt_grade": "Instructeur"}
+        ]}
         if country:
             query["country"] = country
         if city:
@@ -2014,7 +2021,11 @@ async def get_technical_directors(
     current_user: dict = Depends(get_current_user)
 ):
     """Get all technical directors - accessible to all authenticated users"""
-    query = {"role": "directeur_technique"}
+    query = {"$or": [
+        {"role": {"$in": ["directeur_technique", "technical_director"]}},
+        {"roles": {"$in": ["directeur_technique", "technical_director"]}},
+        {"belt_grade": "Directeur Technique"}
+    ]}
     if country:
         query["country"] = country
     if search:
@@ -2158,20 +2169,25 @@ async def get_subscriptions(member_id: Optional[str] = None, current_user: dict 
 async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     # Membres = users avec role="membre" ou "eleve" (legacy compatibility)
     member_query = {"role": {"$in": ["membre", "eleve"]}}
-    total_members = await db.users.count_documents(member_query)
-    active_memberships = await db.users.count_documents({**member_query, "membership_status": "Actif"})
-
-    # Optimized: use aggregation for revenue
-    revenue_pipeline = [{"$group": {"_id": None, "total": {"$sum": "$amount"}}}]
-    revenue_result = await db.subscriptions.aggregate(revenue_pipeline).to_list(1)
-    total_revenue = revenue_result[0]["total"] if revenue_result else 0.0
 
     now = datetime.now(timezone.utc)
     start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    new_members_this_month = await db.users.count_documents({
+
+    # Run independent counts in parallel
+    total_members_task = db.users.count_documents(member_query)
+    active_memberships_task = db.users.count_documents({**member_query, "membership_status": "Actif"})
+    revenue_pipeline = [{"$group": {"_id": None, "total": {"$sum": "$amount"}}}]
+    total_revenue_task = db.subscriptions.aggregate(revenue_pipeline).to_list(1)
+    new_members_task = db.users.count_documents({
         **member_query,
         "created_at": {"$gte": start_of_month.isoformat()}
     })
+
+    total_members, active_memberships, revenue_result, new_members_this_month = await asyncio.gather(
+        total_members_task, active_memberships_task, total_revenue_task, new_members_task
+    )
+
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0.0
 
     members_by_month = [
         {"month": "Jan", "count": 12},
@@ -2186,6 +2202,7 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     # Optimized: use aggregation for country stats
     country_pipeline = [
         {"$match": member_query},
+        {"$project": {"country": 1}},  # Critical: minimize document size early
         {"$group": {"_id": "$country", "count": {"$sum": 1}}},
         {"$project": {"_id": 0, "country": {"$ifNull": ["$_id", "Inconnu"]}, "count": 1}}
     ]
@@ -3235,18 +3252,19 @@ async def get_wall_posts(
         async for author in authors_cursor:
             authors_info[author['id']] = author
 
-    # Batch fetch comment counts
+    # Batch fetch comment counts and reactions in parallel
     post_ids = [post["id"] for post in posts]
-    comment_counts_cursor = db.post_comments.aggregate([
+    comment_counts_task = db.post_comments.aggregate([
         {"$match": {"post_id": {"$in": post_ids}}},
         {"$group": {"_id": "$post_id", "count": {"$sum": 1}}}
-    ])
-    comment_counts = {item["_id"]: item["count"] async for item in comment_counts_cursor}
+    ]).to_list(len(post_ids))
+    reactions_task = db.post_reactions.find({"post_id": {"$in": post_ids}}, {"_id": 0}).to_list(1000)
 
-    # Batch fetch reactions
-    reactions_cursor = db.post_reactions.find({"post_id": {"$in": post_ids}}, {"_id": 0})
+    comment_counts_res, reactions_res = await asyncio.gather(comment_counts_task, reactions_task)
+
+    comment_counts = {item["_id"]: item["count"] for item in comment_counts_res}
     all_reactions = {}
-    async for r in reactions_cursor:
+    for r in reactions_res:
         pid = r["post_id"]
         if pid not in all_reactions:
             all_reactions[pid] = []
@@ -3792,19 +3810,20 @@ async def get_forums(current_user: dict = Depends(get_current_user)):
 
     forum_ids = [f["id"] for f in forums]
 
-    # Aggregate topic counts to avoid N+1 queries
-    topic_counts_cursor = db.forum_topics.aggregate([
+    # Aggregate topic and message counts in parallel
+    topic_counts_task = db.forum_topics.aggregate([
         {"$match": {"forum_id": {"$in": forum_ids}}},
         {"$group": {"_id": "$forum_id", "count": {"$sum": 1}}}
-    ])
-    topic_counts = {item["_id"]: item["count"] async for item in topic_counts_cursor}
+    ]).to_list(len(forum_ids))
+    message_counts_task = db.forum_messages.aggregate([
+        {"$match": {"forum_id": {"$in": forum_ids}}},
+        {"$group": {"_id": "$forum_id", "count": {"$sum": 1}}}
+    ]).to_list(len(forum_ids))
 
-    # Aggregate message counts to avoid N+1 queries
-    message_counts_cursor = db.forum_messages.aggregate([
-        {"$match": {"forum_id": {"$in": forum_ids}}},
-        {"$group": {"_id": "$forum_id", "count": {"$sum": 1}}}
-    ])
-    message_counts = {item["_id"]: item["count"] async for item in message_counts_cursor}
+    topic_counts_res, message_counts_res = await asyncio.gather(topic_counts_task, message_counts_task)
+
+    topic_counts = {item["_id"]: item["count"] for item in topic_counts_res}
+    message_counts = {item["_id"]: item["count"] for item in message_counts_res}
 
     for forum in forums:
         forum["topic_count"] = topic_counts.get(forum["id"], 0)
@@ -5652,16 +5671,8 @@ async def test_smtp_settings(data: SmtpTestRequest, current_user: dict = Depends
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'envoi: {str(e)}")
 
-# ==================== INSTRUCTORS LIST ENDPOINT ====================
-
-@api_router.get("/instructors")
-async def get_instructors():
-    """Get all users who are instructors or technical directors"""
-    instructors = await db.users.find(
-        {"belt_grade": {"$in": ["Instructeur", "Directeur Technique", "Directeur National"]}},
-        {"_id": 0, "id": 1, "full_name": 1, "email": 1, "city": 1, "country": 1, "belt_grade": 1, "photo_url": 1}
-    ).to_list(1000)
-    return {"instructors": instructors}
+# ==================== INSTRUCTORS LIST ENDPOINT (LEGACY) ====================
+# Deprecated: use paginated /api/instructors instead
 
 # ==================== CLUB MANAGEMENT ENDPOINTS ====================
 
@@ -7015,6 +7026,27 @@ else:
             "mode": "api-only"
         }
 
+async def create_indexes():
+    """Create indexes in the background"""
+    try:
+        logger.info("🚀 Création des index pour la performance (arrière-plan)...")
+        # Use background=True for safer index creation on live DB
+        await db.users.create_index([("role", 1)], background=True)
+        await db.users.create_index([("roles", 1)], background=True)
+        await db.users.create_index([("country", 1)], background=True)
+        await db.users.create_index([("full_name", 1)], background=True)
+        await db.users.create_index([("email", 1)], background=True)
+        await db.users.create_index([("belt_grade", 1)], background=True)
+        await db.post_comments.create_index([("post_id", 1)], background=True)
+        await db.post_reactions.create_index([("post_id", 1)], background=True)
+        await db.messages.create_index([("conversation_id", 1)], background=True)
+        await db.messages.create_index([("sender_id", 1), ("read", 1)], background=True)
+        await db.conversations.create_index([("participants", 1)], background=True)
+        await db.posts.create_index([("created_at", -1)], background=True)
+        logger.info("✅ Indexation terminée")
+    except Exception as e:
+        logger.error(f"⚠️ Erreur création index: {e}")
+
 @app.on_event("startup")
 async def startup_db_client():
     """Test MongoDB connection on startup"""
@@ -7022,9 +7054,12 @@ async def startup_db_client():
         # Test the connection
         await client.admin.command('ping')
         logger.info("✅ MongoDB connecté avec succès")
+
+        # Start index creation in background to not block startup
+        asyncio.create_task(create_indexes())
+
     except Exception as e:
-        logger.error(f"❌ ERREUR MongoDB: {e}")
-        logger.error("Vérifiez votre MONGO_URL dans backend/.env")
+        logger.error(f"❌ ERREUR MongoDB startup: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
