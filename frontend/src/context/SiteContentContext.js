@@ -4,7 +4,7 @@ const SiteContentContext = createContext();
 
 export const SiteContentProvider = ({ children }) => {
   const [content, setContent] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [fetched, setFetched] = useState(false);
 

@@ -4583,10 +4583,11 @@ async def update_site_content(data: dict, current_user: dict = Depends(get_curre
             upsert=True
         )
         logger.info(f"✅ Site-content sauvegardé: matched={result.matched_count}, modified={result.modified_count}")
+        _invalidate_site_content_cache()
     except Exception as e:
         logger.error(f"❌ Erreur MongoDB: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Erreur base de données: {str(e)}")
-    
+
     return {"message": "Contenu du site mis à jour"}
 
 @api_router.put("/admin/site-content/{section}")
@@ -4609,18 +4610,45 @@ async def update_site_section(section: str, data: dict, current_user: dict = Dep
         },
         upsert=True
     )
-    
+    _invalidate_site_content_cache()
+
     return {"message": f"Section '{section}' mise à jour"}
+
+# In-memory cache for site content (avoids hitting MongoDB on every page load)
+_site_content_cache = {"data": None, "timestamp": 0}
+_SITE_CONTENT_CACHE_TTL = 60  # seconds
+
+def _invalidate_site_content_cache():
+    """Invalidate the site content cache when admin updates content"""
+    _site_content_cache["data"] = None
+    _site_content_cache["timestamp"] = 0
 
 @api_router.get("/site-content")
 async def get_public_site_content():
     """Public: Get site content for display - optimized for performance"""
+    import time
+    from fastapi.responses import JSONResponse
+
+    now = time.time()
+
+    # Serve from cache if available and fresh
+    if _site_content_cache["data"] is not None and (now - _site_content_cache["timestamp"]) < _SITE_CONTENT_CACHE_TTL:
+        return JSONResponse(
+            content=_site_content_cache["data"],
+            headers={"Cache-Control": "public, max-age=60, stale-while-revalidate=300"}
+        )
+
     content = await db.settings.find_one({"id": "site_content"}, {"_id": 0})
     if not content:
-        return DEFAULT_SITE_CONTENT
-    
+        _site_content_cache["data"] = DEFAULT_SITE_CONTENT
+        _site_content_cache["timestamp"] = now
+        return JSONResponse(
+            content=DEFAULT_SITE_CONTENT,
+            headers={"Cache-Control": "public, max-age=60, stale-while-revalidate=300"}
+        )
+
     merged = {**DEFAULT_SITE_CONTENT, **content}
-    
+
     essential_content = {
         "branding": merged.get("branding", DEFAULT_SITE_CONTENT["branding"]),
         "hero": {
@@ -4643,8 +4671,15 @@ async def get_public_site_content():
         "social_links": merged.get("social_links", DEFAULT_SITE_CONTENT["social_links"]),
         "footer": merged.get("footer", DEFAULT_SITE_CONTENT["footer"])
     }
-    
-    return essential_content
+
+    # Update cache
+    _site_content_cache["data"] = essential_content
+    _site_content_cache["timestamp"] = now
+
+    return JSONResponse(
+        content=essential_content,
+        headers={"Cache-Control": "public, max-age=60, stale-while-revalidate=300"}
+    )
 
 # ==================== PENDING MEMBERS (EXISTING MEMBERS) ENDPOINTS ====================
 
