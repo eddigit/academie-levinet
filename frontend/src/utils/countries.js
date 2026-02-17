@@ -47,6 +47,13 @@ export const countries = [
   { code: 'IE', name: 'Irlande', flag: '🇮🇪' },
   { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
   { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
+  { code: 'AD', name: 'Andorre', flag: '🇦🇩' },
+  { code: 'OM', name: 'Oman', flag: '🇴🇲' },
+  { code: 'KM', name: 'Comores', flag: '🇰🇲' },
+  { code: 'PK', name: 'Pakistan', flag: '🇵🇰' },
+  { code: 'MG', name: 'Madagascar', flag: '🇲🇬' },
+  { code: 'PF', name: 'Polynésie française', flag: '🇵🇫' },
+  { code: 'MU-R', name: 'Île Rodrigues', flag: '🇲🇺' },
 ];
 
 // Get flag by country code

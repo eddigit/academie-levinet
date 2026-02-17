@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
 import api, { getErrorMessage } from '../utils/api';
-import { countries, getFlag, danGrades, disciplines } from '../utils/countries';
+import { countries, getFlag, getFlagByName, danGrades, disciplines } from '../utils/countries';
 import { Plus, Edit, Trash2, Search, X, Loader2, Upload, User, MapPin, Award, Building2, Mail, Phone, Info, Settings } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -221,6 +221,24 @@ const TechnicalDirectorsPage = () => {
     return matchesSearch && matchesCountry;
   });
 
+  // Resolve the correct flag for a director, using country_code when it matches the country name,
+  // otherwise falling back to the country name for resolution
+  const getDirectorFlag = (director) => {
+    const code = director.country_code;
+    const name = director.country;
+    if (code) {
+      const countryByCode = countries.find(c => c.code === code.toUpperCase());
+      // If we have a name and it doesn't match the code, trust the name instead
+      if (name && countryByCode && countryByCode.name.toLowerCase() !== name.toLowerCase()) {
+        const flagByName = getFlagByName(name);
+        if (flagByName !== '\u{1F3F3}\u{FE0F}') return flagByName; // found a valid match by name
+      }
+      return getFlag(code);
+    }
+    if (name) return getFlagByName(name);
+    return '\u{1F3F3}\u{FE0F}';
+  };
+
   const uniqueCountries = [...new Set(directors.map(d => d.country_code).filter(Boolean))];
 
   // Get clubs managed by a director
@@ -328,7 +346,7 @@ const TechnicalDirectorsPage = () => {
                     />
                     {/* Flag badge */}
                     <span className="absolute -bottom-1 -right-1 text-xl">
-                      {getFlag(director.country_code)}
+                      {getDirectorFlag(director)}
                     </span>
                   </div>
 
