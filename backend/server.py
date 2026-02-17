@@ -86,6 +86,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+import cloudinary.utils
 from reportlab.lib.units import cm
 import io
 import base64
@@ -1048,6 +1049,30 @@ class VisitRequestCreate(BaseModel):
     visit_date: Optional[str] = None
 
 # Utility functions
+async def upload_base64_to_cloudinary(base64_data: str, folder: str = "academie-levinet/uploads") -> Optional[str]:
+    """Helper to upload base64 or data URL to Cloudinary"""
+    if not CLOUDINARY_CLOUD_NAME or not CLOUDINARY_API_KEY or not CLOUDINARY_API_SECRET:
+        logger.warning("Cloudinary not configured, returning base64")
+        return None
+
+    try:
+        # If it doesn't have the data:image prefix, add it (default to jpeg)
+        if not base64_data.startswith('data:'):
+            base64_data = f"data:image/jpeg;base64,{base64_data}"
+
+        result = cloudinary.uploader.upload(
+            base64_data,
+            folder=folder,
+            resource_type="image",
+            transformation=[
+                {"width": 800, "height": 800, "crop": "limit", "quality": "auto", "fetch_format": "auto"}
+            ]
+        )
+        return result.get('secure_url')
+    except Exception as e:
+        logger.error(f"Cloudinary upload error: {e}")
+        return None
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -1469,30 +1494,28 @@ async def get_image(image_id: str):
 
 @api_router.post("/upload/photo")
 async def upload_photo(data: PhotoUploadRequest, current_user: dict = Depends(get_current_user)):
-    """Upload a photo and return the URL (stores as base64 data URL)"""
+    """Upload a photo and return the URL (uses Cloudinary if available)"""
     try:
         # Validate base64
         if not data.photo_base64:
             raise HTTPException(status_code=400, detail="Photo data required")
         
-        # Create data URL (this approach stores the image as a data URL)
-        # For production, you'd want to use cloud storage like S3
+        # Try uploading to Cloudinary
+        cloudinary_url = await upload_base64_to_cloudinary(data.photo_base64, folder="academie-levinet/profiles")
+
+        if cloudinary_url:
+            return {"photo_url": cloudinary_url, "message": "Photo uploadée avec succès sur Cloudinary"}
+
+        # Fallback to base64 if Cloudinary fails or is not configured
         if data.photo_base64.startswith('data:'):
             photo_url = data.photo_base64
         else:
-            # Determine mime type from filename
             ext = data.filename.lower().split('.')[-1]
-            mime_types = {
-                'jpg': 'image/jpeg',
-                'jpeg': 'image/jpeg',
-                'png': 'image/png',
-                'gif': 'image/gif',
-                'webp': 'image/webp'
-            }
+            mime_types = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png', 'gif': 'image/gif', 'webp': 'image/webp'}
             mime_type = mime_types.get(ext, 'image/jpeg')
             photo_url = f"data:{mime_type};base64,{data.photo_base64}"
         
-        return {"photo_url": photo_url, "message": "Photo uploadée avec succès"}
+        return {"photo_url": photo_url, "message": "Photo uploadée avec succès (base64 fallback)"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'upload: {str(e)}")
 
@@ -1506,14 +1529,20 @@ async def update_user_photo(user_id: str, data: PhotoUploadRequest, current_user
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
     
-    # Create photo URL
-    if data.photo_base64.startswith('data:'):
-        photo_url = data.photo_base64
+    # Try uploading to Cloudinary
+    cloudinary_url = await upload_base64_to_cloudinary(data.photo_base64, folder="academie-levinet/profiles")
+
+    if cloudinary_url:
+        photo_url = cloudinary_url
     else:
-        ext = data.filename.lower().split('.')[-1]
-        mime_types = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png', 'gif': 'image/gif', 'webp': 'image/webp'}
-        mime_type = mime_types.get(ext, 'image/jpeg')
-        photo_url = f"data:{mime_type};base64,{data.photo_base64}"
+        # Fallback to base64
+        if data.photo_base64.startswith('data:'):
+            photo_url = data.photo_base64
+        else:
+            ext = data.filename.lower().split('.')[-1]
+            mime_types = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png', 'gif': 'image/gif', 'webp': 'image/webp'}
+            mime_type = mime_types.get(ext, 'image/jpeg')
+            photo_url = f"data:{mime_type};base64,{data.photo_base64}"
     
     await db.users.update_one({"id": user_id}, {"$set": {"photo_url": photo_url}})
     
@@ -1541,6 +1570,8 @@ async def get_all_users(
     club_id: Optional[str] = None,
     membership_status: Optional[str] = None,
     belt_grade: Optional[str] = None,
+    limit: int = 50,
+    skip: int = 0,
     current_user: dict = Depends(get_current_user)
 ):
     """
@@ -1575,18 +1606,24 @@ async def get_all_users(
     if belt_grade:
         query["belt_grade"] = belt_grade
 
-    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
+    # Optimize query with projection to exclude password_hash and limit results
+    cursor = db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).skip(skip).limit(limit)
+    users = await cursor.to_list(limit)
+    total = await db.users.count_documents(query)
 
     for user in users:
         if isinstance(user.get('created_at'), str):
-            user['created_at'] = datetime.fromisoformat(user['created_at'])
+            try:
+                user['created_at'] = datetime.fromisoformat(user['created_at'].replace('Z', '+00:00'))
+            except:
+                pass
         # Ajouter first_name/last_name depuis full_name si absent
         if user.get('full_name') and not user.get('first_name'):
             parts = user['full_name'].split(' ', 1)
             user['first_name'] = parts[0]
             user['last_name'] = parts[1] if len(parts) > 1 else ''
 
-    return {"users": users, "total": len(users)}
+    return {"users": users, "total": total}
 
 @api_router.post("/admin/users")
 async def create_admin_user(data: AdminUserCreate, current_user: dict = Depends(get_current_user)):
@@ -1891,6 +1928,9 @@ async def get_members_alias(
     city: Optional[str] = None,
     technical_director_id: Optional[str] = None,
     status: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 50,
+    skip: int = 0,
     current_user: dict = Depends(get_current_user)
 ):
     """Alias: Récupère les utilisateurs avec role=membre/eleve"""
@@ -1903,8 +1943,16 @@ async def get_members_alias(
         query['technical_director_id'] = technical_director_id
     if status:
         query['membership_status'] = status
+    if search:
+        query["$or"] = [
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
 
-    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).to_list(1000)
+    cursor = db.users.find(query, {"_id": 0, "password_hash": 0, "photo": 0}).sort("full_name", 1).skip(skip).limit(limit)
+    users = await cursor.to_list(limit)
+    total = await db.users.count_documents(query)
+
     # Ajouter first_name/last_name pour compatibilité
     for user in users:
         if user.get('full_name') and not user.get('first_name'):
@@ -1912,14 +1960,20 @@ async def get_members_alias(
             user['first_name'] = parts[0]
             user['last_name'] = parts[1] if len(parts) > 1 else ''
         if isinstance(user.get('created_at'), str):
-            user['created_at'] = datetime.fromisoformat(user['created_at'])
-    return users
+            try:
+                user['created_at'] = datetime.fromisoformat(user['created_at'].replace('Z', '+00:00'))
+            except:
+                pass
+    return {"users": users, "total": total}
 
 @api_router.get("/instructors")
 async def get_instructors(
     country: Optional[str] = None,
     city: Optional[str] = None,
     club_id: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 100,
+    skip: int = 0,
     current_user: dict = Depends(get_current_user)
 ):
     """Get all instructors - accessible to all authenticated users"""
@@ -1931,14 +1985,22 @@ async def get_instructors(
             query["city"] = city
         if club_id:
             query["club_id"] = club_id
+        if search:
+            query["$or"] = [
+                {"full_name": {"$regex": search, "$options": "i"}},
+                {"email": {"$regex": search, "$options": "i"}}
+            ]
 
-        instructors = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("full_name", 1).to_list(500)
+        cursor = db.users.find(query, {"_id": 0, "password_hash": 0, "photo": 0}).sort("full_name", 1).skip(skip).limit(limit)
+        instructors = await cursor.to_list(limit)
+        total = await db.users.count_documents(query)
+
         for user in instructors:
             if user.get('full_name') and not user.get('first_name'):
                 parts = user['full_name'].split(' ', 1)
                 user['first_name'] = parts[0]
                 user['last_name'] = parts[1] if len(parts) > 1 else ''
-        return instructors
+        return {"users": instructors, "total": total}
     except Exception as e:
         logger.error(f"Error in get_instructors: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Erreur lors du chargement des instructeurs: {str(e)}")
@@ -1946,14 +2008,24 @@ async def get_instructors(
 @api_router.get("/technical-directors")
 async def get_technical_directors(
     country: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 100,
+    skip: int = 0,
     current_user: dict = Depends(get_current_user)
 ):
     """Get all technical directors - accessible to all authenticated users"""
     query = {"role": "directeur_technique"}
     if country:
         query["country"] = country
+    if search:
+        query["$or"] = [
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
     
-    directors = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("full_name", 1).to_list(500)
+    cursor = db.users.find(query, {"_id": 0, "password_hash": 0, "photo": 0}).sort("full_name", 1).skip(skip).limit(limit)
+    directors = await cursor.to_list(limit)
+    total = await db.users.count_documents(query)
     # Country name to code mapping for resolving missing country_code
     COUNTRY_NAME_TO_CODE = {
         "france": "FR", "belgique": "BE", "suisse": "CH", "canada": "CA",
@@ -1990,7 +2062,7 @@ async def get_technical_directors(
             resolved = COUNTRY_NAME_TO_CODE.get(country_name.lower().strip())
             if resolved:
                 user['country_code'] = resolved
-    return directors
+    return {"users": directors, "total": total}
 
 @api_router.get("/members/{member_id}")
 async def get_member_alias(member_id: str, current_user: dict = Depends(get_current_user)):
@@ -2089,8 +2161,10 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     total_members = await db.users.count_documents(member_query)
     active_memberships = await db.users.count_documents({**member_query, "membership_status": "Actif"})
 
-    subscriptions = await db.subscriptions.find({}, {"_id": 0}).to_list(10000)
-    total_revenue = sum(sub['amount'] for sub in subscriptions)
+    # Optimized: use aggregation for revenue
+    revenue_pipeline = [{"$group": {"_id": None, "total": {"$sum": "$amount"}}}]
+    revenue_result = await db.subscriptions.aggregate(revenue_pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0.0
 
     now = datetime.now(timezone.utc)
     start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -2109,15 +2183,19 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
         {"month": "Jul", "count": 30}
     ]
 
-    members = await db.users.find(member_query, {"_id": 0, "password_hash": 0}).to_list(1000)
-    members_by_country_dict = {}
-    for member in members:
-        country = member.get('country', 'Unknown')
-        members_by_country_dict[country] = members_by_country_dict.get(country, 0) + 1
+    # Optimized: use aggregation for country stats
+    country_pipeline = [
+        {"$match": member_query},
+        {"$group": {"_id": "$country", "count": {"$sum": 1}}},
+        {"$project": {"_id": 0, "country": {"$ifNull": ["$_id", "Inconnu"]}, "count": 1}}
+    ]
+    members_by_country = await db.users.aggregate(country_pipeline).to_list(1000)
 
-    members_by_country = [{"country": k, "count": v} for k, v in members_by_country_dict.items()]
-
-    recent_members_list = await db.users.find(member_query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(5).to_list(5)
+    # Optimized: use strict projection for recent members
+    recent_members_list = await db.users.find(
+        member_query,
+        {"_id": 0, "password_hash": 0, "photo": 0}
+    ).sort("created_at", -1).limit(5).to_list(5)
     recent_members_formatted = []
     for member in recent_members_list:
         if isinstance(member.get('created_at'), str):
@@ -2769,6 +2847,7 @@ async def search_users(q: str = "", current_user: dict = Depends(get_current_use
     results = []
     
     # Search users - exclure les adresses système (academie-levinet, academielevinet)
+    # Use strict projection to avoid large document sizes
     users = await db.users.find({
         "$and": [
             {"id": {"$ne": current_user['id']}},
@@ -2778,7 +2857,7 @@ async def search_users(q: str = "", current_user: dict = Depends(get_current_use
                 {"email": {"$regex": q, "$options": "i"}}
             ]}
         ]
-    }, {"_id": 0, "password_hash": 0}).to_list(10)
+    }, {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "role": 1}).to_list(10)
     
     for u in users:
         results.append({
@@ -2836,6 +2915,38 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
         {"_id": 0}
     ).sort("updated_at", -1).to_list(100)
     
+    if not conversations:
+        return []
+
+    # Batch fetch all other participants' photos to avoid N+1 queries
+    other_participant_ids = []
+    conversation_ids = []
+    for conv in conversations:
+        conversation_ids.append(conv['id'])
+        other_participant_idx = 1 if conv['participants'][0] == current_user['id'] else 0
+        if len(conv['participants']) > other_participant_idx:
+            other_participant_ids.append(conv['participants'][other_participant_idx])
+
+    users_info = {}
+    if other_participant_ids:
+        users_cursor = db.users.find(
+            {"id": {"$in": other_participant_ids}},
+            {"_id": 0, "id": 1, "photo_url": 1}
+        )
+        async for user in users_cursor:
+            users_info[user['id']] = user.get('photo_url')
+
+    # Batch fetch unread counts
+    unread_counts_cursor = db.messages.aggregate([
+        {"$match": {
+            "conversation_id": {"$in": conversation_ids},
+            "sender_id": {"$ne": current_user['id']},
+            "read": False
+        }},
+        {"$group": {"_id": "$conversation_id", "count": {"$sum": 1}}}
+    ])
+    unread_counts = {item["_id"]: item["count"] async for item in unread_counts_cursor}
+
     # Convert datetime strings and add unread count
     for conv in conversations:
         if isinstance(conv.get('created_at'), str):
@@ -2845,13 +2956,8 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
         if conv.get('last_message_at') and isinstance(conv.get('last_message_at'), str):
             conv['last_message_at'] = datetime.fromisoformat(conv['last_message_at'])
         
-        # Get unread count for this conversation
-        unread_count = await db.messages.count_documents({
-            "conversation_id": conv['id'],
-            "sender_id": {"$ne": current_user['id']},
-            "read": False
-        })
-        conv['unread_count'] = unread_count
+        # Get unread count from batch-fetched data
+        conv['unread_count'] = unread_counts.get(conv['id'], 0)
         
         # Get the other participant's info
         other_participant_idx = 1 if conv['participants'][0] == current_user['id'] else 0
@@ -2859,12 +2965,8 @@ async def get_conversations(current_user: dict = Depends(get_current_user)):
         conv['other_participant_name'] = conv['participant_names'][other_participant_idx] if len(conv['participant_names']) > other_participant_idx else "Utilisateur"
         conv['other_participant_id'] = other_participant_id
         
-        # Get other participant's photo
-        if other_participant_id:
-            other_user = await db.users.find_one({"id": other_participant_id}, {"_id": 0, "photo_url": 1})
-            conv['other_participant_photo'] = other_user.get('photo_url') if other_user else None
-        else:
-            conv['other_participant_photo'] = None
+        # Get other participant's photo from our batch-fetched info
+        conv['other_participant_photo'] = users_info.get(other_participant_id) if other_participant_id else None
     
     return conversations
 
@@ -3119,35 +3221,66 @@ async def get_wall_posts(
     """Get all posts for the community wall"""
     posts = await db.posts.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     
+    if not posts:
+        return {"posts": [], "total": 0}
+
+    # Batch fetch all authors
+    author_ids = list(set(post.get("author_id") for post in posts if post.get("author_id")))
+    authors_info = {}
+    if author_ids:
+        authors_cursor = db.users.find(
+            {"id": {"$in": author_ids}},
+            {"_id": 0, "id": 1, "full_name": 1, "photo_url": 1, "role": 1}
+        )
+        async for author in authors_cursor:
+            authors_info[author['id']] = author
+
+    # Batch fetch comment counts
+    post_ids = [post["id"] for post in posts]
+    comment_counts_cursor = db.post_comments.aggregate([
+        {"$match": {"post_id": {"$in": post_ids}}},
+        {"$group": {"_id": "$post_id", "count": {"$sum": 1}}}
+    ])
+    comment_counts = {item["_id"]: item["count"] async for item in comment_counts_cursor}
+
+    # Batch fetch reactions
+    reactions_cursor = db.post_reactions.find({"post_id": {"$in": post_ids}}, {"_id": 0})
+    all_reactions = {}
+    async for r in reactions_cursor:
+        pid = r["post_id"]
+        if pid not in all_reactions:
+            all_reactions[pid] = []
+        all_reactions[pid].append(r)
+
     # Enrich posts with author info, comments count, reactions
     for post in posts:
-        # Get author info
-        author = await db.users.find_one({"id": post.get("author_id")}, {"_id": 0, "password_hash": 0})
-        if author:
-            post["author"] = author
+        pid = post["id"]
+        # Get author info from our batch-fetched data
+        author_id = post.get("author_id")
+        if author_id in authors_info:
+            post["author"] = authors_info[author_id]
         else:
             # Fallback if author not found - use stored info if available
             post["author"] = {
-                "id": post.get("author_id"),
+                "id": author_id,
                 "full_name": post.get("author_name", "Membre"),
                 "photo_url": post.get("author_photo")
             }
         
-        # Get comments count
-        comments_count = await db.post_comments.count_documents({"post_id": post["id"]})
-        post["comments_count"] = comments_count
+        # Get comments count from batch-fetched data
+        post["comments_count"] = comment_counts.get(pid, 0)
         
-        # Get reactions summary
-        reactions = await db.post_reactions.find({"post_id": post["id"]}, {"_id": 0}).to_list(100)
+        # Get reactions summary from batch-fetched data
+        post_reactions = all_reactions.get(pid, [])
         reaction_summary = {}
         user_reaction = None
-        for r in reactions:
+        for r in post_reactions:
             rt = r.get("reaction_type", "like")
             reaction_summary[rt] = reaction_summary.get(rt, 0) + 1
             if r.get("user_id") == current_user.get("id"):
                 user_reaction = rt
         post["reactions"] = reaction_summary
-        post["reactions_count"] = len(reactions)
+        post["reactions_count"] = len(post_reactions)
         post["user_reaction"] = user_reaction
     
     total = await db.posts.count_documents({})
@@ -3227,15 +3360,29 @@ async def get_post_comments(
     """Get comments for a specific post"""
     comments = await db.post_comments.find({"post_id": post_id}, {"_id": 0}).sort("created_at", 1).limit(limit).to_list(limit)
     
+    if not comments:
+        return {"comments": []}
+
+    # Batch fetch all authors
+    author_ids = list(set(comment.get("author_id") for comment in comments if comment.get("author_id")))
+    authors_info = {}
+    if author_ids:
+        authors_cursor = db.users.find(
+            {"id": {"$in": author_ids}},
+            {"_id": 0, "id": 1, "full_name": 1, "photo_url": 1, "role": 1}
+        )
+        async for author in authors_cursor:
+            authors_info[author['id']] = author
+
     # Enrich with author info
     for comment in comments:
-        author = await db.users.find_one({"id": comment.get("author_id")}, {"_id": 0, "password_hash": 0})
-        if author:
-            comment["author"] = author
+        author_id = comment.get("author_id")
+        if author_id in authors_info:
+            comment["author"] = authors_info[author_id]
         else:
             # Fallback if author not found
             comment["author"] = {
-                "id": comment.get("author_id"),
+                "id": author_id,
                 "full_name": comment.get("author_name", "Membre"),
                 "photo_url": comment.get("author_photo")
             }
@@ -3394,7 +3541,7 @@ async def get_wall_stats(current_user: dict = Depends(get_current_user)):
     posts_this_week = await db.posts.count_documents({"created_at": {"$gte": week_ago}})
     
     # Get recent achievements/milestones
-    recent_members = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(5).to_list(5)
+    recent_members = await db.users.find({}, {"_id": 0, "password_hash": 0, "photo": 0}).sort("created_at", -1).limit(5).to_list(5)
     
     return {
         "total_members": total_members,
@@ -3640,11 +3787,28 @@ async def get_forums_stats(current_user: dict = Depends(get_current_user)):
 async def get_forums(current_user: dict = Depends(get_current_user)):
     """Get all forums"""
     forums = await db.forums.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
-    
-    # Add topic and message counts
+    if not forums:
+        return []
+
+    forum_ids = [f["id"] for f in forums]
+
+    # Aggregate topic counts to avoid N+1 queries
+    topic_counts_cursor = db.forum_topics.aggregate([
+        {"$match": {"forum_id": {"$in": forum_ids}}},
+        {"$group": {"_id": "$forum_id", "count": {"$sum": 1}}}
+    ])
+    topic_counts = {item["_id"]: item["count"] async for item in topic_counts_cursor}
+
+    # Aggregate message counts to avoid N+1 queries
+    message_counts_cursor = db.forum_messages.aggregate([
+        {"$match": {"forum_id": {"$in": forum_ids}}},
+        {"$group": {"_id": "$forum_id", "count": {"$sum": 1}}}
+    ])
+    message_counts = {item["_id"]: item["count"] async for item in message_counts_cursor}
+
     for forum in forums:
-        forum["topic_count"] = await db.forum_topics.count_documents({"forum_id": forum["id"]})
-        forum["message_count"] = await db.forum_messages.count_documents({"forum_id": forum["id"]})
+        forum["topic_count"] = topic_counts.get(forum["id"], 0)
+        forum["message_count"] = message_counts.get(forum["id"], 0)
     
     return forums
 

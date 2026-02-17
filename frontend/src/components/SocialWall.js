@@ -329,21 +329,44 @@ const SocialWall = ({ variant = 'full' }) => {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [limit] = useState(20);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [leftSponsors, setLeftSponsors] = useState([]);
   const [rightSponsors, setRightSponsors] = useState([]);
   const [nextEvent, setNextEvent] = useState(null);
 
-  const fetchPosts = useCallback(async () => {
+  const fetchPosts = useCallback(async (isLoadMore = false) => {
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+
     try {
-      const response = await api.get('/wall/posts');
-      setPosts(response.data.posts || []);
+      const response = await api.get('/wall/posts', {
+        params: { limit, skip: isLoadMore ? skip + limit : 0 }
+      });
+
+      const newPosts = response.data.posts || [];
+      if (isLoadMore) {
+        setPosts(prev => [...prev, ...newPosts]);
+        setSkip(prev => prev + limit);
+      } else {
+        setPosts(newPosts);
+        setSkip(0);
+      }
+      setTotal(response.data.total || 0);
     } catch (error) {
       console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
-    setLoading(false);
-  }, []);
+  }, [limit, skip]);
 
   const fetchOnlineUsers = useCallback(async () => {
     try {
@@ -550,6 +573,22 @@ const SocialWall = ({ variant = 'full' }) => {
                 currentUserId={user?.id}
               />
             ))}
+
+            {/* Load More Button */}
+            {total > posts.length && (
+              <button
+                onClick={() => fetchPosts(true)}
+                disabled={loadingMore}
+                className="w-full py-3 bg-paper hover:bg-white/5 border border-white/10 rounded-xl text-text-primary font-semibold transition-colors disabled:opacity-50"
+              >
+                {loadingMore ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                    Chargement...
+                  </div>
+                ) : 'Voir plus de publications'}
+              </button>
+            )}
           </div>
         )}
       </div>

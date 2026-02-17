@@ -21,14 +21,30 @@ const MembersPage = () => {
   const [filters, setFilters] = useState({ country: '', city: '', technical_director_id: '', status: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Pagination
+  const [limit] = useState(50);
+  const [skip, setSkip] = useState(0);
+  const [total, setTotal] = useState(0);
+
   useEffect(() => {
     fetchMembers();
-  }, [filters]);
+  }, [filters, skip]);
 
   const fetchMembers = async () => {
+    setLoading(true);
     try {
-      const data = await api.getMembers(filters);
+      // Backend now returns {users: [], total: 0}
+      const response = await api.get('/members', {
+        params: {
+          ...filters,
+          limit,
+          skip
+        }
+      });
+
+      const data = response.data.users || response.data || [];
       setMembers(data);
+      setTotal(response.data.total || data.length);
     } catch (error) {
       console.error('Error fetching members:', error);
       toast.error('Erreur lors du chargement des membres');
@@ -116,7 +132,7 @@ const MembersPage = () => {
         </div>
 
         {/* Members Table */}
-        <div className="stat-card" data-testid="members-table">
+        <div className="stat-card mb-6" data-testid="members-table">
           {loading ? (
             <div className="text-center py-12">
               <p className="text-text-secondary font-manrope">Chargement...</p>
@@ -194,6 +210,35 @@ const MembersPage = () => {
             </div>
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {total > limit && (
+          <div className="flex items-center justify-between bg-paper p-4 rounded-xl border border-white/10 mt-4 mb-8">
+            <div className="text-sm text-text-muted">
+              Affichage de {skip + 1} à {Math.min(skip + limit, total)} sur {total} membres
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSkip(Math.max(0, skip - limit))}
+                disabled={skip === 0}
+                className="border-white/10"
+              >
+                Précédent
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSkip(skip + limit)}
+                disabled={skip + limit >= total}
+                className="border-white/10"
+              >
+                Suivant
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

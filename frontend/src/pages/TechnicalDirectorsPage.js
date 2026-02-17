@@ -22,6 +22,9 @@ const TechnicalDirectorsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [countryFilter, setCountryFilter] = useState('all');
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 24;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDirector, setEditingDirector] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -43,16 +46,28 @@ const TechnicalDirectorsPage = () => {
 
   useEffect(() => {
     fetchDirectors();
+  }, [page, countryFilter]);
+
+  useEffect(() => {
     fetchClubs();
   }, []);
 
   const fetchDirectors = async () => {
     try {
-      // Utiliser /technical-directors accessible à tous les utilisateurs connectés
-      const response = await api.get('/technical-directors');
-      // Backend returns array directly
-      const users = Array.isArray(response.data) ? response.data : (response.data?.users || []);
-      setDirectors(users);
+      setLoading(true);
+      const skip = (page - 1) * limit;
+      const response = await api.get('/technical-directors', {
+        params: {
+          limit,
+          skip,
+          country: countryFilter === 'all' ? undefined : countryFilter,
+          search: searchTerm || undefined
+        }
+      });
+
+      const data = response.data;
+      setDirectors(data.users || []);
+      setTotal(data.total || 0);
     } catch (error) {
       console.error('Error fetching directors:', error);
       setDirectors([]);
@@ -60,6 +75,12 @@ const TechnicalDirectorsPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+    fetchDirectors();
   };
 
   const fetchClubs = async () => {
@@ -212,15 +233,6 @@ const TechnicalDirectorsPage = () => {
     }
   };
 
-  const filteredDirectors = directors.filter(d => {
-    const name = d.full_name || d.name || '';
-    const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          d.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          d.city?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCountry = countryFilter === 'all' || d.country_code === countryFilter;
-    return matchesSearch && matchesCountry;
-  });
-
   // Resolve the correct flag for a director, using country_code when it matches the country name,
   // otherwise falling back to the country name for resolution
   const getDirectorFlag = (director) => {
@@ -301,16 +313,16 @@ const TechnicalDirectorsPage = () => {
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
+          <form onSubmit={handleSearch} className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
             <Input
-              placeholder="Rechercher..."
+              placeholder="Rechercher par nom ou email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 bg-paper border-white/10"
             />
-          </div>
-          <Select value={countryFilter} onValueChange={setCountryFilter}>
+          </form>
+          <Select value={countryFilter} onValueChange={(v) => { setCountryFilter(v); setPage(1); }}>
             <SelectTrigger className="w-full sm:w-48 bg-paper border-white/10">
               <SelectValue placeholder="Tous les pays" />
             </SelectTrigger>
@@ -327,7 +339,7 @@ const TechnicalDirectorsPage = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredDirectors.map((director) => {
+          {directors.map((director) => {
             const directorClubs = getDirectorClubs(director.id);
             return (
               <div
@@ -414,10 +426,37 @@ const TechnicalDirectorsPage = () => {
           })}
         </div>
 
-        {filteredDirectors.length === 0 && (
+        {directors.length === 0 && (
           <div className="text-center py-12">
             <User className="w-12 h-12 text-text-muted mx-auto mb-4" />
             <p className="text-text-muted font-manrope">Aucun directeur technique trouvé</p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {total > limit && (
+          <div className="flex items-center justify-center gap-4 pt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 1}
+              onClick={() => setPage(p => p - 1)}
+              className="border-white/10"
+            >
+              Précédent
+            </Button>
+            <span className="text-sm text-text-secondary">
+              Page {page} sur {Math.ceil(total / limit)}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= Math.ceil(total / limit)}
+              onClick={() => setPage(p => p + 1)}
+              className="border-white/10"
+            >
+              Suivant
+            </Button>
           </div>
         )}
       </div>

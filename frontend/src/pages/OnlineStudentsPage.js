@@ -16,17 +16,24 @@ const OnlineStudentsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Pagination
+  const [limit] = useState(50);
+  const [skip, setSkip] = useState(0);
+  const [total, setTotal] = useState(0);
+
   useEffect(() => {
     fetchOnlineStudents();
-  }, []);
+  }, [skip]);
 
   const fetchOnlineStudents = async () => {
+    setLoading(true);
     try {
-      const response = await api.get('/admin/users');
-      const allUsers = response.data.users || response.data || [];
-      // Filter only eleve_libre (online students)
-      const onlineStudents = allUsers.filter(u => u.role === 'eleve_libre');
-      setStudents(onlineStudents);
+      const response = await api.get('/admin/users', {
+        params: { role: 'eleve_libre', limit, skip }
+      });
+      const data = response.data.users || [];
+      setStudents(data);
+      setTotal(response.data.total || data.length);
     } catch (error) {
       console.error('Error fetching online students:', error);
       toast.error('Erreur lors du chargement des élèves libres');
@@ -104,7 +111,7 @@ const OnlineStudentsPage = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {filteredStudents.map((student) => (
               <div
                 key={student.id}
@@ -165,6 +172,35 @@ const OnlineStudentsPage = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {total > limit && (
+          <div className="flex items-center justify-between bg-paper p-4 rounded-xl border border-white/10 mt-4 mb-8">
+            <div className="text-sm text-text-muted">
+              Affichage de {skip + 1} à {Math.min(skip + limit, total)} sur {total} élèves libres
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSkip(Math.max(0, skip - limit))}
+                disabled={skip === 0}
+                className="border-white/10"
+              >
+                Précédent
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSkip(skip + limit)}
+                disabled={skip + limit >= total}
+                className="border-white/10"
+              >
+                Suivant
+              </Button>
+            </div>
           </div>
         )}
       </div>
