@@ -21,6 +21,9 @@ const InstructorsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [countryFilter, setCountryFilter] = useState('all');
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const limit = 24;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingInstructor, setEditingInstructor] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -42,16 +45,28 @@ const InstructorsPage = () => {
 
   useEffect(() => {
     fetchInstructors();
+  }, [page, countryFilter]);
+
+  useEffect(() => {
     fetchClubs();
   }, []);
 
   const fetchInstructors = async () => {
     try {
-      // Utiliser /instructors accessible à tous les utilisateurs connectés
-      const response = await api.get('/instructors');
-      // Backend returns array directly
-      const users = Array.isArray(response.data) ? response.data : (response.data?.users || []);
-      setInstructors(users);
+      setLoading(true);
+      const skip = (page - 1) * limit;
+      const response = await api.get('/instructors', {
+        params: {
+          limit,
+          skip,
+          country: countryFilter === 'all' ? undefined : countryFilter,
+          search: searchTerm || undefined
+        }
+      });
+
+      const data = response.data;
+      setInstructors(data.users || []);
+      setTotal(data.total || 0);
     } catch (error) {
       console.error('Error fetching instructors:', error);
       setInstructors([]);
@@ -59,6 +74,12 @@ const InstructorsPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+    fetchInstructors();
   };
 
   const fetchClubs = async () => {
@@ -223,14 +244,6 @@ const InstructorsPage = () => {
     }
   };
 
-  const filteredInstructors = instructors.filter(i => {
-    const matchesSearch = i.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          i.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          i.city?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCountry = countryFilter === 'all' || i.country_code === countryFilter;
-    return matchesSearch && matchesCountry;
-  });
-
   const uniqueCountries = [...new Set(instructors.map(i => i.country_code).filter(Boolean))];
 
   if (loading) {
@@ -285,16 +298,16 @@ const InstructorsPage = () => {
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
+          <form onSubmit={handleSearch} className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
             <Input
-              placeholder="Rechercher..."
+              placeholder="Rechercher par nom ou email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 bg-paper border-white/10"
             />
-          </div>
-          <Select value={countryFilter} onValueChange={setCountryFilter}>
+          </form>
+          <Select value={countryFilter} onValueChange={(v) => { setCountryFilter(v); setPage(1); }}>
             <SelectTrigger className="w-full sm:w-48 bg-paper border-white/10">
               <SelectValue placeholder="Tous les pays" />
             </SelectTrigger>
@@ -311,7 +324,7 @@ const InstructorsPage = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredInstructors.map((instructor) => (
+          {instructors.map((instructor) => (
             <div
               key={instructor.id}
               className="bg-paper rounded-lg border border-white/10 p-4 hover:border-primary/50 transition-colors"
@@ -385,10 +398,37 @@ const InstructorsPage = () => {
           ))}
         </div>
 
-        {filteredInstructors.length === 0 && (
+        {instructors.length === 0 && (
           <div className="text-center py-12">
             <User className="w-12 h-12 text-text-muted mx-auto mb-4" />
             <p className="text-text-muted font-manrope">Aucun instructeur trouvé</p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {total > limit && (
+          <div className="flex items-center justify-center gap-4 pt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page === 1}
+              onClick={() => setPage(p => p - 1)}
+              className="border-white/10"
+            >
+              Précédent
+            </Button>
+            <span className="text-sm text-text-secondary">
+              Page {page} sur {Math.ceil(total / limit)}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= Math.ceil(total / limit)}
+              onClick={() => setPage(p => p + 1)}
+              className="border-white/10"
+            >
+              Suivant
+            </Button>
           </div>
         )}
       </div>

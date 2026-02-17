@@ -57,6 +57,11 @@ const AdminUsersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
 
+  // Pagination
+  const [limit] = useState(50);
+  const [skip, setSkip] = useState(0);
+  const [total, setTotal] = useState(0);
+
   // Listes pour les affectations
   const [clubs, setClubs] = useState([]);
   const [instructors, setInstructors] = useState([]);
@@ -91,7 +96,7 @@ const AdminUsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [roleFilter]);
+  }, [roleFilter, skip]);
 
   // Charger les clubs, instructeurs et DT au montage
   useEffect(() => {
@@ -116,11 +121,17 @@ const AdminUsersPage = () => {
   }, []);
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const response = await api.get('/admin/users', {
-        params: roleFilter ? { role: roleFilter } : {}
+        params: {
+          ...(roleFilter ? { role: roleFilter } : {}),
+          limit,
+          skip
+        }
       });
       setUsers(response.data.users || []);
+      setTotal(response.data.total || 0);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Erreur lors du chargement des utilisateurs');
@@ -322,8 +333,8 @@ const AdminUsersPage = () => {
 
   const getCounts = () => {
     return {
-      total: users.length,
-      admin: users.filter(u => u.role === 'admin').length,
+      total: total,
+      admin: users.filter(u => u.role === 'admin').length, // This will only count current page
       directeur_technique: users.filter(u => u.role === 'directeur_technique').length,
       instructeur: users.filter(u => u.role === 'instructeur').length,
       eleve: users.filter(u => u.role === 'eleve' || u.role === 'membre').length,
@@ -745,7 +756,7 @@ const AdminUsersPage = () => {
             </div>
 
             {/* Desktop Table */}
-            <div className="hidden lg:block bg-paper rounded-xl border border-white/10 overflow-hidden">
+            <div className="hidden lg:block bg-paper rounded-xl border border-white/10 overflow-hidden mb-6">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-white/10 bg-background/50">
@@ -830,6 +841,35 @@ const AdminUsersPage = () => {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {total > limit && (
+              <div className="flex items-center justify-between bg-paper p-4 rounded-xl border border-white/10 mt-4 mb-8">
+                <div className="text-sm text-text-muted">
+                  Affichage de {skip + 1} à {Math.min(skip + limit, total)} sur {total} utilisateurs
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSkip(Math.max(0, skip - limit))}
+                    disabled={skip === 0}
+                    className="border-white/10"
+                  >
+                    Précédent
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSkip(skip + limit)}
+                    disabled={skip + limit >= total}
+                    className="border-white/10"
+                  >
+                    Suivant
+                  </Button>
+                </div>
+              </div>
+            )}
           </>
         )}
 
