@@ -1950,11 +1950,42 @@ async def get_technical_directors(
         query["country"] = country
     
     directors = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("full_name", 1).to_list(500)
+    # Country name to code mapping for resolving missing country_code
+    COUNTRY_NAME_TO_CODE = {
+        "france": "FR", "belgique": "BE", "suisse": "CH", "canada": "CA",
+        "luxembourg": "LU", "maroc": "MA", "tunisie": "TN",
+        "sénégal": "SN", "senegal": "SN", "côte d'ivoire": "CI",
+        "cameroun": "CM", "allemagne": "DE", "espagne": "ES", "italie": "IT",
+        "portugal": "PT", "royaume-uni": "GB", "états-unis": "US", "etats-unis": "US",
+        "brésil": "BR", "bresil": "BR", "mexique": "MX", "argentine": "AR",
+        "japon": "JP", "australie": "AU", "nouvelle-zélande": "NZ",
+        "afrique du sud": "ZA", "île maurice": "MU", "ile maurice": "MU",
+        "andorre": "AD", "oman": "OM", "comores": "KM", "pakistan": "PK",
+        "madagascar": "MG", "polynésie française": "PF", "polynesie francaise": "PF",
+        "île rodrigues": "MU-R", "ile rodrigues": "MU-R",
+        "algérie": "DZ", "algerie": "DZ", "pologne": "PL", "pays-bas": "NL",
+        "suède": "SE", "suede": "SE", "norvège": "NO", "norvege": "NO",
+        "danemark": "DK", "finlande": "FI", "grèce": "GR", "grece": "GR",
+        "turquie": "TR", "roumanie": "RO", "hongrie": "HU",
+        "république tchèque": "CZ", "republique tcheque": "CZ",
+        "autriche": "AT", "irlande": "IE", "monaco": "MC",
+        "russie": "RU", "chine": "CN", "inde": "IN", "israël": "IL", "israel": "IL",
+        "vietnam": "VN", "thaïlande": "TH", "thailande": "TH",
+        "corée du sud": "KR", "coree du sud": "KR",
+        "chili": "CL", "colombie": "CO",
+    }
     for user in directors:
         if user.get('full_name') and not user.get('first_name'):
             parts = user['full_name'].split(' ', 1)
             user['first_name'] = parts[0]
             user['last_name'] = parts[1] if len(parts) > 1 else ''
+        # Resolve country_code from country name if missing or mismatched
+        country_name = user.get('country', '')
+        country_code = user.get('country_code', '')
+        if country_name and not country_code:
+            resolved = COUNTRY_NAME_TO_CODE.get(country_name.lower().strip())
+            if resolved:
+                user['country_code'] = resolved
     return directors
 
 @api_router.get("/members/{member_id}")
@@ -5096,17 +5127,29 @@ async def generate_invoice_for_member(
 @api_router.post("/pending-members")
 async def create_pending_member(data: PendingMemberCreate):
     """Create a pending member request (for existing members)"""
-    # Check if email already exists in users
-    existing_user = await db.users.find_one({"email": data.email})
+    # Normalize email to lowercase to prevent case-sensitive duplicates
+    normalized_email = data.email.strip().lower()
+
+    # Check if email already exists in users (case-insensitive)
+    existing_user = await db.users.find_one(
+        {"email": {"$regex": f"^{re.escape(normalized_email)}$", "$options": "i"}}
+    )
     if existing_user:
         raise HTTPException(status_code=400, detail="Un compte existe déjà avec cet email. Veuillez vous connecter.")
-    
-    # Check if already has a pending request
-    existing_pending = await db.pending_members.find_one({"email": data.email, "status": "En attente"})
+
+    # Check if already has a pending or approved request (any non-rejected status, case-insensitive)
+    existing_pending = await db.pending_members.find_one(
+        {"email": {"$regex": f"^{re.escape(normalized_email)}$", "$options": "i"}, "status": {"$in": ["En attente", "Approuvé"]}}
+    )
     if existing_pending:
+        if existing_pending.get("status") == "Approuvé":
+            raise HTTPException(status_code=400, detail="Votre demande a déjà été approuvée. Vérifiez vos emails pour vos identifiants de connexion.")
         raise HTTPException(status_code=400, detail="Une demande est déjà en cours pour cet email.")
-    
-    pending_member = PendingMember(**data.model_dump())
+
+    # Store with normalized email
+    member_data = data.model_dump()
+    member_data['email'] = normalized_email
+    pending_member = PendingMember(**member_data)
     doc = pending_member.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     
@@ -5160,14 +5203,31 @@ async def approve_pending_member(pending_id: str, current_user: dict = Depends(g
     
     if pending.get('status') != 'En attente':
         raise HTTPException(status_code=400, detail="Cette demande a déjà été traitée")
-    
+
+    # Check if a user account already exists for this email (prevents duplicate account creation)
+    normalized_email = pending['email'].strip().lower()
+    existing_user = await db.users.find_one(
+        {"email": {"$regex": f"^{re.escape(normalized_email)}$", "$options": "i"}}
+    )
+    if existing_user:
+        # Mark this pending request as approved since user already exists
+        await db.pending_members.update_one(
+            {"id": pending_id},
+            {"$set": {
+                "status": "Approuvé",
+                "reviewed_by": current_user['id'],
+                "reviewed_at": datetime.now(timezone.utc).isoformat(),
+                "admin_notes": "Compte existant détecté - approuvé automatiquement"
+            }}
+        )
+        return {"message": "Un compte existe déjà pour cet email. La demande a été marquée comme approuvée.", "user_id": existing_user.get('id')}
+
     # Generate temporary password
     import secrets
     import string
     temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
-    
-    # Create user account - normaliser l'email en minuscules
-    normalized_email = pending['email'].strip().lower()
+
+    # Create user account
     user = User(
         email=normalized_email,
         password_hash=hash_password(temp_password),
@@ -5421,17 +5481,51 @@ async def get_clubs(
         query["technical_director_id"] = technical_director_id
     
     clubs = await db.clubs.find(query, {"_id": 0}).sort("name", 1).to_list(1000)
-    
-    # Enrich with member counts and DT names
+
+    # Collect all user IDs referenced by clubs to resolve in a single batch
+    all_user_ids = set()
+    for club in clubs:
+        if club.get("technical_director_id"):
+            all_user_ids.add(club["technical_director_id"])
+        for uid in club.get("technical_director_ids", []):
+            all_user_ids.add(uid)
+        for uid in club.get("national_director_ids", []):
+            all_user_ids.add(uid)
+        for uid in club.get("instructor_ids", []):
+            all_user_ids.add(uid)
+
+    # Batch-fetch all referenced users at once
+    user_map = {}
+    if all_user_ids:
+        users = await db.users.find(
+            {"id": {"$in": list(all_user_ids)}},
+            {"_id": 0, "id": 1, "full_name": 1, "email": 1, "photo_url": 1, "city": 1, "country": 1, "dan_grade": 1, "club_id": 1}
+        ).to_list(len(all_user_ids))
+        user_map = {u["id"]: u for u in users}
+
+    # Enrich clubs with resolved profiles and member counts
     for club in clubs:
         member_count = await db.users.count_documents({"club_id": club["id"]})
         club["member_count"] = member_count
-        
-        # Get technical director name
+
+        # Resolve technical director (old single field)
         if club.get("technical_director_id"):
-            dt = await db.users.find_one({"id": club["technical_director_id"]}, {"_id": 0, "full_name": 1})
+            dt = user_map.get(club["technical_director_id"])
             club["technical_director_name"] = dt.get("full_name") if dt else "Non assigné"
-    
+
+        # Resolve technical directors (multiple)
+        club["technical_directors_resolved"] = [
+            user_map[uid] for uid in club.get("technical_director_ids", []) if uid in user_map
+        ]
+        # Resolve national directors
+        club["national_directors_resolved"] = [
+            user_map[uid] for uid in club.get("national_director_ids", []) if uid in user_map
+        ]
+        # Resolve instructors
+        club["instructors_resolved"] = [
+            user_map[uid] for uid in club.get("instructor_ids", []) if uid in user_map
+        ]
+
     return {"clubs": clubs, "total": len(clubs)}
 
 @api_router.get("/clubs/{club_id}")
@@ -5969,6 +6063,13 @@ async def get_onboarding_countries():
         {"code": "NZ", "name": "Nouvelle-Zélande"},
         {"code": "ZA", "name": "Afrique du Sud"},
         {"code": "MU", "name": "Île Maurice"},
+        {"code": "AD", "name": "Andorre"},
+        {"code": "OM", "name": "Oman"},
+        {"code": "KM", "name": "Comores"},
+        {"code": "PK", "name": "Pakistan"},
+        {"code": "MU-R", "name": "Île Rodrigues"},
+        {"code": "MG", "name": "Madagascar"},
+        {"code": "PF", "name": "Polynésie française"},
         {"code": "OTHER", "name": "Autre pays"}
     ]
     return {"countries": countries}

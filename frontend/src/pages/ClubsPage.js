@@ -226,24 +226,38 @@ const ClubsPage = () => {
     }
   };
 
-  const getTechnicalDirectorName = (id) => {
+  const getTechnicalDirectorName = (id, club) => {
+    // First try resolved data from backend
+    const resolved = club?.technical_directors_resolved?.find(d => d.id === id);
+    if (resolved) return resolved.full_name || resolved.name || 'Inconnu';
+    // Fallback to list
     const d = technicalDirectors.find(dir => dir.id === id);
     return d?.full_name || d?.name || 'Inconnu';
   };
 
-  const getNationalDirectorName = (id) => {
+  const getNationalDirectorName = (id, club) => {
+    const resolved = club?.national_directors_resolved?.find(d => d.id === id);
+    if (resolved) return resolved.full_name || resolved.name || 'Inconnu';
     const d = nationalDirectors.find(dir => dir.id === id);
     return d?.full_name || d?.name || 'Inconnu';
   };
 
-  const getInstructorName = (id) => {
+  const getInstructorName = (id, club) => {
+    const resolved = club?.instructors_resolved?.find(i => i.id === id);
+    if (resolved) return resolved.full_name || resolved.name || 'Inconnu';
     const i = instructorsList.find(inst => inst.id === id);
     return i?.full_name || i?.name || 'Inconnu';
   };
 
-  const getTechnicalDirector = (id) => technicalDirectors.find(d => d.id === id);
-  const getNationalDirector = (id) => nationalDirectors.find(d => d.id === id);
-  const getInstructor = (id) => instructorsList.find(i => i.id === id);
+  const getTechnicalDirector = (id, club) => {
+    return club?.technical_directors_resolved?.find(d => d.id === id) || technicalDirectors.find(d => d.id === id);
+  };
+  const getNationalDirector = (id, club) => {
+    return club?.national_directors_resolved?.find(d => d.id === id) || nationalDirectors.find(d => d.id === id);
+  };
+  const getInstructor = (id, club) => {
+    return club?.instructors_resolved?.find(i => i.id === id) || instructorsList.find(i => i.id === id);
+  };
 
   const filteredClubs = clubs.filter(club => {
     const matchesSearch = club.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -334,11 +348,11 @@ const ClubsPage = () => {
                     <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><UserCog className="w-3 h-3" />Directeurs Nationaux:</p>
                     <div className="flex flex-wrap gap-2">
                       {club.national_director_ids.map(id => {
-                        const director = getNationalDirector(id);
+                        const director = getNationalDirector(id, club);
                         return (
                           <div key={id} className="flex items-center gap-2 px-2 py-1 bg-purple-500/10 rounded-lg">
-                            <UserAvatar user={{ full_name: getNationalDirectorName(id), photo_url: director?.photo_url }} size="xs" />
-                            <span className="text-xs text-purple-400">{getNationalDirectorName(id)}</span>
+                            <UserAvatar user={{ full_name: getNationalDirectorName(id, club), photo_url: director?.photo_url }} size="xs" />
+                            <span className="text-xs text-purple-400">{getNationalDirectorName(id, club)}</span>
                           </div>
                         );
                       })}
@@ -352,11 +366,11 @@ const ClubsPage = () => {
                     <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><UserCog className="w-3 h-3" />Directeurs Techniques:</p>
                     <div className="flex flex-wrap gap-2">
                       {(club.technical_director_ids || [club.technical_director_id]).filter(Boolean).map(id => {
-                        const director = getTechnicalDirector(id);
+                        const director = getTechnicalDirector(id, club);
                         return (
                           <div key={id} className="flex items-center gap-2 px-2 py-1 bg-accent/10 rounded-lg">
-                            <UserAvatar user={{ full_name: getTechnicalDirectorName(id), photo_url: director?.photo_url }} size="xs" />
-                            <span className="text-xs text-accent">{getTechnicalDirectorName(id)}</span>
+                            <UserAvatar user={{ full_name: getTechnicalDirectorName(id, club), photo_url: director?.photo_url }} size="xs" />
+                            <span className="text-xs text-accent">{getTechnicalDirectorName(id, club)}</span>
                           </div>
                         );
                       })}
@@ -370,11 +384,11 @@ const ClubsPage = () => {
                     <p className="text-xs text-text-muted mb-2 flex items-center gap-1"><Users className="w-3 h-3" />Instructeurs:</p>
                     <div className="flex flex-wrap gap-2">
                       {club.instructor_ids.slice(0, 4).map(id => {
-                        const instructor = getInstructor(id);
+                        const instructor = getInstructor(id, club);
                         return (
                           <div key={id} className="flex items-center gap-2 px-2 py-1 bg-primary/10 rounded-lg">
-                            <UserAvatar user={{ full_name: getInstructorName(id), photo_url: instructor?.photo_url }} size="xs" />
-                            <span className="text-xs text-primary">{getInstructorName(id)}</span>
+                            <UserAvatar user={{ full_name: getInstructorName(id, club), photo_url: instructor?.photo_url }} size="xs" />
+                            <span className="text-xs text-primary">{getInstructorName(id, club)}</span>
                           </div>
                         );
                       })}
