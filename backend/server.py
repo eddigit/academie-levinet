@@ -1090,7 +1090,7 @@ def create_token(user_id: str, email: str) -> str:
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+        user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0, "photo": 0})
         if not user:
             raise HTTPException(status_code=401, detail="User not found")
         return user
@@ -1357,7 +1357,7 @@ async def update_profile(data: UserProfileUpdate, current_user: dict = Depends(g
         {"$set": update_data}
     )
     
-    updated_user = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "password_hash": 0})
+    updated_user = await db.users.find_one({"id": current_user['id']}, {"_id": 0, "password_hash": 0, "photo": 0})
     return updated_user
 
 @api_router.put("/profile/password")
@@ -1607,7 +1607,7 @@ async def get_all_users(
         query["belt_grade"] = belt_grade
 
     # Optimize query with projection to exclude password_hash and limit results
-    cursor = db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).skip(skip).limit(limit)
+    cursor = db.users.find(query, {"_id": 0, "password_hash": 0, "photo": 0}).sort("created_at", -1).skip(skip).limit(limit)
     users = await cursor.to_list(limit)
     total = await db.users.count_documents(query)
 
@@ -1808,10 +1808,10 @@ async def get_user_details(user_id: str, current_user: dict = Depends(get_curren
     """Admin/DT: Get full user details"""
     require_management(current_user)
     
-    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0, "photo": 0})
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
-    
+
     return user
 
 @api_router.put("/admin/users/{user_id}")
@@ -1890,7 +1890,7 @@ async def update_user(user_id: str, data: AdminUserUpdate, current_user: dict = 
             context_name=grade_context_name
         )
     
-    updated_user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    updated_user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0, "photo": 0})
     return {"message": "Utilisateur mis à jour", "user": updated_user}
 
 @api_router.put("/admin/users/{user_id}/password")
@@ -2078,7 +2078,7 @@ async def get_technical_directors(
 @api_router.get("/members/{member_id}")
 async def get_member_alias(member_id: str, current_user: dict = Depends(get_current_user)):
     """Alias: Récupère un utilisateur par ID"""
-    user = await db.users.find_one({"id": member_id}, {"_id": 0, "password_hash": 0})
+    user = await db.users.find_one({"id": member_id}, {"_id": 0, "password_hash": 0, "photo": 0})
     if not user:
         raise HTTPException(status_code=404, detail="Member not found")
     if user.get('full_name') and not user.get('first_name'):
@@ -2098,7 +2098,7 @@ async def update_member_alias(member_id: str, data: AdminUserUpdate, current_use
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Member not found")
 
-    updated = await db.users.find_one({"id": member_id}, {"_id": 0, "password_hash": 0})
+    updated = await db.users.find_one({"id": member_id}, {"_id": 0, "password_hash": 0, "photo": 0})
     return updated
 
 @api_router.post("/members")
@@ -3006,12 +3006,12 @@ async def create_conversation(data: ConversationCreate, current_user: dict = Dep
     recipient_name = "Utilisateur"
     
     # Check in users
-    recipient = await db.users.find_one({"id": data.recipient_id}, {"_id": 0})
+    recipient = await db.users.find_one({"id": data.recipient_id}, {"_id": 0, "photo": 0})
     if recipient:
         recipient_name = recipient['full_name']
     else:
         # Check in members
-        recipient = await db.members.find_one({"id": data.recipient_id}, {"_id": 0})
+        recipient = await db.members.find_one({"id": data.recipient_id}, {"_id": 0, "photo": 0})
         if recipient:
             recipient_name = f"{recipient['first_name']} {recipient['last_name']}"
         else:
@@ -3116,11 +3116,11 @@ async def send_message(conversation_id: str, data: MessageCreate, current_user: 
     other_participant_id = conversation['participants'][1] if conversation['participants'][0] == current_user['id'] else conversation['participants'][0]
     
     # Find recipient email
-    recipient = await db.users.find_one({"id": other_participant_id}, {"_id": 0})
+    recipient = await db.users.find_one({"id": other_participant_id}, {"_id": 0, "photo": 0})
     if not recipient:
-        recipient = await db.members.find_one({"id": other_participant_id}, {"_id": 0})
+        recipient = await db.members.find_one({"id": other_participant_id}, {"_id": 0, "photo": 0})
     if not recipient:
-        recipient = await db.technical_directors.find_one({"id": other_participant_id}, {"_id": 0})
+        recipient = await db.technical_directors.find_one({"id": other_participant_id}, {"_id": 0, "photo": 0})
     
     if recipient and recipient.get('email'):
         recipient_name = recipient.get('full_name') or recipient.get('name') or f"{recipient.get('first_name', '')} {recipient.get('last_name', '')}".strip()
@@ -3540,7 +3540,7 @@ async def get_online_users(current_user: dict = Depends(get_current_user)):
     for record in active_records:
         user = await db.users.find_one(
             {"id": record.get("user_id")},
-            {"_id": 0, "password_hash": 0}
+            {"_id": 0, "password_hash": 0, "photo": 0}
         )
         if user:
             online_users.append(user)
@@ -4506,7 +4506,7 @@ async def get_my_orders(current_user: dict = Depends(get_current_user)):
 @api_router.get("/membership/status")
 async def get_membership_status(current_user: dict = Depends(get_current_user)):
     """Get current user's membership status"""
-    user = await db.users.find_one({"id": current_user.get("id")}, {"_id": 0, "password_hash": 0})
+    user = await db.users.find_one({"id": current_user.get("id")}, {"_id": 0, "password_hash": 0, "photo": 0})
     return {
         "licence_paid": user.get("licence_paid", False),
         "licence_date": user.get("licence_date"),
@@ -5136,7 +5136,7 @@ async def get_members_subscriptions(current_user: dict = Depends(get_current_use
     
     members = await db.users.find(
         {"role": "member"},
-        {"_id": 0, "password_hash": 0}
+        {"_id": 0, "password_hash": 0, "photo": 0}
     ).sort("created_at", -1).to_list(500)
     
     # Calculate subscription status for each member
@@ -5233,7 +5233,7 @@ async def download_invoice_pdf(invoice_id: str, current_user: dict = Depends(get
         raise HTTPException(status_code=403, detail="Accès non autorisé")
     
     # Get user info
-    user = await db.users.find_one({"id": invoice["user_id"]}, {"_id": 0, "password_hash": 0})
+    user = await db.users.find_one({"id": invoice["user_id"]}, {"_id": 0, "password_hash": 0, "photo": 0})
     
     # Generate PDF
     buffer = io.BytesIO()
@@ -5925,7 +5925,7 @@ async def get_club_stats(club_id: str, current_user: dict = Depends(get_current_
     if not club:
         raise HTTPException(status_code=404, detail="Club non trouvé")
     
-    members = await db.users.find({"club_id": club_id}, {"_id": 0}).to_list(1000)
+    members = await db.users.find({"club_id": club_id}, {"_id": 0, "password_hash": 0, "photo": 0}).to_list(1000)
     
     # Calculate statistics
     stats = {
