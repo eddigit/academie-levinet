@@ -106,9 +106,16 @@ const PostCard = ({ post, onReact, onComment, onDelete, currentUserId }) => {
 
       {/* Post Content */}
       <div className="px-4 pb-3">
-        <p className="text-text-primary whitespace-pre-wrap">{post.content}</p>
+        {post.content && post.content.trim() && (
+          <p className="text-text-primary whitespace-pre-wrap">{post.content}</p>
+        )}
         {post.image_url && (
-          <img src={post.image_url} alt="" className="mt-3 rounded-lg max-h-96 w-full object-cover" />
+          <img
+            src={post.image_url}
+            alt=""
+            className="mt-3 rounded-lg max-h-96 w-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+            onClick={() => window.open(post.image_url, '_blank')}
+          />
         )}
       </div>
 
@@ -238,16 +245,83 @@ const CreatePost = ({ onPostCreated }) => {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = React.useRef(null);
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner un fichier image (JPG, PNG, GIF, etc.)');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('L\'image est trop volumineuse. Taille maximale : 10 Mo');
+      return;
+    }
+
+    setSelectedImage(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!content.trim() || isSubmitting) return;
+    if ((!content.trim() && !selectedImage) || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      const response = await api.post('/wall/posts', { content, post_type: 'text' });
+      let imageUrl = null;
+
+      // Upload image to Cloudinary if one is selected
+      if (selectedImage && imagePreview) {
+        setUploadingImage(true);
+        try {
+          const uploadResponse = await api.post('/upload/image', {
+            image_data: imagePreview
+          });
+          imageUrl = uploadResponse.data.url;
+        } catch (uploadError) {
+          console.error('Error uploading image:', uploadError);
+          alert('Erreur lors de l\'upload de l\'image. Veuillez réessayer.');
+          setIsSubmitting(false);
+          setUploadingImage(false);
+          return;
+        }
+        setUploadingImage(false);
+      }
+
+      const postData = {
+        content: content.trim() || ' ',
+        post_type: imageUrl ? 'image' : 'text',
+        image_url: imageUrl
+      };
+
+      const response = await api.post('/wall/posts', postData);
       onPostCreated(response.data);
       setContent('');
+      setSelectedImage(null);
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
       setIsExpanded(false);
     } catch (error) {
       console.error('Error creating post:', error);
@@ -270,9 +344,46 @@ const CreatePost = ({ onPostCreated }) => {
                 rows={4}
                 autoFocus
               />
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative mt-3 rounded-lg overflow-hidden border border-white/10">
+                  <img
+                    src={imagePreview}
+                    alt="Aperçu"
+                    className="max-h-64 w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-2">
-                  <button type="button" className="p-2 text-text-muted hover:text-primary hover:bg-white/5 rounded-lg transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`p-2 rounded-lg transition-colors ${
+                      selectedImage
+                        ? 'text-primary bg-primary/10'
+                        : 'text-text-muted hover:text-primary hover:bg-white/5'
+                    }`}
+                    title="Ajouter une image"
+                  >
                     <ImageIcon className="w-5 h-5" />
                   </button>
                   <TooltipProvider>
@@ -295,17 +406,19 @@ const CreatePost = ({ onPostCreated }) => {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => { setIsExpanded(false); setContent(''); }}
+                    onClick={() => { setIsExpanded(false); setContent(''); removeImage(); }}
                     className="px-4 py-2 text-text-muted hover:text-text-primary transition-colors"
                   >
                     Annuler
                   </button>
                   <button
                     type="submit"
-                    disabled={!content.trim() || isSubmitting}
+                    disabled={(!content.trim() && !selectedImage) || isSubmitting}
                     className="px-4 py-2 bg-primary text-white rounded-lg font-semibold disabled:opacity-50 hover:bg-primary-dark transition-colors"
                   >
-                    {isSubmitting ? 'Publication...' : 'Publier'}
+                    {isSubmitting
+                      ? (uploadingImage ? 'Upload image...' : 'Publication...')
+                      : 'Publier'}
                   </button>
                 </div>
               </div>
