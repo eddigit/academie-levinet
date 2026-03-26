@@ -59,11 +59,11 @@ const PublicFooter = () => {
           <ul className="space-y-4">
             <li className="flex items-center justify-center gap-3 text-text-secondary">
               <Mail className="w-4 h-4 text-primary" strokeWidth={1.5} />
-              <span className="font-manrope text-sm">{contact.email}</span>
+              <a href={`mailto:${contact.email}`} className="font-manrope text-sm hover:text-primary transition-colors">{contact.email}</a>
             </li>
             <li className="flex items-center justify-center gap-3 text-text-secondary">
               <Phone className="w-4 h-4 text-primary" strokeWidth={1.5} />
-              <span className="font-manrope text-sm">{contact.phone}</span>
+              <a href="https://wa.me/33698070851" target="_blank" rel="noopener noreferrer" className="font-manrope text-sm hover:text-primary transition-colors">{contact.phone}</a>
             </li>
             <li className="flex items-center justify-center gap-3 text-text-secondary">
               <MapPin className="w-4 h-4 text-primary flex-shrink-0" strokeWidth={1.5} />
@@ -104,7 +104,7 @@ const PublicFooter = () => {
         <div className="mt-12 pt-8 border-t border-white/5">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-text-muted font-manrope text-sm text-center md:text-left">
-              <p>{footer.copyright}</p>
+              <p><a href="/login" className="text-text-muted hover:text-text-muted cursor-default" title="">{footer.copyright}</a></p>
               <p className="text-xs text-text-muted/60 mt-1">
                 v{BUILD_INFO.version} • Build: {BUILD_INFO.date} {BUILD_INFO.time} • Commit: {BUILD_INFO.commitHash}
               </p>
