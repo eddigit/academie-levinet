@@ -30,7 +30,7 @@ const events = [
     location: 'Montpellier Ouest — Saint Jean de Védas',
     description: 'Stage de Krav Maga Self Pro Krav dirigé par le Capitaine Jacques Levinet, 10ème Dan. Ouvert à tous les niveaux.',
     contact: '06 98 07 08 51',
-    image: null,
+    image: 'https://res.cloudinary.com/dool0ngfx/image/upload/v1774536954/academie-levinet/events/qryfjtlmpb58lvhuo2oa.jpg',
     price: '50 €',
   },
 ];
