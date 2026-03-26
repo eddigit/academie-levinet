@@ -42,16 +42,7 @@ const PublicHeader = () => {
           >
             Boutique
           </Link>
-          {/* Bouton Connexion masqué — appli en stand by (cercle restreint uniquement) */}
-          {user && (
-            <Link
-              to="/dashboard"
-              data-testid="header-login-button"
-              className="px-4 lg:px-6 py-2 bg-primary hover:bg-primary-dark text-white text-sm lg:text-base font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)]"
-            >
-              Plateforme
-            </Link>
-          )}
+          {/* Bouton Connexion/Plateforme masqué — appli en stand by */}
         </div>
       </div>
     </header>
