@@ -1,5 +1,5 @@
-import React from 'react';
-import { Calendar, MapPin, Phone, Euro, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, MapPin, Phone, Euro, ChevronRight, X, ZoomIn } from 'lucide-react';
 import PublicLayout from '../components/PublicLayout';
 
 const events = [
@@ -35,16 +35,45 @@ const events = [
   },
 ];
 
-const EventCard = ({ event }) => (
+// Lightbox pour voir l'affiche en grand
+const ImageLightbox = ({ image, title, onClose }) => (
+  <div 
+    className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-4 cursor-pointer"
+    onClick={onClose}
+  >
+    <button 
+      onClick={onClose}
+      className="absolute top-4 right-4 text-white/80 hover:text-white bg-black/50 rounded-full p-2 z-10"
+    >
+      <X className="w-8 h-8" />
+    </button>
+    <img
+      src={image}
+      alt={title}
+      className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+      onClick={(e) => e.stopPropagation()}
+    />
+  </div>
+);
+
+const EventCard = ({ event, onImageClick }) => (
   <div className="bg-paper border border-white/10 rounded-xl overflow-hidden hover:border-primary/30 transition-all duration-300 group">
     {event.image ? (
-      <div className="aspect-[16/10] overflow-hidden">
+      <div 
+        className="aspect-[16/10] overflow-hidden relative cursor-pointer"
+        onClick={() => onImageClick(event.image, event.title)}
+      >
         <img
           src={event.image}
           alt={event.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/20 backdrop-blur-sm rounded-full p-3">
+            <ZoomIn className="w-6 h-6 text-white" />
+          </div>
+        </div>
       </div>
     ) : (
       <div className="aspect-[16/10] bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
@@ -83,8 +112,19 @@ const EventCard = ({ event }) => (
 );
 
 const PublicEventsPage = () => {
+  const [lightbox, setLightbox] = useState(null);
+
   return (
     <PublicLayout>
+      {/* Lightbox */}
+      {lightbox && (
+        <ImageLightbox 
+          image={lightbox.image} 
+          title={lightbox.title} 
+          onClose={() => setLightbox(null)} 
+        />
+      )}
+
       {/* Hero */}
       <section className="relative pt-32 pb-16 bg-gradient-to-b from-background via-background to-paper">
         <div className="container mx-auto px-4 text-center">
@@ -106,7 +146,11 @@ const PublicEventsPage = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {events.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard 
+                key={event.id} 
+                event={event} 
+                onImageClick={(image, title) => setLightbox({ image, title })}
+              />
             ))}
           </div>
         </div>
