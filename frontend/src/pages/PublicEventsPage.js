@@ -11,7 +11,7 @@ const events = [
     description: 'Stage de Krav Maga Self Pro Krav dirigé par le Capitaine Jacques Levinet, 10ème Dan. Ouvert à tous les niveaux.',
     contact: '06 98 07 08 51',
     image: 'https://res.cloudinary.com/dool0ngfx/image/upload/v1774535438/academie-levinet/events/viuffsdrwzw3hrk08nii.jpg',
-    price: null,
+    price: '50 €',
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ const events = [
     description: 'Stage de Krav Maga Self Pro Krav dirigé par le Capitaine Jacques Levinet, 10ème Dan. Ouvert à tous les niveaux.',
     contact: '06 98 07 08 51',
     image: null,
-    price: null,
+    price: '50 €',
   },
 ];
 
