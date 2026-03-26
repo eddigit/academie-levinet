@@ -7,12 +7,9 @@ import { ShoppingBag, Filter, Search, Star, ChevronRight, Check } from 'lucide-r
 
 const CATEGORIES = [
   { id: 'all', name: 'Tous les produits' },
-  { id: 'Mitaines', name: 'Mitaines' },
-  { id: 'Gants de Combat', name: 'Gants de Combat' },
-  { id: 'Casques', name: 'Casques' },
-  { id: 'Protections', name: 'Protections' },
-  { id: 'Kimonos', name: 'Kimonos' },
-  { id: 'Accessoires', name: 'Accessoires' },
+  { id: 'Livres', name: 'Livres' },
+  { id: 'Vidéos', name: 'Vidéos' },
+  { id: 'Matériel', name: 'Matériel' },
 ];
 
 const ProductCard = ({ product, onAddToCart }) => {
