@@ -48,6 +48,7 @@ const MemberGrades = lazy(() => import('./pages/member/MemberGrades'));
 const MemberSettingsPage = lazy(() => import('./pages/member/MemberSettingsPage'));
 const MemberShopPage = lazy(() => import('./pages/member/MemberShopPage'));
 const WalletPage = lazy(() => import('./pages/WalletPage'));
+const PublicEventsPage = lazy(() => import('./pages/PublicEventsPage'));
 const ShopPage = lazy(() => import('./pages/ShopPage'));
 const AdminProductsPage = lazy(() => import('./pages/AdminProductsPage'));
 const DashboardShopPage = lazy(() => import('./pages/DashboardShopPage'));
@@ -137,6 +138,7 @@ const AppContent = () => {
           <Route path="/international" element={<InternationalPage />} />
           <Route path="/kravmag" element={<KravMagAJLPage />} />
           <Route path="/editions" element={<EditionsAJLPage />} />
+          <Route path="/evenements" element={<PublicEventsPage />} />
           <Route path="/join" element={<JoinPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/trouver-club" element={<FindClubPage />} />
