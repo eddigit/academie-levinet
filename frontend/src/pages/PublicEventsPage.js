@@ -166,7 +166,7 @@ const PublicEventsPage = () => {
             Contactez-nous pour réserver votre place ou obtenir plus d'informations sur nos prochains événements.
           </p>
           <a
-            href="tel:+33698070851"
+            href="mailto:contact@academielevinet.com"
             className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]"
           >
             Nous Contacter
