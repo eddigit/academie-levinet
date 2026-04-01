@@ -55,7 +55,7 @@ const DisciplineCannePage = () => {
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
           <div className="inline-block px-4 py-2 bg-accent/10 border border-accent/30 rounded-sm mb-6">
-            <span className="text-accent font-oswald text-sm uppercase tracking-wider">Discipline Traditionnelle</span>
+            <span className="text-accent font-oswald text-sm uppercase tracking-wider">Méthode Moderne</span>
           </div>
           
           <h1 className="font-oswald text-5xl md:text-7xl font-bold text-text-primary uppercase mb-6 tracking-tight">

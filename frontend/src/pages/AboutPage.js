@@ -20,6 +20,7 @@ const AboutPage = () => {
       description: 'Organisation mère qui fédère l\'ensemble de la structure. Centre de décision et garant de la qualité pédagogique.',
       color: 'accent',
       icon: Award,
+      link: '/about',
     },
     {
       acronym: 'WKMO',
@@ -27,6 +28,7 @@ const AboutPage = () => {
       description: 'Branche civile rassemblant les pratiquants de self-défense du monde entier. Krav Maga, KAPAP, et Self Pro Krav pour tous.',
       color: 'primary',
       icon: Users,
+      link: '/disciplines/wkmo',
     },
     {
       acronym: 'IPC',
@@ -34,6 +36,7 @@ const AboutPage = () => {
       description: 'Branche professionnelle dédiée à l\'optimisation de l\'entraînement des forces de l\'ordre pour une efficacité opérationnelle maximale.',
       color: 'secondary',
       icon: Shield,
+      link: '/disciplines/ipc',
     },
   ];
 
@@ -131,9 +134,10 @@ const AboutPage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {pillars.map((pillar, idx) => (
-              <div 
+              <a
+                href={pillar.link}
                 key={idx} 
-                className={`bg-white/5 border border-white/10 rounded-lg p-8 hover:border-${pillar.color}/50 transition-all duration-300 group`}
+                className={`bg-white/5 border border-white/10 rounded-lg p-8 hover:border-${pillar.color}/50 transition-all duration-300 group cursor-pointer no-underline`}
               >
                 <div className={`w-16 h-16 rounded-lg bg-${pillar.color}/10 flex items-center justify-center mb-6 group-hover:bg-${pillar.color}/20 transition-colors`}>
                   <pillar.icon className={`w-8 h-8 text-${pillar.color}`} strokeWidth={1.5} />
@@ -147,7 +151,7 @@ const AboutPage = () => {
                 <p className="text-text-muted font-manrope leading-relaxed">
                   {pillar.description}
                 </p>
-              </div>
+              </a>
             ))}
           </div>
         </div>

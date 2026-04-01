@@ -9,6 +9,7 @@ const CATEGORIES = [
   { id: 'all', name: 'Tous les produits' },
   { id: 'Livres', name: 'Livres' },
   { id: 'Vidéos', name: 'Vidéos' },
+  { id: 'Tenue', name: 'Tenue' },
   { id: 'Matériel', name: 'Matériel' },
 ];
 
@@ -233,21 +234,7 @@ const ShopPage = () => {
                   </div>
                 </div>
 
-                {/* Premium Banner */}
-                <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl p-4 border border-primary/20">
-                  <p className="font-oswald text-sm font-bold text-primary uppercase mb-2">
-                    Membre Premium ?
-                  </p>
-                  <p className="text-text-secondary text-xs mb-3">
-                    Bénéficiez de 10% de remise sur tous les produits !
-                  </p>
-                  <Link
-                    to="/member/dashboard"
-                    className="text-primary text-xs font-semibold flex items-center gap-1 hover:underline"
-                  >
-                    En savoir plus <ChevronRight className="w-3 h-3" />
-                  </Link>
-                </div>
+                {/* Banner info boutique */}
               </div>
             </aside>
 

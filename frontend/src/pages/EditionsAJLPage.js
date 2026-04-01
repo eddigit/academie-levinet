@@ -240,7 +240,7 @@ const EditionsAJLPage = () => {
             </p>
             <div className="text-center">
               <a
-                href="mailto:contact@academielevinet.com?subject=Soumission%20d%27ouvrage"
+                href="mailto:editionsajl@academielevinet.com?subject=Soumission%20d%27ouvrage"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]"
               >
                 Soumettre Mon Ouvrage
