@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SiteContentProvider } from './context/SiteContentContext';
 import CartDrawer from './components/CartDrawer';
+import { CHATBOT_ENABLED } from './config/featureFlags';
 
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
@@ -92,7 +93,12 @@ const ProtectedRoute = ({ children }) => {
 const ChatWidgetWrapper = () => {
   const location = useLocation();
   const { user } = useAuth();
-  
+
+  // Kill switch global : si le chatbot est désactivé, on ne monte rien.
+  if (!CHATBOT_ENABLED) {
+    return null;
+  }
+
   // Pages where we don't show any chat
   const noChat = ['/login', '/onboarding', '/payment/success', '/payment/cancel'];
   if (noChat.some(path => location.pathname.startsWith(path))) {
