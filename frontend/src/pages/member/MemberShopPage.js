@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MemberSidebar from '../../components/MemberSidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { SHOWCASE_MODE } from '../../config/featureFlags';
 import api from '../../utils/api';
 import { ShoppingBag, Filter, Search, Star, Tag, Check } from 'lucide-react';
 
@@ -36,18 +37,18 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {isPremium && (
+        {!SHOWCASE_MODE && isPremium && (
           <span className="absolute top-3 right-3 px-2 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold rounded flex items-center gap-1">
             <Tag className="w-3 h-3" />
             -10%
           </span>
         )}
-        {product.stock < 5 && product.stock > 0 && (
+        {!SHOWCASE_MODE && product.stock < 5 && product.stock > 0 && (
           <span className="absolute top-3 left-3 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">
             Stock limité
           </span>
         )}
-        {product.stock === 0 && (
+        {!SHOWCASE_MODE && product.stock === 0 && (
           <span className="absolute top-3 left-3 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
             Rupture
           </span>
@@ -67,7 +68,7 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
         </p>
 
         {/* Sizes */}
-        {product.sizes && product.sizes.length > 0 && (
+        {!SHOWCASE_MODE && product.sizes && product.sizes.length > 0 && (
           <div className="mb-3">
             <div className="flex flex-wrap gap-1">
               {product.sizes.slice(0, 4).map((size) => (
@@ -93,7 +94,7 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
         {/* Price & Action */}
         <div className="flex items-center justify-between pt-3 border-t border-white/5">
           <div>
-            {isPremium ? (
+            {!SHOWCASE_MODE && isPremium ? (
               <div className="flex items-center gap-2">
                 <p className="font-oswald text-xl font-bold text-primary">{discountedPrice}€</p>
                 <p className="font-oswald text-sm text-text-muted line-through">{product.price.toFixed(2)}€</p>
@@ -102,27 +103,29 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
               <p className="font-oswald text-xl font-bold text-primary">{product.price.toFixed(2)}€</p>
             )}
           </div>
-          <button
-            onClick={handleAddToCart}
-            disabled={product.stock === 0 || added}
-            className={`flex items-center gap-1 px-3 py-2 rounded-lg font-semibold text-xs transition-all disabled:cursor-not-allowed ${
-              added 
-                ? 'bg-green-500 text-white' 
-                : 'bg-primary text-white hover:bg-primary-dark disabled:opacity-50'
-            }`}
-          >
-            {added ? (
-              <>
-                <Check className="w-3 h-3" />
-                Ajouté !
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="w-3 h-3" />
-                Ajouter
-              </>
-            )}
-          </button>
+          {!SHOWCASE_MODE && (
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0 || added}
+              className={`flex items-center gap-1 px-3 py-2 rounded-lg font-semibold text-xs transition-all disabled:cursor-not-allowed ${
+                added
+                  ? 'bg-green-500 text-white'
+                  : 'bg-primary text-white hover:bg-primary-dark disabled:opacity-50'
+              }`}
+            >
+              {added ? (
+                <>
+                  <Check className="w-3 h-3" />
+                  Ajouté !
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3 h-3" />
+                  Ajouter
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -178,22 +181,24 @@ const MemberShopPage = () => {
           </div>
           
           {/* Cart Button */}
-          <button
-            onClick={openCart}
-            className="relative flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span>Panier</span>
-            {getItemCount() > 0 && (
-              <span className="absolute -top-2 -right-2 w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                {getItemCount()}
-              </span>
-            )}
-          </button>
+          {!SHOWCASE_MODE && (
+            <button
+              onClick={openCart}
+              className="relative flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              <span>Panier</span>
+              {getItemCount() > 0 && (
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {getItemCount()}
+                </span>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Premium Banner */}
-        {!isPremium && (
+        {!SHOWCASE_MODE && !isPremium && (
           <div className="mb-6 p-4 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-xl border border-primary/30">
             <div className="flex items-center justify-between">
               <div>
@@ -207,7 +212,7 @@ const MemberShopPage = () => {
           </div>
         )}
 
-        {isPremium && (
+        {!SHOWCASE_MODE && isPremium && (
           <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
             <div className="flex items-center gap-3">
               <Star className="w-6 h-6 text-yellow-500" fill="currentColor" />

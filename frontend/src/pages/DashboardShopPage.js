@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { SHOWCASE_MODE } from '../config/featureFlags';
 import api from '../utils/api';
 import { ShoppingBag, Filter, Search, Star, Tag, Check, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -37,18 +38,18 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {isPremium && (
+        {!SHOWCASE_MODE && isPremium && (
           <span className="absolute top-3 right-3 px-2 py-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-bold rounded flex items-center gap-1">
             <Tag className="w-3 h-3" />
             -10%
           </span>
         )}
-        {product.stock < 5 && product.stock > 0 && (
+        {!SHOWCASE_MODE && product.stock < 5 && product.stock > 0 && (
           <span className="absolute top-3 left-3 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">
             Stock limité
           </span>
         )}
-        {product.stock === 0 && (
+        {!SHOWCASE_MODE && product.stock === 0 && (
           <span className="absolute top-3 left-3 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
             Rupture
           </span>
@@ -68,7 +69,7 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
         </p>
 
         {/* Sizes */}
-        {product.sizes && product.sizes.length > 0 && (
+        {!SHOWCASE_MODE && product.sizes && product.sizes.length > 0 && (
           <div className="mb-3">
             <div className="flex flex-wrap gap-1">
               {product.sizes.slice(0, 4).map((size) => (
@@ -94,7 +95,7 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
         {/* Price & Action */}
         <div className="flex items-center justify-between pt-3 border-t border-white/5">
           <div>
-            {isPremium ? (
+            {!SHOWCASE_MODE && isPremium ? (
               <div className="flex items-center gap-2">
                 <p className="font-oswald text-xl font-bold text-primary">{discountedPrice}€</p>
                 <p className="font-oswald text-sm text-text-muted line-through">{product.price.toFixed(2)}€</p>
@@ -103,29 +104,31 @@ const ProductCard = ({ product, isPremium, onAddToCart }) => {
               <p className="font-oswald text-xl font-bold text-text-primary">{product.price.toFixed(2)}€</p>
             )}
           </div>
-          <button
-            onClick={handleAddToCart}
-            disabled={product.stock === 0 || added}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-              added
-                ? 'bg-green-500 text-white'
-                : product.stock === 0
-                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                : 'bg-primary text-white hover:bg-primary-dark'
-            }`}
-          >
-            {added ? (
-              <>
-                <Check className="w-4 h-4" />
-                Ajouté
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="w-4 h-4" />
-                Ajouter
-              </>
-            )}
-          </button>
+          {!SHOWCASE_MODE && (
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0 || added}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                added
+                  ? 'bg-green-500 text-white'
+                  : product.stock === 0
+                  ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  : 'bg-primary text-white hover:bg-primary-dark'
+              }`}
+            >
+              {added ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  Ajouté
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4" />
+                  Ajouter
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -189,7 +192,7 @@ const DashboardShopPage = () => {
         </div>
 
         {/* Premium Banner */}
-        {!isPremium && (
+        {!SHOWCASE_MODE && !isPremium && (
           <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-primary-dark/10 rounded-xl border border-primary/20">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -206,7 +209,7 @@ const DashboardShopPage = () => {
           </div>
         )}
 
-        {isPremium && (
+        {!SHOWCASE_MODE && isPremium && (
           <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl border border-yellow-500/30">
             <div className="flex items-center gap-3">
               <Star className="w-6 h-6 text-yellow-500" fill="currentColor" />

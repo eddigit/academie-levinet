@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PublicLayout from '../components/PublicLayout';
 import { useCart } from '../context/CartContext';
+import { SHOWCASE_MODE } from '../config/featureFlags';
 import api from '../utils/api';
 import { ShoppingBag, Filter, Search, Star, ChevronRight, Check } from 'lucide-react';
 
@@ -39,12 +40,12 @@ const ProductCard = ({ product, onAddToCart }) => {
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        {product.stock < 5 && product.stock > 0 && (
+        {!SHOWCASE_MODE && product.stock < 5 && product.stock > 0 && (
           <span className="absolute top-3 left-3 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">
             Stock limité
           </span>
         )}
-        {product.stock === 0 && (
+        {!SHOWCASE_MODE && product.stock === 0 && (
           <span className="absolute top-3 left-3 px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
             Rupture
           </span>
@@ -64,7 +65,7 @@ const ProductCard = ({ product, onAddToCart }) => {
         </p>
 
         {/* Sizes */}
-        {product.sizes && product.sizes.length > 0 && (
+        {!SHOWCASE_MODE && product.sizes && product.sizes.length > 0 && (
           <div className="mb-4">
             <p className={`text-xs mb-2 ${sizeError ? 'text-red-500 font-semibold' : 'text-text-muted'}`}>
               {sizeError ? 'Veuillez sélectionner une taille' : 'Taille'}
@@ -97,27 +98,29 @@ const ProductCard = ({ product, onAddToCart }) => {
           <p className="font-oswald text-2xl font-bold text-primary">
             {product.price.toFixed(2)}€
           </p>
-          <button
-            onClick={handleAddToCart}
-            disabled={product.stock === 0 || added}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all disabled:cursor-not-allowed ${
-              added 
-                ? 'bg-green-500 text-white' 
-                : 'bg-primary text-white hover:bg-primary-dark disabled:opacity-50'
-            }`}
-          >
-            {added ? (
-              <>
-                <Check className="w-4 h-4" />
-                Ajouté !
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="w-4 h-4" />
-                Ajouter
-              </>
-            )}
-          </button>
+          {!SHOWCASE_MODE && (
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0 || added}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all disabled:cursor-not-allowed ${
+                added
+                  ? 'bg-green-500 text-white'
+                  : 'bg-primary text-white hover:bg-primary-dark disabled:opacity-50'
+              }`}
+            >
+              {added ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  Ajouté !
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4" />
+                  Ajouter
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -176,18 +179,20 @@ const ShopPage = () => {
             </p>
             
             {/* Cart Button */}
-            <button
-              onClick={openCart}
-              className="absolute right-0 top-0 flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors"
-            >
-              <ShoppingBag className="w-5 h-5" />
-              <span className="hidden sm:inline">Panier</span>
-              {cartCount > 0 && (
-                <span className="w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </button>
+            {!SHOWCASE_MODE && (
+              <button
+                onClick={openCart}
+                className="absolute right-0 top-0 flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors"
+              >
+                <ShoppingBag className="w-5 h-5" />
+                <span className="hidden sm:inline">Panier</span>
+                {cartCount > 0 && (
+                  <span className="w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </section>
