@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { X, ChevronRight, Shield, Users, Award, Target, Globe, BookOpen, UserPlus, Menu, Calendar } from 'lucide-react';
+import { X, ChevronRight, Shield, Users, Award, Target, Globe, BookOpen, UserPlus, Menu, Calendar, ShoppingBag } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
 
 const MegaMenu = () => {
@@ -63,6 +63,12 @@ const MegaMenu = () => {
       title: 'Événements',
       items: [
         { name: 'Stages & Événements', href: '/evenements', icon: Calendar, description: 'Calendrier des prochains stages' },
+      ]
+    },
+    {
+      title: 'Boutique',
+      items: [
+        { name: 'Catalogue', href: '/boutique', icon: ShoppingBag, description: 'Livres, vidéos, matériel officiel' },
       ]
     },
     {
