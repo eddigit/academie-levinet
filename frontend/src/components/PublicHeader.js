@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import MegaMenu from './MegaMenu';
+import LanguageSwitcher from './LanguageSwitcher';
 import { useAuth } from '../context/AuthContext';
 import { useSiteContent } from '../context/SiteContentContext';
 
@@ -42,6 +43,7 @@ const PublicHeader = () => {
           >
             Boutique
           </Link>
+          <LanguageSwitcher />
           {/* Bouton Connexion/Plateforme masqué — appli en stand by */}
         </div>
       </div>

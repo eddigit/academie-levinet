@@ -4,6 +4,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Google Translate widget — hide native chrome (we use our own FR/EN switcher) */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-gadget-icon,
+.goog-logo-link,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+iframe.goog-te-menu-frame {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
+.goog-te-gadget {
+  font-size: 0 !important;
+  color: transparent !important;
+}
+.goog-te-gadget > span,
+.goog-te-gadget .goog-te-combo {
+  display: none !important;
+}
+.skiptranslate iframe {
+  visibility: hidden !important;
+  height: 0 !important;
+}
+
 /* ==========================================
    MOBILE FIRST CSS - PWA OPTIMIZED
    ========================================== */
