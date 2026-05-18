@@ -113,6 +113,40 @@ const FounderPage = () => {
         </div>
       </section>
 
+      {/* CV Section */}
+      <section className="py-20 px-6 bg-paper">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="font-oswald text-4xl font-bold text-center text-text-primary uppercase mb-4 tracking-tight">
+            Son <span className="text-primary">Curriculum Vitæ</span>
+          </h2>
+          <p className="text-center text-text-muted font-manrope mb-12">
+            Un parcours d'excellence reconnu par les plus hautes instances militaires et sportives.
+          </p>
+
+          <div className="rounded-lg overflow-hidden border border-white/10 shadow-2xl bg-white">
+            <img
+              src="https://res.cloudinary.com/dniurvpzd/image/upload/v1779126597/WhatsApp_Image_2026-05-18_at_14.57.08_rjynnr.jpg"
+              alt={`CV de ${founderName}`}
+              className="w-full h-auto block"
+              loading="lazy"
+            />
+          </div>
+
+          <div className="flex justify-center mt-8">
+            <a
+              href="https://res.cloudinary.com/dniurvpzd/image/upload/fl_attachment:CV-Jacques-Levinet/v1779126597/WhatsApp_Image_2026-05-18_at_14.57.08_rjynnr.jpg"
+              download="CV-Jacques-Levinet.jpg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+            >
+              <Download className="w-5 h-5" strokeWidth={2} />
+              Télécharger le CV
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Philosophy Section */}
       <section className="py-20 px-6 bg-paper">
         <div className="container mx-auto max-w-4xl">
