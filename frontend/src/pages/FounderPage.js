@@ -1,7 +1,7 @@
 import React from 'react';
 import PublicLayout from '../components/PublicLayout';
 import { Link } from 'react-router-dom';
-import { Award, Shield, Globe, Star, ChevronRight, Loader2 } from 'lucide-react';
+import { Award, Shield, Globe, Star, ChevronRight, Loader2, Download } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
 
 const FounderPage = () => {
@@ -82,6 +82,17 @@ const FounderPage = () => {
                   </div>
                 ))}
               </div>
+
+              <a
+                href="https://res.cloudinary.com/dniurvpzd/image/upload/fl_attachment:CV-Jacques-Levinet/v1779126597/WhatsApp_Image_2026-05-18_at_14.57.08_rjynnr.jpg"
+                download="CV-Jacques-Levinet.jpg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-8 inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary hover:bg-primary-dark text-white font-oswald uppercase leading-none tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+              >
+                <Download className="w-5 h-5" strokeWidth={2} />
+                Télécharger le CV
+              </a>
             </div>
 
             {/* Image */}
